@@ -1,0 +1,14 @@
+project:
+  type: book
+
+book:
+  title: "Quarto Coverage Tracking"
+  subtitle: "Project Documentation"
+  chapters:
+    - index.qmd
+    - spec.qmd
+
+format:
+  html:
+    toc: true
+    number-sections: true

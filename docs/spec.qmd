@@ -1,0 +1,202 @@
+# Coverage Tracking Spec
+
+## Goal
+
+Add a portable coverage-tracking feature to Quarto books so students can quickly see what has already been covered in class, while allowing the professor to compare coverage across multiple sections of the same course.
+
+The solution should remain easy to copy into other Quarto books and should work with GitHub Pages hosting (static-first approach).
+
+## Scope
+
+### In scope (initial release)
+
+- Track coverage at the section-header level using explicit section IDs (for example, `## Topic {#sec-topic}`).
+- Persist per-section coverage data in version-controlled files (no hosted database required).
+- Render student-facing highlighting for "covered" material based on selected class section.
+- Require section selection before content is fully readable.
+- Support professor mode for viewing one or multiple sections at once.
+- Provide a minimal workflow for offline coverage updates and republishing.
+
+### Out of scope (initial release)
+
+- Real-time writes from the hosted website back to server-side storage.
+- Authentication/authorization infrastructure.
+- Hosted databases and backend APIs.
+- Fine-grained analytics beyond covered/not covered at section level.
+
+## Assumptions and constraints
+
+- Books are published as static HTML (for example, GitHub Pages).
+- Client-side JavaScript can read static JSON files but cannot safely write back to hosted files.
+- Coverage updates can be performed offline by the professor and then committed/published.
+- Reliable section tracking requires stable section IDs in source `.qmd` files.
+
+## Functional requirements
+
+### FR-1: Coverage identity
+
+- Coverage is keyed by:
+  - Book page path (or canonical URL path),
+  - Section ID,
+  - Course section code (for example, `MATH101-01`).
+
+### FR-2: Student section selection
+
+- On first visit, the reader must choose exactly one class section from a configured list.
+- Until selected, page content is visually blurred with a clear selector UI.
+- Selected section is stored locally (for example, `localStorage`) for future visits.
+
+### FR-3: Student highlighting
+
+- After selection, sections covered for that class section are visually highlighted (default: light green background).
+- Sections without coverage remain unstyled.
+
+### FR-4: Professor mode
+
+- Professor mode is enabled by URL parameter (for example, `?prof=true`).
+- In professor mode, user can select multiple class sections.
+- Visuals differentiate:
+  - Covered by all selected sections,
+  - Covered by some selected sections,
+  - Covered by individual section(s) only.
+
+### FR-5: Offline update workflow
+
+- Coverage data can be edited offline in a source file and republished with the book.
+- Data format should remain human-readable and merge-friendly.
+
+## Proposed architecture
+
+### 1) Authoring conventions in Quarto content
+
+- Enforce section IDs for trackable headers:
+  - Example: `## Limits Review {#sec-limits-review}`
+- Provide a lightweight rule/checklist for new content to include stable IDs.
+
+### 2) Static configuration and data files
+
+- `coverage-config.json`:
+  - Available class sections,
+  - Color mapping,
+  - Optional labels and defaults.
+- `coverage-data.json`:
+  - Coverage records by class section and page/section ID.
+- Both files are shipped with the static site and loaded client-side.
+
+### 3) Frontend addon (portable JS/CSS)
+
+- `coverage-tracker.js`:
+  - Detect page path,
+  - Read URL parameters,
+  - Load config/data JSON,
+  - Render selection UI,
+  - Apply section highlighting,
+  - Persist chosen section(s).
+- `coverage-tracker.css`:
+  - Blur overlay before selection,
+  - Student highlight styles,
+  - Professor multi-state styles.
+
+### 4) Quarto integration
+
+- Include addon assets in each book through Quarto configuration and/or partial includes.
+- Keep install instructions short so files can be copied into other books.
+
+## Sample demo Quarto book
+
+Create a working sample book that demonstrates the coverage-tracking behavior end-to-end.
+
+### Required location
+
+- The sample book will be created at `sampleBooks/sample1/`.
+
+### Purpose
+
+- Provide a safe sandbox for testing before copying into course production books.
+- Serve as a reference implementation for folder structure, config, and setup.
+- Make regressions easy to catch while iterating on JavaScript/CSS behavior.
+
+### Planned contents of `sampleBooks/sample1/`
+
+- Quarto book scaffold (`_quarto.yml`, `index.qmd`, and at least one chapter page).
+- Headers with explicit section IDs to test coverage mapping.
+- Coverage addon assets (`coverage-tracker.js`, `coverage-tracker.css`).
+- Static data files (`coverage-config.json`, `coverage-data.json`) with at least two course sections.
+- A short README with render/test instructions for student mode and professor mode.
+
+### Demo acceptance criteria
+
+- Rendering the sample produces HTML with the addon enabled.
+- Student mode enforces single-section selection and highlights covered sections.
+- Professor mode (`?prof=true`) supports multi-select and overlap visualization.
+- Coverage JSON can be edited locally, re-rendered, and reflected in the output.
+
+## Data model (initial)
+
+```json
+{
+  "version": 1,
+  "sections": ["MATH101-01", "MATH101-02"],
+  "coverage": {
+    "MATH101-01": {
+      "/chapter-1.html": ["sec-limits-review", "sec-continuity-basics"]
+    },
+    "MATH101-02": {
+      "/chapter-1.html": ["sec-limits-review"]
+    }
+  }
+}
+```
+
+## UX behavior
+
+### Student mode (default)
+
+1. Page loads.
+2. If no section in storage, blur content and show section dropdown.
+3. On selection, unblur content and highlight covered sections.
+4. Persist selection for next visit.
+
+### Professor mode (`?prof=true`)
+
+1. Page loads in professor controls mode.
+2. Show multi-select for sections.
+3. Apply visual encoding for overlap/all/some coverage.
+4. Allow quick toggle/reset of selected sections.
+
+## Phased implementation plan
+
+### Phase 1: MVP data + student highlighting
+
+- Define JSON schema and sample data.
+- Implement page + section matching logic.
+- Implement single-section selector and local persistence.
+- Implement default student highlight style.
+
+### Phase 2: Professor comparison mode
+
+- Add URL parameter handling.
+- Add multi-select UI.
+- Add overlap color logic and legend.
+
+### Phase 3: Portability and docs
+
+- Package assets for easy copy/paste into other books.
+- Add setup instructions and conventions for section IDs.
+- Add maintenance guidance for updating coverage data.
+
+## Risks and mitigations
+
+- Missing/unstable section IDs:
+  - Mitigation: require explicit IDs and document conventions.
+- URL/path mismatches after book structure changes:
+  - Mitigation: normalize paths and document republish checks.
+- Style conflicts with existing book themes:
+  - Mitigation: namespace CSS classes and keep selectors specific.
+
+## Definition of done (initial implementation)
+
+- A Quarto book can load static coverage JSON and highlight covered sections for a selected class section.
+- Section selection is required on first visit and persisted locally.
+- Professor mode can compare multiple sections with distinct visual states.
+- Feature files are documented and easy to copy into another Quarto book.

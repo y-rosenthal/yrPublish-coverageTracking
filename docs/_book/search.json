@@ -1,0 +1,132 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Quarto Coverage Tracking",
+    "section": "",
+    "text": "1 Documentation Home\nThis Quarto book documents the coverage-tracking feature described in the repository README.md.\nUse the chapters in this book to track implementation decisions, scope, and progress.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Documentation Home</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#current-chapters",
+    "href": "index.html#current-chapters",
+    "title": "Quarto Coverage Tracking",
+    "section": "1.1 Current chapters",
+    "text": "1.1 Current chapters\n\nspec.qmd: functional and technical specification for the first implementation.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Documentation Home</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html",
+    "href": "spec.html",
+    "title": "2  Coverage Tracking Spec",
+    "section": "",
+    "text": "2.1 Goal\nAdd a portable coverage-tracking feature to Quarto books so students can quickly see what has already been covered in class, while allowing the professor to compare coverage across multiple sections of the same course.\nThe solution should remain easy to copy into other Quarto books and should work with GitHub Pages hosting (static-first approach).",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#scope",
+    "href": "spec.html#scope",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.2 Scope",
+    "text": "2.2 Scope\n\n2.2.1 In scope (initial release)\n\nTrack coverage at the section-header level using explicit section IDs (for example, ## Topic {#sec-topic}).\nPersist per-section coverage data in version-controlled files (no hosted database required).\nRender student-facing highlighting for “covered” material based on selected class section.\nRequire section selection before content is fully readable.\nSupport professor mode for viewing one or multiple sections at once.\nProvide a minimal workflow for offline coverage updates and republishing.\n\n\n\n2.2.2 Out of scope (initial release)\n\nReal-time writes from the hosted website back to server-side storage.\nAuthentication/authorization infrastructure.\nHosted databases and backend APIs.\nFine-grained analytics beyond covered/not covered at section level.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#assumptions-and-constraints",
+    "href": "spec.html#assumptions-and-constraints",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.3 Assumptions and constraints",
+    "text": "2.3 Assumptions and constraints\n\nBooks are published as static HTML (for example, GitHub Pages).\nClient-side JavaScript can read static JSON files but cannot safely write back to hosted files.\nCoverage updates can be performed offline by the professor and then committed/published.\nReliable section tracking requires stable section IDs in source .qmd files.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#functional-requirements",
+    "href": "spec.html#functional-requirements",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.4 Functional requirements",
+    "text": "2.4 Functional requirements\n\n2.4.1 FR-1: Coverage identity\n\nCoverage is keyed by:\n\nBook page path (or canonical URL path),\nSection ID,\nCourse section code (for example, MATH101-01).\n\n\n\n\n2.4.2 FR-2: Student section selection\n\nOn first visit, the reader must choose exactly one class section from a configured list.\nUntil selected, page content is visually blurred with a clear selector UI.\nSelected section is stored locally (for example, localStorage) for future visits.\n\n\n\n2.4.3 FR-3: Student highlighting\n\nAfter selection, sections covered for that class section are visually highlighted (default: light green background).\nSections without coverage remain unstyled.\n\n\n\n2.4.4 FR-4: Professor mode\n\nProfessor mode is enabled by URL parameter (for example, ?prof=true).\nIn professor mode, user can select multiple class sections.\nVisuals differentiate:\n\nCovered by all selected sections,\nCovered by some selected sections,\nCovered by individual section(s) only.\n\n\n\n\n2.4.5 FR-5: Offline update workflow\n\nCoverage data can be edited offline in a source file and republished with the book.\nData format should remain human-readable and merge-friendly.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#proposed-architecture",
+    "href": "spec.html#proposed-architecture",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.5 Proposed architecture",
+    "text": "2.5 Proposed architecture\n\n2.5.1 1) Authoring conventions in Quarto content\n\nEnforce section IDs for trackable headers:\n\nExample: ## Limits Review {#sec-limits-review}\n\nProvide a lightweight rule/checklist for new content to include stable IDs.\n\n\n\n2.5.2 2) Static configuration and data files\n\ncoverage-config.json:\n\nAvailable class sections,\nColor mapping,\nOptional labels and defaults.\n\ncoverage-data.json:\n\nCoverage records by class section and page/section ID.\n\nBoth files are shipped with the static site and loaded client-side.\n\n\n\n2.5.3 3) Frontend addon (portable JS/CSS)\n\ncoverage-tracker.js:\n\nDetect page path,\nRead URL parameters,\nLoad config/data JSON,\nRender selection UI,\nApply section highlighting,\nPersist chosen section(s).\n\ncoverage-tracker.css:\n\nBlur overlay before selection,\nStudent highlight styles,\nProfessor multi-state styles.\n\n\n\n\n2.5.4 4) Quarto integration\n\nInclude addon assets in each book through Quarto configuration and/or partial includes.\nKeep install instructions short so files can be copied into other books.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#sample-demo-quarto-book",
+    "href": "spec.html#sample-demo-quarto-book",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.6 Sample demo Quarto book",
+    "text": "2.6 Sample demo Quarto book\nCreate a working sample book that demonstrates the coverage-tracking behavior end-to-end.\n\n2.6.1 Required location\n\nThe sample book will be created at sampleBooks/sample1/.\n\n\n\n2.6.2 Purpose\n\nProvide a safe sandbox for testing before copying into course production books.\nServe as a reference implementation for folder structure, config, and setup.\nMake regressions easy to catch while iterating on JavaScript/CSS behavior.\n\n\n\n2.6.3 Planned contents of sampleBooks/sample1/\n\nQuarto book scaffold (_quarto.yml, index.qmd, and at least one chapter page).\nHeaders with explicit section IDs to test coverage mapping.\nCoverage addon assets (coverage-tracker.js, coverage-tracker.css).\nStatic data files (coverage-config.json, coverage-data.json) with at least two course sections.\nA short README with render/test instructions for student mode and professor mode.\n\n\n\n2.6.4 Demo acceptance criteria\n\nRendering the sample produces HTML with the addon enabled.\nStudent mode enforces single-section selection and highlights covered sections.\nProfessor mode (?prof=true) supports multi-select and overlap visualization.\nCoverage JSON can be edited locally, re-rendered, and reflected in the output.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#data-model-initial",
+    "href": "spec.html#data-model-initial",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.7 Data model (initial)",
+    "text": "2.7 Data model (initial)\n{\n  \"version\": 1,\n  \"sections\": [\"MATH101-01\", \"MATH101-02\"],\n  \"coverage\": {\n    \"MATH101-01\": {\n      \"/chapter-1.html\": [\"sec-limits-review\", \"sec-continuity-basics\"]\n    },\n    \"MATH101-02\": {\n      \"/chapter-1.html\": [\"sec-limits-review\"]\n    }\n  }\n}",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#ux-behavior",
+    "href": "spec.html#ux-behavior",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.8 UX behavior",
+    "text": "2.8 UX behavior\n\n2.8.1 Student mode (default)\n\nPage loads.\nIf no section in storage, blur content and show section dropdown.\nOn selection, unblur content and highlight covered sections.\nPersist selection for next visit.\n\n\n\n2.8.2 Professor mode (?prof=true)\n\nPage loads in professor controls mode.\nShow multi-select for sections.\nApply visual encoding for overlap/all/some coverage.\nAllow quick toggle/reset of selected sections.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#phased-implementation-plan",
+    "href": "spec.html#phased-implementation-plan",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.9 Phased implementation plan",
+    "text": "2.9 Phased implementation plan\n\n2.9.1 Phase 1: MVP data + student highlighting\n\nDefine JSON schema and sample data.\nImplement page + section matching logic.\nImplement single-section selector and local persistence.\nImplement default student highlight style.\n\n\n\n2.9.2 Phase 2: Professor comparison mode\n\nAdd URL parameter handling.\nAdd multi-select UI.\nAdd overlap color logic and legend.\n\n\n\n2.9.3 Phase 3: Portability and docs\n\nPackage assets for easy copy/paste into other books.\nAdd setup instructions and conventions for section IDs.\nAdd maintenance guidance for updating coverage data.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#risks-and-mitigations",
+    "href": "spec.html#risks-and-mitigations",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.10 Risks and mitigations",
+    "text": "2.10 Risks and mitigations\n\nMissing/unstable section IDs:\n\nMitigation: require explicit IDs and document conventions.\n\nURL/path mismatches after book structure changes:\n\nMitigation: normalize paths and document republish checks.\n\nStyle conflicts with existing book themes:\n\nMitigation: namespace CSS classes and keep selectors specific.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  },
+  {
+    "objectID": "spec.html#definition-of-done-initial-implementation",
+    "href": "spec.html#definition-of-done-initial-implementation",
+    "title": "2  Coverage Tracking Spec",
+    "section": "2.11 Definition of done (initial implementation)",
+    "text": "2.11 Definition of done (initial implementation)\n\nA Quarto book can load static coverage JSON and highlight covered sections for a selected class section.\nSection selection is required on first visit and persisted locally.\nProfessor mode can compare multiple sections with distinct visual states.\nFeature files are documented and easy to copy into another Quarto book.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
+    ]
+  }
+]

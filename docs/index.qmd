@@ -1,0 +1,9 @@
+# Documentation Home
+
+This Quarto book documents the coverage-tracking feature described in the repository `README.md`.
+
+Use the chapters in this book to track implementation decisions, scope, and progress.
+
+## Current chapters
+
+- `spec.qmd`: functional and technical specification for the first implementation.

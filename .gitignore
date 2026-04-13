@@ -1,0 +1,5 @@
+.DS_Store
+/.quarto/
+.quarto.save
+**/*.quarto_ipynb
+
