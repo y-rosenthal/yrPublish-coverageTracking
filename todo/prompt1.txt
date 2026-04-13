@@ -1,0 +1,30 @@
+I would like the coverage-data to be more readable and maintainable by humans. Therefore, don't use JSON. Also use a different file for each section. These should be CSV files that contain lines such as:
+
+URL,html-id,covered
+
+or
+
+URL,html-id,not-covered
+
+If there is no entry for a particular URL,html-id, the default logic is that it was not covered. However, if a line in the csv appears as:
+
+URL,html-id
+
+or
+
+URL,html-id,
+
+then the default should be tha it WAS covered. This allows for these files to be either easier to read by listing all sections or smaller by not-listing some sections taht were not covered. If a new section is added to the text without updating the coverage the coverage will symantically indicate that it wasn't covered yet.
+
+Continue to use the JSON for the coverage-config.json file.
+
+Also please create a USER-GUIDE.qmd file (in Quarto markdown) and add it to the docs book that explains to a professor how to use this system. I don't think a student needs any documentation to read the website - it's easy to understand how to pick their section.
+
+Also I would like some tools for professors and content editors.
+
+1. A bash script named yrAddSectionsIds.sh, that takes a .qmd file as input and outputs a new version of the .qmd that adds html-ids to any section that didn't already have one. Make sure to skip quarto code blocks so that # signs in the code block aren't mistaken for Quarto headings.
+
+2. A bash script named yrUpdateCoverage.sh that takes one or more .qmd files as input as well as a coverage.csv file (as described) for a section. The script should be assumed to be run from inside a Quarto project that uses this system. The script should output a new .csv file that adds any missing html-ids for the .qmd files.
+
+3. Design a way for a professor to use the website's UI to create and edit these .csv files.
+
