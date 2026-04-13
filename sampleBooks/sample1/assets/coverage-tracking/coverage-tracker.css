@@ -125,3 +125,9 @@ body.ct-needs-selection #quarto-content {
   border-radius: 0.28rem;
   padding: 0.05rem 0.25rem;
 }
+
+.ct-prof-section-link .menu-text {
+  border-radius: 0.28rem;
+  padding: 0.06rem 0.3rem;
+  font-weight: 700;
+}

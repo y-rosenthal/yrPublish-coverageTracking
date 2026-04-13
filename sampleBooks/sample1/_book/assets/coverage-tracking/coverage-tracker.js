@@ -300,14 +300,79 @@
     return item;
   }
 
+  function createProfessorControlItem(labelText, color, onOpenChooser) {
+    var item = createElement("li", { class: "sidebar-item ct-prof-sidebar-item" });
+    var container = createElement("div", { class: "sidebar-item-container" });
+    var link = createElement(
+      "a",
+      { href: "#", class: "sidebar-item-text sidebar-link ct-prof-section-link" },
+      ""
+    );
+    var text = createElement("span", { class: "menu-text" }, labelText);
+    if (color) {
+      text.style.backgroundColor = color;
+      text.style.color = "#fff";
+    }
+    link.appendChild(text);
+    link.addEventListener("click", function (evt) {
+      evt.preventDefault();
+      onOpenChooser();
+    });
+    container.appendChild(link);
+    item.appendChild(container);
+    return item;
+  }
+
+  function getSidebarMenuList() {
+    return (
+      document.querySelector("#quarto-sidebar .sidebar-menu-container > ul") ||
+      document.querySelector("#quarto-sidebar ul.list-unstyled.mt-1") ||
+      document.querySelector("#quarto-sidebar ul.list-unstyled")
+    );
+  }
+
+  function clearProfessorControls() {
+    document.querySelectorAll(".ct-prof-sidebar-item").forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  function clearStudentControls() {
+    document.querySelectorAll(".ct-sidebar-item").forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  function mountProfessorControls(config, selectedSectionIds, onOpenChooser) {
+    clearProfessorControls();
+    var sidebarMenu = getSidebarMenuList();
+    if (!sidebarMenu) {
+      return;
+    }
+
+    if (!selectedSectionIds.length) {
+      var emptyItem = createProfessorControlItem("Choose section(s)", "", onOpenChooser);
+      sidebarMenu.prepend(emptyItem);
+      return;
+    }
+
+    var colors = sectionColorMap(config);
+    // Preserve visual order with first selected section at top.
+    selectedSectionIds
+      .slice()
+      .reverse()
+      .forEach(function (sectionId) {
+        var label = getSectionLabel(config, sectionId) || sectionId;
+        var item = createProfessorControlItem(label, colors[sectionId] || "", onOpenChooser);
+        sidebarMenu.prepend(item);
+      });
+  }
+
   function mountStudentControls(controlElement) {
     if (document.querySelector(".ct-sidebar-item")) {
       return;
     }
-    var sidebarMenu =
-      document.querySelector("#quarto-sidebar .sidebar-menu-container > ul") ||
-      document.querySelector("#quarto-sidebar ul.list-unstyled.mt-1") ||
-      document.querySelector("#quarto-sidebar ul.list-unstyled");
+    var sidebarMenu = getSidebarMenuList();
     if (sidebarMenu) {
       sidebarMenu.prepend(controlElement);
       return;
@@ -328,6 +393,7 @@
   function init(config, data) {
     var profMode = isProfessorMode();
     if (profMode) {
+      clearStudentControls();
       var stored = localStorage.getItem(STORAGE_KEY_PROF);
       var selected = [];
       if (stored) {
@@ -337,14 +403,27 @@
           selected = [];
         }
       }
+      function openProfessorChooser() {
+        var existing = document.getElementById("ct-overlay");
+        if (existing) {
+          existing.remove();
+        }
+        var panel = createProfessorPanel(config, selected, function (ids) {
+          selected = ids;
+          localStorage.setItem(STORAGE_KEY_PROF, JSON.stringify(ids));
+          applyProfessorCoverage(ids, config, data);
+          mountProfessorControls(config, ids, openProfessorChooser);
+        });
+        document.body.appendChild(panel);
+      }
+
       applyProfessorCoverage(selected, config, data);
-      var panel = createProfessorPanel(config, selected, function (ids) {
-        localStorage.setItem(STORAGE_KEY_PROF, JSON.stringify(ids));
-        applyProfessorCoverage(ids, config, data);
-      });
-      document.body.appendChild(panel);
+      mountProfessorControls(config, selected, openProfessorChooser);
+      openProfessorChooser();
       return;
     }
+
+    clearProfessorControls();
 
     if (shouldResetStudentSelection()) {
       getStudentStorage().removeItem(STORAGE_KEY_STUDENT);

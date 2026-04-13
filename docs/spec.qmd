@@ -58,6 +58,9 @@ The solution should remain easy to copy into other Quarto books and should work 
 - Professor mode is enabled by URL parameter `?prof` or `?prof=true`.
 - In professor mode, user can select zero or more class sections.
 - Professor selection UI uses explicit checkboxes (not keyboard-dependent multi-select controls).
+- Chosen professor sections are shown at the top of the left sidebar as clickable, color-coded entries.
+- Clicking any professor sidebar entry re-opens the section chooser.
+- If no sections are selected, show one sidebar entry labeled `Choose section(s)`.
 - Visuals differentiate:
   - Covered by all selected sections,
   - Covered by some selected sections,
