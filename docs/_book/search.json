@@ -124,7 +124,7 @@
     "href": "spec.html#definition-of-done-initial-implementation",
     "title": "2  Coverage Tracking Spec",
     "section": "2.11 Definition of done (initial implementation)",
-    "text": "2.11 Definition of done (initial implementation)\n\nA Quarto book can load static coverage JSON and highlight covered sections for a selected class section.\nSection selection is required on first visit and persisted locally.\nProfessor mode can compare multiple sections with distinct visual states.\nFeature files are documented and easy to copy into another Quarto book.",
+    "text": "2.11 Definition of done (initial implementation)\n\nA Quarto book can load static coverage JSON and highlight covered sections for a selected class section.\nSection selection is required on first visit and persisted for the current browser tab/session.\nProfessor mode can compare multiple sections with distinct visual states.\nFeature files are documented and easy to copy into another Quarto book.",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
     ]

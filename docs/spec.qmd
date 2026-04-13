@@ -210,6 +210,6 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 ## Definition of done (initial implementation)
 
 - A Quarto book can load static coverage JSON and highlight covered sections for a selected class section.
-- Section selection is required on first visit and persisted locally.
+- Section selection is required on first visit and persisted for the current browser tab/session.
 - Professor mode can compare multiple sections with distinct visual states.
 - Feature files are documented and easy to copy into another Quarto book.
