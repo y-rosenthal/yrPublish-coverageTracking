@@ -50,6 +50,38 @@
     });
   }
 
+  function getTrackerBasePath() {
+    var script =
+      document.currentScript ||
+      document.querySelector("script[src*='coverage-tracking/coverage-tracker.js']") ||
+      document.querySelector("script[src$='coverage-tracker.js']");
+    if (!script) {
+      return "assets/coverage-tracking/";
+    }
+    var src = script.getAttribute("src") || "";
+    // Keep this path relative so it works on localhost and GitHub Pages subpaths.
+    return src.replace(/coverage-tracker\.js(\?.*)?$/, "");
+  }
+
+  function showTrackerLoadError(message) {
+    var existing = document.getElementById("ct-load-error");
+    if (existing) {
+      return;
+    }
+    var panel = createElement("div", { id: "ct-load-error", class: "ct-overlay" });
+    var content = createElement("div", { class: "ct-panel", role: "alert" });
+    content.appendChild(createElement("h2", null, "Coverage tracker failed to load"));
+    content.appendChild(
+      createElement(
+        "p",
+        null,
+        message || "Could not load coverage files. Refresh the page or check asset paths."
+      )
+    );
+    panel.appendChild(content);
+    document.body.appendChild(panel);
+  }
+
   function clearCoverageStyles() {
     document.querySelectorAll(".ct-covered, .ct-covered-all, .ct-covered-some").forEach(function (el) {
       el.classList.remove("ct-covered", "ct-covered-all", "ct-covered-some");
@@ -306,15 +338,17 @@
   }
 
   function boot() {
+    var basePath = getTrackerBasePath();
     Promise.all([
-      fetchJson("assets/coverage-config.json"),
-      fetchJson("assets/coverage-data.json")
+      fetchJson(basePath + "coverage-config.json"),
+      fetchJson(basePath + "coverage-data.json")
     ])
       .then(function (loaded) {
         init(loaded[0], loaded[1]);
       })
       .catch(function (err) {
         console.error("Coverage tracker initialization failed", err);
+        showTrackerLoadError("Could not load coverage config/data from " + basePath);
       });
   }
 

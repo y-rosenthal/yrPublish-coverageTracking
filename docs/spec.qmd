@@ -127,8 +127,9 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 
 - Quarto book scaffold (`_quarto.yml`, `index.qmd`, and at least one chapter page).
 - Headers with explicit section IDs to test coverage mapping.
-- Coverage addon assets (`coverage-tracker.js`, `coverage-tracker.css`).
-- Static data files (`coverage-config.json`, `coverage-data.json`) with at least two course sections.
+- Feature assets grouped in `assets/coverage-tracking/` for portability into a larger `yrPublish` repository.
+- Coverage addon assets (`coverage-tracker.js`, `coverage-tracker.css`) in that subfolder.
+- Static data files (`coverage-config.json`, `coverage-data.json`) in that subfolder with at least two course sections.
 - A short README with render/test instructions for student mode and professor mode.
 
 ### Demo acceptance criteria

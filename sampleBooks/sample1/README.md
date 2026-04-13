@@ -19,7 +19,7 @@ Output is written to `sampleBooks/sample1/_book/`.
   - Confirm the page is blurred until one class section is selected
   - Confirm the same blur + picker appears when opening deep links (for example `chapter1.html#sec-continuity-basics`) before any section is saved
   - Confirm covered sections are highlighted after selection
-  - Click "Change section" to clear selection and re-open the picker
+  - Click "change class section" to clear selection and re-open the picker
   - Confirm `?resetSection=true` also clears the saved student selection and shows the picker again
 
 - Professor mode:
@@ -30,4 +30,4 @@ Output is written to `sampleBooks/sample1/_book/`.
 
 ## Update coverage
 
-Edit `assets/coverage-data.json` and render again to publish updated highlights.
+Edit `assets/coverage-tracking/coverage-data.json` and render again to publish updated highlights.
