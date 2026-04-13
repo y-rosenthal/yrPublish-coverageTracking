@@ -1,0 +1,19 @@
+project:
+  type: book
+  resources:
+    - assets/coverage-config.json
+    - assets/coverage-data.json
+
+book:
+  title: "Coverage Tracker Demo Book"
+  subtitle: "Sample 1"
+  chapters:
+    - index.qmd
+    - chapter1.qmd
+
+format:
+  html:
+    css:
+      - assets/coverage-tracker.css
+    include-after-body:
+      - assets/coverage-tracker.html

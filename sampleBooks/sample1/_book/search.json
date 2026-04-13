@@ -1,0 +1,62 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Coverage Tracker Demo Book",
+    "section": "",
+    "text": "1 Welcome\nThis sample Quarto book demonstrates section-level course coverage tracking.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sec-how-to-use",
+    "href": "index.html#sec-how-to-use",
+    "title": "Coverage Tracker Demo Book",
+    "section": "1.1 How to use this sample",
+    "text": "1.1 How to use this sample\nUse the dropdown to pick a section as a student. Add ?prof=true to the URL to enable professor mode and select multiple sections.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sec-reading-plan",
+    "href": "index.html#sec-reading-plan",
+    "title": "Coverage Tracker Demo Book",
+    "section": "1.2 Reading plan",
+    "text": "1.2 Reading plan\nIn this sample, some sections are marked as covered for one section and not the other so you can observe different highlighting states.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
+    ]
+  },
+  {
+    "objectID": "chapter1.html",
+    "href": "chapter1.html",
+    "title": "2  Chapter 1",
+    "section": "",
+    "text": "2.1 Limits review\nThis section is covered in both demo sections.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Chapter 1</span>"
+    ]
+  },
+  {
+    "objectID": "chapter1.html#sec-continuity-basics",
+    "href": "chapter1.html#sec-continuity-basics",
+    "title": "2  Chapter 1",
+    "section": "2.2 Continuity basics",
+    "text": "2.2 Continuity basics\nThis section is only covered in section 01.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Chapter 1</span>"
+    ]
+  },
+  {
+    "objectID": "chapter1.html#sec-derivatives-preview",
+    "href": "chapter1.html#sec-derivatives-preview",
+    "title": "2  Chapter 1",
+    "section": "2.3 Derivatives preview",
+    "text": "2.3 Derivatives preview\nThis section is only covered in section 02.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Chapter 1</span>"
+    ]
+  }
+]

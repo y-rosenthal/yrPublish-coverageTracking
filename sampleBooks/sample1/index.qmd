@@ -1,0 +1,11 @@
+# Welcome
+
+This sample Quarto book demonstrates section-level course coverage tracking.
+
+## How to use this sample {#sec-how-to-use}
+
+Use the dropdown to pick a section as a student. Add `?prof=true` to the URL to enable professor mode and select multiple sections.
+
+## Reading plan {#sec-reading-plan}
+
+In this sample, some sections are marked as covered for one section and not the other so you can observe different highlighting states.

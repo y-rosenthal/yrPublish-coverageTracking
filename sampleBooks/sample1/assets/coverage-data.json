@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "coverage": {
+    "MATH101-01": {
+      "/index.html": [
+        "sec-how-to-use"
+      ],
+      "/chapter1.html": [
+        "sec-limits-review",
+        "sec-continuity-basics"
+      ]
+    },
+    "MATH101-02": {
+      "/index.html": [
+        "sec-reading-plan"
+      ],
+      "/chapter1.html": [
+        "sec-limits-review",
+        "sec-derivatives-preview"
+      ]
+    }
+  }
+}

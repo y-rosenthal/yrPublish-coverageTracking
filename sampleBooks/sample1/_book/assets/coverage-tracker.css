@@ -1,0 +1,95 @@
+body.ct-needs-selection #quarto-content {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.ct-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.ct-panel {
+  max-width: 36rem;
+  width: 100%;
+  border: 1px solid #d0d7de;
+  border-radius: 0.65rem;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.ct-panel h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.ct-panel p {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.ct-panel label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.ct-panel select,
+.ct-panel button {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #bcc5cf;
+  border-radius: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.ct-panel button {
+  margin-top: 0.65rem;
+  font-weight: 600;
+  background: #2f6feb;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.ct-panel button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ct-covered {
+  background-color: rgba(80, 180, 80, 0.16);
+  border-radius: 0.22rem;
+}
+
+.ct-covered-all {
+  background-color: rgba(80, 180, 80, 0.2);
+  border-radius: 0.22rem;
+}
+
+.ct-covered-some {
+  background-color: rgba(255, 205, 86, 0.22);
+  border-radius: 0.22rem;
+}
+
+.ct-badge-row {
+  margin-left: 0.35rem;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.ct-badge {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  margin-right: 0.2rem;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}

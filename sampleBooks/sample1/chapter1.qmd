@@ -1,0 +1,13 @@
+# Chapter 1
+
+## Limits review {#sec-limits-review}
+
+This section is covered in both demo sections.
+
+## Continuity basics {#sec-continuity-basics}
+
+This section is only covered in section 01.
+
+## Derivatives preview {#sec-derivatives-preview}
+
+This section is only covered in section 02.
