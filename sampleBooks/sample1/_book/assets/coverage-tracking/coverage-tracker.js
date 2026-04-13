@@ -134,6 +134,16 @@
     return map;
   }
 
+  function getSectionLabel(config, sectionId) {
+    var found = (config.sections || []).find(function (s) {
+      return s.id === sectionId;
+    });
+    if (!found) {
+      return "";
+    }
+    return found.label || found.id;
+  }
+
   function applyProfessorCoverage(sectionIds, config, data) {
     clearCoverageStyles();
     if (!sectionIds.length) {
@@ -259,7 +269,7 @@
     return panel;
   }
 
-  function createStudentControls(onChangeSection) {
+  function createStudentControls(onChangeSection, buttonText) {
     var item = createElement("li", { class: "sidebar-item ct-sidebar-item" });
     var container = createElement("div", { class: "sidebar-item-container" });
     var link = createElement(
@@ -267,7 +277,7 @@
       { href: "#", class: "sidebar-item-text sidebar-link ct-change-section-link" },
       ""
     );
-    var text = createElement("span", { class: "menu-text" }, "change class section");
+    var text = createElement("span", { class: "menu-text" }, buttonText || "change class section");
     link.appendChild(text);
     link.addEventListener("click", function (evt) {
       evt.preventDefault();
@@ -294,11 +304,12 @@
     document.body.appendChild(controlElement);
   }
 
-  function mountStudentChangeControl() {
+  function mountStudentChangeControl(config, selectedSectionId) {
+    var label = getSectionLabel(config, selectedSectionId);
     var controls = createStudentControls(function () {
       getStudentStorage().removeItem(STORAGE_KEY_STUDENT);
       window.location.reload();
-    });
+    }, label || "change class section");
     mountStudentControls(controls);
   }
 
@@ -335,12 +346,12 @@
       var overlay = createStudentOverlay(config, "", function (sectionId) {
         getStudentStorage().setItem(STORAGE_KEY_STUDENT, sectionId);
         applyStudentCoverage(sectionId, data);
-        mountStudentChangeControl();
+        mountStudentChangeControl(config, sectionId);
       });
       document.body.appendChild(overlay);
     } else {
       applyStudentCoverage(studentSection, data);
-      mountStudentChangeControl();
+      mountStudentChangeControl(config, studentSection);
     }
   }
 

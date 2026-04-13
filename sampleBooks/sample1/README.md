@@ -17,10 +17,11 @@ Output is written to `sampleBooks/sample1/_book/`.
 - Student mode:
   - Open `sampleBooks/sample1/_book/index.html`
   - Confirm the page is blurred until one class section is selected
+  - After selecting a class section, confirm the sidebar control text changes to that section name
   - Open the same URL in a different browser tab and confirm the picker appears again
   - Confirm the same blur + picker appears when opening deep links (for example `chapter1.html#sec-continuity-basics`) before any section is saved
   - Confirm covered sections are highlighted after selection
-  - Click "change class section" to clear selection and re-open the picker
+  - Click the section-named sidebar control to clear selection and re-open the picker
   - Confirm `?resetSection=true` also clears the saved student selection and shows the picker again
 
 - Professor mode:

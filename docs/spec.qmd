@@ -72,6 +72,7 @@ The solution should remain easy to copy into other Quarto books and should work 
 - The user must have a clear way to re-display the section picker after a section has already been saved.
 - At minimum, support a URL-triggered reset flow (for example, `?resetSection=true`) that clears saved student selection and re-opens the picker.
 - Prefer also providing an in-page control (for example, "Change section") to clear and re-pick without editing local storage manually.
+- Once a student section is selected, the in-page control label should display the selected section name while retaining its reset/re-pick behavior.
 
 ## Proposed architecture
 
