@@ -94,18 +94,14 @@ body.ct-needs-selection #quarto-content {
   border: 1px solid rgba(0, 0, 0, 0.18);
 }
 
-.ct-student-controls {
-  position: fixed;
-  right: 0.8rem;
-  bottom: 0.8rem;
-  z-index: 1900;
+.ct-sidebar-item .ct-change-section-link {
+  font-weight: 700;
+  color: #1f6feb;
+  text-transform: none;
 }
 
-.ct-change-section-btn {
-  border: 1px solid #bcc5cf;
-  border-radius: 0.45rem;
-  padding: 0.4rem 0.65rem;
-  background: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
+.ct-sidebar-item .ct-change-section-link .menu-text {
+  background: rgba(31, 111, 235, 0.12);
+  border-radius: 0.28rem;
+  padding: 0.05rem 0.25rem;
 }

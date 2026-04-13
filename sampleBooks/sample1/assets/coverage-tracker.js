@@ -223,13 +223,46 @@
   }
 
   function createStudentControls(onChangeSection) {
-    var controls = createElement("div", { class: "ct-student-controls" });
-    var button = createElement("button", { type: "button", class: "ct-change-section-btn" }, "Change section");
-    button.addEventListener("click", function () {
+    var item = createElement("li", { class: "sidebar-item ct-sidebar-item" });
+    var container = createElement("div", { class: "sidebar-item-container" });
+    var link = createElement(
+      "a",
+      { href: "#", class: "sidebar-item-text sidebar-link ct-change-section-link" },
+      ""
+    );
+    var text = createElement("span", { class: "menu-text" }, "change class section");
+    link.appendChild(text);
+    link.addEventListener("click", function (evt) {
+      evt.preventDefault();
       onChangeSection();
     });
-    controls.appendChild(button);
-    return controls;
+    container.appendChild(link);
+    item.appendChild(container);
+    return item;
+  }
+
+  function mountStudentControls(controlElement) {
+    if (document.querySelector(".ct-sidebar-item")) {
+      return;
+    }
+    var sidebarMenu =
+      document.querySelector("#quarto-sidebar .sidebar-menu-container > ul") ||
+      document.querySelector("#quarto-sidebar ul.list-unstyled.mt-1") ||
+      document.querySelector("#quarto-sidebar ul.list-unstyled");
+    if (sidebarMenu) {
+      sidebarMenu.prepend(controlElement);
+      return;
+    }
+    // Fallback for non-standard layouts.
+    document.body.appendChild(controlElement);
+  }
+
+  function mountStudentChangeControl() {
+    var controls = createStudentControls(function () {
+      localStorage.removeItem(STORAGE_KEY_STUDENT);
+      window.location.reload();
+    });
+    mountStudentControls(controls);
   }
 
   function init(config, data) {
@@ -263,15 +296,12 @@
       var overlay = createStudentOverlay(config, "", function (sectionId) {
         localStorage.setItem(STORAGE_KEY_STUDENT, sectionId);
         applyStudentCoverage(sectionId, data);
+        mountStudentChangeControl();
       });
       document.body.appendChild(overlay);
     } else {
       applyStudentCoverage(studentSection, data);
-      var controls = createStudentControls(function () {
-        localStorage.removeItem(STORAGE_KEY_STUDENT);
-        window.location.reload();
-      });
-      document.body.appendChild(controls);
+      mountStudentChangeControl();
     }
   }
 
