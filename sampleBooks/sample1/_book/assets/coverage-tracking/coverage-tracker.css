@@ -42,6 +42,26 @@ body.ct-needs-selection #quarto-content {
   margin-bottom: 0.35rem;
 }
 
+.ct-prof-checklist {
+  border: 1px solid #bcc5cf;
+  border-radius: 0.4rem;
+  padding: 0.45rem 0.55rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.ct-prof-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+.ct-prof-check-item:last-child {
+  margin-bottom: 0;
+}
+
 .ct-panel select,
 .ct-panel button {
   width: 100%;

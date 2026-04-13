@@ -25,8 +25,8 @@ Output is written to `sampleBooks/sample1/_book/`.
   - Confirm `?resetSection=true` also clears the saved student selection and shows the picker again
 
 - Professor mode:
-  - Open `sampleBooks/sample1/_book/index.html?prof=true`
-  - Select multiple sections
+  - Open `sampleBooks/sample1/_book/index.html?prof=true` or `sampleBooks/sample1/_book/index.html?prof`
+  - Select zero or more sections using checkboxes
   - Confirm sections covered by all selected sections differ from partially covered sections
   - Confirm small colored badges indicate which section(s) covered each item
 

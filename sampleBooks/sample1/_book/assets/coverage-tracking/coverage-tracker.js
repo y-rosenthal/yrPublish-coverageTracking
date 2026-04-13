@@ -26,7 +26,12 @@
   }
 
   function isProfessorMode() {
-    return getQueryParam("prof") === "true";
+    var params = new URLSearchParams(window.location.search);
+    if (!params.has("prof")) {
+      return false;
+    }
+    var value = params.get("prof");
+    return value === "" || value === "true";
   }
 
   function shouldResetStudentSelection() {
@@ -241,29 +246,36 @@
     var content = createElement("div", { class: "ct-panel" });
     var title = createElement("h2", null, "Professor mode");
     var body = createElement("p", null, "Select one or more sections to compare coverage.");
-    var label = createElement("label", { for: "ct-prof-select" }, "Sections");
-    var select = createElement("select", { id: "ct-prof-select", multiple: "multiple", size: "6" });
+    var label = createElement("label", null, "Sections");
+    var checklist = createElement("div", { class: "ct-prof-checklist", id: "ct-prof-checklist" });
 
-    (config.sections || []).forEach(function (s) {
-      var opt = createElement("option", { value: s.id }, s.label || s.id);
-      if (selected.indexOf(s.id) > -1) {
-        opt.selected = true;
-      }
-      select.appendChild(opt);
+    (config.sections || []).forEach(function (s, index) {
+      var row = createElement("label", { class: "ct-prof-check-item", for: "ct-prof-item-" + index });
+      var checkbox = createElement("input", {
+        type: "checkbox",
+        id: "ct-prof-item-" + index,
+        value: s.id
+      });
+      checkbox.checked = selected.indexOf(s.id) > -1;
+      var text = createElement("span", null, s.label || s.id);
+      row.appendChild(checkbox);
+      row.appendChild(text);
+      checklist.appendChild(row);
     });
 
     var btn = createElement("button", { type: "button" }, "Apply selection");
     btn.addEventListener("click", function () {
-      var picked = Array.from(select.selectedOptions).map(function (o) {
-        return o.value;
+      var picked = Array.from(checklist.querySelectorAll("input[type='checkbox']:checked")).map(function (el) {
+        return el.value;
       });
       onApply(picked);
+      panel.remove();
     });
 
     content.appendChild(title);
     content.appendChild(body);
     content.appendChild(label);
-    content.appendChild(select);
+    content.appendChild(checklist);
     content.appendChild(btn);
     panel.appendChild(content);
     return panel;

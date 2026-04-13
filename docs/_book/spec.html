@@ -302,8 +302,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="fr-4-professor-mode" class="level3" data-number="2.4.4">
 <h3 data-number="2.4.4" class="anchored" data-anchor-id="fr-4-professor-mode"><span class="header-section-number">2.4.4</span> FR-4: Professor mode</h3>
 <ul>
-<li>Professor mode is enabled by URL parameter (for example, <code>?prof=true</code>).</li>
-<li>In professor mode, user can select multiple class sections.</li>
+<li>Professor mode is enabled by URL parameter <code>?prof</code> or <code>?prof=true</code>.</li>
+<li>In professor mode, user can select zero or more class sections.</li>
+<li>Professor selection UI uses explicit checkboxes (not keyboard-dependent multi-select controls).</li>
 <li>Visuals differentiate:
 <ul>
 <li>Covered by all selected sections,</li>
@@ -457,7 +458,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="2.8.2" class="anchored" data-anchor-id="professor-mode-proftrue"><span class="header-section-number">2.8.2</span> Professor mode (<code>?prof=true</code>)</h3>
 <ol type="1">
 <li>Page loads in professor controls mode.</li>
-<li>Show multi-select for sections.</li>
+<li>Show checkbox list for sections (allow zero or more selected).</li>
 <li>Apply visual encoding for overlap/all/some coverage.</li>
 <li>Allow quick toggle/reset of selected sections.</li>
 </ol>

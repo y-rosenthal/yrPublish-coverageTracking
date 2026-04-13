@@ -55,8 +55,9 @@ The solution should remain easy to copy into other Quarto books and should work 
 
 ### FR-4: Professor mode
 
-- Professor mode is enabled by URL parameter (for example, `?prof=true`).
-- In professor mode, user can select multiple class sections.
+- Professor mode is enabled by URL parameter `?prof` or `?prof=true`.
+- In professor mode, user can select zero or more class sections.
+- Professor selection UI uses explicit checkboxes (not keyboard-dependent multi-select controls).
 - Visuals differentiate:
   - Covered by all selected sections,
   - Covered by some selected sections,
@@ -174,7 +175,7 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 ### Professor mode (`?prof=true`)
 
 1. Page loads in professor controls mode.
-2. Show multi-select for sections.
+2. Show checkbox list for sections (allow zero or more selected).
 3. Apply visual encoding for overlap/all/some coverage.
 4. Allow quick toggle/reset of selected sections.
 
