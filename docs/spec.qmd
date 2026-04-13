@@ -44,8 +44,9 @@ The solution should remain easy to copy into other Quarto books and should work 
 
 - On first visit, the reader must choose exactly one class section from a configured list.
 - Until selected, page content is visually blurred with a clear selector UI.
-- Selected section is stored locally (for example, `localStorage`) for future visits.
+- Selected student section is stored for the current browser tab/session (for example, `sessionStorage`).
 - This requirement applies to all entry points, including deep links to chapter pages or anchors in the middle of the book.
+- Opening the same URL in a new tab should require section selection again unless a section was selected in that same tab session.
 
 ### FR-3: Student highlighting
 
@@ -165,7 +166,7 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 1. Page loads.
 2. If no section in storage, blur content and show section dropdown.
 3. On selection, unblur content and highlight covered sections.
-4. Persist selection for next visit.
+4. Persist selection for the current tab session.
 5. If user opens a deep link without a saved selection, apply the same blur + picker gating before content is readable.
 6. If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.
 

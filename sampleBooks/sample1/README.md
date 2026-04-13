@@ -17,6 +17,7 @@ Output is written to `sampleBooks/sample1/_book/`.
 - Student mode:
   - Open `sampleBooks/sample1/_book/index.html`
   - Confirm the page is blurred until one class section is selected
+  - Open the same URL in a different browser tab and confirm the picker appears again
   - Confirm the same blur + picker appears when opening deep links (for example `chapter1.html#sec-continuity-basics`) before any section is saved
   - Confirm covered sections are highlighted after selection
   - Click "change class section" to clear selection and re-open the picker

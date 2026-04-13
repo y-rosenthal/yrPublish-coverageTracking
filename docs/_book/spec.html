@@ -287,8 +287,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>On first visit, the reader must choose exactly one class section from a configured list.</li>
 <li>Until selected, page content is visually blurred with a clear selector UI.</li>
-<li>Selected section is stored locally (for example, <code>localStorage</code>) for future visits.</li>
+<li>Selected student section is stored for the current browser tab/session (for example, <code>sessionStorage</code>).</li>
 <li>This requirement applies to all entry points, including deep links to chapter pages or anchors in the middle of the book.</li>
+<li>Opening the same URL in a new tab should require section selection again unless a section was selected in that same tab session.</li>
 </ul>
 </section>
 <section id="fr-3-student-highlighting" class="level3" data-number="2.4.3">
@@ -446,7 +447,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Page loads.</li>
 <li>If no section in storage, blur content and show section dropdown.</li>
 <li>On selection, unblur content and highlight covered sections.</li>
-<li>Persist selection for next visit.</li>
+<li>Persist selection for the current tab session.</li>
 <li>If user opens a deep link without a saved selection, apply the same blur + picker gating before content is readable.</li>
 <li>If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.</li>
 </ol>

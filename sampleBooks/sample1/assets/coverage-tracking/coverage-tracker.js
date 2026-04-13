@@ -4,6 +4,11 @@
   var STORAGE_KEY_STUDENT = "ct_selected_section";
   var STORAGE_KEY_PROF = "ct_selected_sections";
 
+  function getStudentStorage() {
+    // Session storage makes section choice tab/session scoped.
+    return window.sessionStorage;
+  }
+
   function getPathCandidates() {
     var pathname = window.location.pathname || "";
     var clean = pathname.replace(/\/+$/, "") || "/";
@@ -291,7 +296,7 @@
 
   function mountStudentChangeControl() {
     var controls = createStudentControls(function () {
-      localStorage.removeItem(STORAGE_KEY_STUDENT);
+      getStudentStorage().removeItem(STORAGE_KEY_STUDENT);
       window.location.reload();
     });
     mountStudentControls(controls);
@@ -319,14 +324,16 @@
     }
 
     if (shouldResetStudentSelection()) {
+      getStudentStorage().removeItem(STORAGE_KEY_STUDENT);
+      // Clear prior versions that used localStorage for student selection.
       localStorage.removeItem(STORAGE_KEY_STUDENT);
     }
 
-    var studentSection = localStorage.getItem(STORAGE_KEY_STUDENT) || "";
+    var studentSection = getStudentStorage().getItem(STORAGE_KEY_STUDENT) || "";
     if (!studentSection) {
       document.body.classList.add("ct-needs-selection");
       var overlay = createStudentOverlay(config, "", function (sectionId) {
-        localStorage.setItem(STORAGE_KEY_STUDENT, sectionId);
+        getStudentStorage().setItem(STORAGE_KEY_STUDENT, sectionId);
         applyStudentCoverage(sectionId, data);
         mountStudentChangeControl();
       });
