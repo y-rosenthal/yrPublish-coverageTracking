@@ -145,7 +145,7 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 
 - Rendering the sample produces HTML with the addon enabled.
 - Student mode enforces single-section selection and highlights covered sections.
-- Professor mode (`?prof=true`) supports multi-select and overlap visualization.
+- Professor mode (`?prof` or `?prof=true`) supports checkbox-based multi-select, overlap visualization, and non-auto-opening chooser behavior.
 - Coverage JSON can be edited locally, re-rendered, and reflected in the output.
 - Deep links (including chapter URLs and anchors) still enforce picker gating when student selection is not set.
 - Sample includes a reset flow that re-displays the section picker after a previous selection.
@@ -178,7 +178,7 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 5. If user opens a deep link without a saved selection, apply the same blur + picker gating before content is readable.
 6. If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.
 
-### Professor mode (`?prof=true`)
+### Professor mode (`?prof` or `?prof=true`)
 
 1. Page loads in professor controls mode.
 2. Show checkbox list for sections (allow zero or more selected).

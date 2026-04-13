@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#ux-behavior" id="toc-ux-behavior" class="nav-link" data-scroll-target="#ux-behavior"><span class="header-section-number">2.8</span> UX behavior</a>
   <ul class="collapse">
   <li><a href="#student-mode-default" id="toc-student-mode-default" class="nav-link" data-scroll-target="#student-mode-default"><span class="header-section-number">2.8.1</span> Student mode (default)</a></li>
-  <li><a href="#professor-mode-proftrue" id="toc-professor-mode-proftrue" class="nav-link" data-scroll-target="#professor-mode-proftrue"><span class="header-section-number">2.8.2</span> Professor mode (<code>?prof=true</code>)</a></li>
+  <li><a href="#professor-mode-prof-or-proftrue" id="toc-professor-mode-prof-or-proftrue" class="nav-link" data-scroll-target="#professor-mode-prof-or-proftrue"><span class="header-section-number">2.8.2</span> Professor mode (<code>?prof</code> or <code>?prof=true</code>)</a></li>
   </ul></li>
   <li><a href="#phased-implementation-plan" id="toc-phased-implementation-plan" class="nav-link" data-scroll-target="#phased-implementation-plan"><span class="header-section-number">2.9</span> Phased implementation plan</a>
   <ul class="collapse">
@@ -425,7 +425,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>Rendering the sample produces HTML with the addon enabled.</li>
 <li>Student mode enforces single-section selection and highlights covered sections.</li>
-<li>Professor mode (<code>?prof=true</code>) supports multi-select and overlap visualization.</li>
+<li>Professor mode (<code>?prof</code> or <code>?prof=true</code>) supports checkbox-based multi-select, overlap visualization, and non-auto-opening chooser behavior.</li>
 <li>Coverage JSON can be edited locally, re-rendered, and reflected in the output.</li>
 <li>Deep links (including chapter URLs and anchors) still enforce picker gating when student selection is not set.</li>
 <li>Sample includes a reset flow that re-displays the section picker after a previous selection.</li>
@@ -460,8 +460,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.</li>
 </ol>
 </section>
-<section id="professor-mode-proftrue" class="level3" data-number="2.8.2">
-<h3 data-number="2.8.2" class="anchored" data-anchor-id="professor-mode-proftrue"><span class="header-section-number">2.8.2</span> Professor mode (<code>?prof=true</code>)</h3>
+<section id="professor-mode-prof-or-proftrue" class="level3" data-number="2.8.2">
+<h3 data-number="2.8.2" class="anchored" data-anchor-id="professor-mode-prof-or-proftrue"><span class="header-section-number">2.8.2</span> Professor mode (<code>?prof</code> or <code>?prof=true</code>)</h3>
 <ol type="1">
 <li>Page loads in professor controls mode.</li>
 <li>Show checkbox list for sections (allow zero or more selected).</li>
