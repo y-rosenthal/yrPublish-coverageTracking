@@ -61,6 +61,9 @@ The solution should remain easy to copy into other Quarto books and should work 
 - Chosen professor sections are shown at the top of the left sidebar as clickable, color-coded entries.
 - Clicking any professor sidebar entry re-opens the section chooser.
 - If no sections are selected, show one sidebar entry labeled `Choose section(s)`.
+- While in professor mode, internal navigation links preserve the professor query parameter across pages.
+- The professor chooser should not auto-open on page navigation; it opens only when the professor clicks a sidebar control entry.
+- Pressing `Esc` in the professor chooser dismisses the chooser without applying changes.
 - Visuals differentiate:
   - Covered by all selected sections,
   - Covered by some selected sections,

@@ -38,6 +38,14 @@
     return getQueryParam("resetSection") === "true";
   }
 
+  function professorQueryValue() {
+    var params = new URLSearchParams(window.location.search);
+    if (!params.has("prof")) {
+      return null;
+    }
+    return params.get("prof");
+  }
+
   function createElement(tag, attrs, text) {
     var el = document.createElement(tag);
     if (attrs) {
@@ -263,13 +271,25 @@
       checklist.appendChild(row);
     });
 
+    function closePanel() {
+      document.removeEventListener("keydown", onKeyDown);
+      panel.remove();
+    }
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePanel();
+      }
+    }
+
     var btn = createElement("button", { type: "button" }, "Apply selection");
     btn.addEventListener("click", function () {
       var picked = Array.from(checklist.querySelectorAll("input[type='checkbox']:checked")).map(function (el) {
         return el.value;
       });
       onApply(picked);
-      panel.remove();
+      closePanel();
     });
 
     content.appendChild(title);
@@ -278,6 +298,7 @@
     content.appendChild(checklist);
     content.appendChild(btn);
     panel.appendChild(content);
+    document.addEventListener("keydown", onKeyDown);
     return panel;
   }
 
@@ -343,6 +364,50 @@
     });
   }
 
+  function preserveProfessorParamInLinks() {
+    if (!isProfessorMode()) {
+      return;
+    }
+    var profValue = professorQueryValue();
+    var links = document.querySelectorAll("a[href]");
+    links.forEach(function (link) {
+      var rawHref = link.getAttribute("href");
+      if (!rawHref || rawHref.startsWith("#")) {
+        return;
+      }
+      if (
+        rawHref.startsWith("mailto:") ||
+        rawHref.startsWith("tel:") ||
+        rawHref.startsWith("javascript:")
+      ) {
+        return;
+      }
+
+      var url;
+      try {
+        url = new URL(rawHref, window.location.href);
+      } catch (_err) {
+        return;
+      }
+
+      if (url.origin !== window.location.origin) {
+        return;
+      }
+      if (url.searchParams.has("prof")) {
+        return;
+      }
+
+      if (profValue === "" || profValue === null) {
+        url.searchParams.set("prof", "");
+      } else {
+        url.searchParams.set("prof", profValue);
+      }
+
+      var finalHref = url.pathname + (url.search ? url.search : "") + (url.hash ? url.hash : "");
+      link.setAttribute("href", finalHref);
+    });
+  }
+
   function mountProfessorControls(config, selectedSectionIds, onOpenChooser) {
     clearProfessorControls();
     var sidebarMenu = getSidebarMenuList();
@@ -393,6 +458,7 @@
   function init(config, data) {
     var profMode = isProfessorMode();
     if (profMode) {
+      preserveProfessorParamInLinks();
       clearStudentControls();
       var stored = localStorage.getItem(STORAGE_KEY_PROF);
       var selected = [];
@@ -419,7 +485,6 @@
 
       applyProfessorCoverage(selected, config, data);
       mountProfessorControls(config, selected, openProfessorChooser);
-      openProfessorChooser();
       return;
     }
 

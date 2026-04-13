@@ -26,10 +26,13 @@ Output is written to `sampleBooks/sample1/_book/`.
 
 - Professor mode:
   - Open `sampleBooks/sample1/_book/index.html?prof=true` or `sampleBooks/sample1/_book/index.html?prof`
+  - Navigate to another chapter and confirm the `prof` query parameter remains in the URL
+  - After sections are applied, navigate pages and confirm the chooser does not auto-open
   - Select zero or more sections using checkboxes
   - Confirm selected sections appear at the top of the left sidebar as color-coded entries
   - If no sections are selected, confirm one left-sidebar entry is shown as `Choose section(s)`
   - Click any professor sidebar entry and confirm the chooser popup opens again
+  - Press `Esc` in the chooser and confirm it closes without applying changes
   - Confirm sections covered by all selected sections differ from partially covered sections
   - Confirm small colored badges indicate which section(s) covered each item
 
