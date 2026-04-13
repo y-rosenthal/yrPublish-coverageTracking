@@ -45,6 +45,7 @@ The solution should remain easy to copy into other Quarto books and should work 
 - On first visit, the reader must choose exactly one class section from a configured list.
 - Until selected, page content is visually blurred with a clear selector UI.
 - Selected section is stored locally (for example, `localStorage`) for future visits.
+- This requirement applies to all entry points, including deep links to chapter pages or anchors in the middle of the book.
 
 ### FR-3: Student highlighting
 
@@ -64,6 +65,12 @@ The solution should remain easy to copy into other Quarto books and should work 
 
 - Coverage data can be edited offline in a source file and republished with the book.
 - Data format should remain human-readable and merge-friendly.
+
+### FR-6: Reset and re-pick section
+
+- The user must have a clear way to re-display the section picker after a section has already been saved.
+- At minimum, support a URL-triggered reset flow (for example, `?resetSection=true`) that clears saved student selection and re-opens the picker.
+- Prefer also providing an in-page control (for example, "Change section") to clear and re-pick without editing local storage manually.
 
 ## Proposed architecture
 
@@ -130,6 +137,8 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 - Student mode enforces single-section selection and highlights covered sections.
 - Professor mode (`?prof=true`) supports multi-select and overlap visualization.
 - Coverage JSON can be edited locally, re-rendered, and reflected in the output.
+- Deep links (including chapter URLs and anchors) still enforce picker gating when student selection is not set.
+- Sample includes a reset flow that re-displays the section picker after a previous selection.
 
 ## Data model (initial)
 
@@ -156,6 +165,8 @@ Create a working sample book that demonstrates the coverage-tracking behavior en
 2. If no section in storage, blur content and show section dropdown.
 3. On selection, unblur content and highlight covered sections.
 4. Persist selection for next visit.
+5. If user opens a deep link without a saved selection, apply the same blur + picker gating before content is readable.
+6. If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.
 
 ### Professor mode (`?prof=true`)
 

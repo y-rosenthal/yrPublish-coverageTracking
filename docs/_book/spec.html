@@ -177,6 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#fr-3-student-highlighting" id="toc-fr-3-student-highlighting" class="nav-link" data-scroll-target="#fr-3-student-highlighting"><span class="header-section-number">2.4.3</span> FR-3: Student highlighting</a></li>
   <li><a href="#fr-4-professor-mode" id="toc-fr-4-professor-mode" class="nav-link" data-scroll-target="#fr-4-professor-mode"><span class="header-section-number">2.4.4</span> FR-4: Professor mode</a></li>
   <li><a href="#fr-5-offline-update-workflow" id="toc-fr-5-offline-update-workflow" class="nav-link" data-scroll-target="#fr-5-offline-update-workflow"><span class="header-section-number">2.4.5</span> FR-5: Offline update workflow</a></li>
+  <li><a href="#fr-6-reset-and-re-pick-section" id="toc-fr-6-reset-and-re-pick-section" class="nav-link" data-scroll-target="#fr-6-reset-and-re-pick-section"><span class="header-section-number">2.4.6</span> FR-6: Reset and re-pick section</a></li>
   </ul></li>
   <li><a href="#proposed-architecture" id="toc-proposed-architecture" class="nav-link" data-scroll-target="#proposed-architecture"><span class="header-section-number">2.5</span> Proposed architecture</a>
   <ul class="collapse">
@@ -287,6 +288,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>On first visit, the reader must choose exactly one class section from a configured list.</li>
 <li>Until selected, page content is visually blurred with a clear selector UI.</li>
 <li>Selected section is stored locally (for example, <code>localStorage</code>) for future visits.</li>
+<li>This requirement applies to all entry points, including deep links to chapter pages or anchors in the middle of the book.</li>
 </ul>
 </section>
 <section id="fr-3-student-highlighting" class="level3" data-number="2.4.3">
@@ -314,6 +316,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>Coverage data can be edited offline in a source file and republished with the book.</li>
 <li>Data format should remain human-readable and merge-friendly.</li>
+</ul>
+</section>
+<section id="fr-6-reset-and-re-pick-section" class="level3" data-number="2.4.6">
+<h3 data-number="2.4.6" class="anchored" data-anchor-id="fr-6-reset-and-re-pick-section"><span class="header-section-number">2.4.6</span> FR-6: Reset and re-pick section</h3>
+<ul>
+<li>The user must have a clear way to re-display the section picker after a section has already been saved.</li>
+<li>At minimum, support a URL-triggered reset flow (for example, <code>?resetSection=true</code>) that clears saved student selection and re-opens the picker.</li>
+<li>Prefer also providing an in-page control (for example, “Change section”) to clear and re-pick without editing local storage manually.</li>
 </ul>
 </section>
 </section>
@@ -407,6 +417,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Student mode enforces single-section selection and highlights covered sections.</li>
 <li>Professor mode (<code>?prof=true</code>) supports multi-select and overlap visualization.</li>
 <li>Coverage JSON can be edited locally, re-rendered, and reflected in the output.</li>
+<li>Deep links (including chapter URLs and anchors) still enforce picker gating when student selection is not set.</li>
+<li>Sample includes a reset flow that re-displays the section picker after a previous selection.</li>
 </ul>
 </section>
 </section>
@@ -434,6 +446,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>If no section in storage, blur content and show section dropdown.</li>
 <li>On selection, unblur content and highlight covered sections.</li>
 <li>Persist selection for next visit.</li>
+<li>If user opens a deep link without a saved selection, apply the same blur + picker gating before content is readable.</li>
+<li>If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.</li>
 </ol>
 </section>
 <section id="professor-mode-proftrue" class="level3" data-number="2.8.2">

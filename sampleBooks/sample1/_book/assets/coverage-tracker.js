@@ -24,6 +24,10 @@
     return getQueryParam("prof") === "true";
   }
 
+  function shouldResetStudentSelection() {
+    return getQueryParam("resetSection") === "true";
+  }
+
   function createElement(tag, attrs, text) {
     var el = document.createElement(tag);
     if (attrs) {
@@ -218,6 +222,16 @@
     return panel;
   }
 
+  function createStudentControls(onChangeSection) {
+    var controls = createElement("div", { class: "ct-student-controls" });
+    var button = createElement("button", { type: "button", class: "ct-change-section-btn" }, "Change section");
+    button.addEventListener("click", function () {
+      onChangeSection();
+    });
+    controls.appendChild(button);
+    return controls;
+  }
+
   function init(config, data) {
     var profMode = isProfessorMode();
     if (profMode) {
@@ -239,6 +253,10 @@
       return;
     }
 
+    if (shouldResetStudentSelection()) {
+      localStorage.removeItem(STORAGE_KEY_STUDENT);
+    }
+
     var studentSection = localStorage.getItem(STORAGE_KEY_STUDENT) || "";
     if (!studentSection) {
       document.body.classList.add("ct-needs-selection");
@@ -249,6 +267,11 @@
       document.body.appendChild(overlay);
     } else {
       applyStudentCoverage(studentSection, data);
+      var controls = createStudentControls(function () {
+        localStorage.removeItem(STORAGE_KEY_STUDENT);
+        window.location.reload();
+      });
+      document.body.appendChild(controls);
     }
   }
 
