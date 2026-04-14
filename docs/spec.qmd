@@ -65,8 +65,9 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 - Toggling an inline checkbox updates in-memory coverage, refreshes highlights, and stays in sync with the CSV editor dialog when it is open.
 - Nested ids are logical overrides: if an outer tracked id is covered but a nested tracked id is not, the nested region is rendered as uncovered.
 - Outer-id toggles may cascade to nested ids:
-  - checking outer id: auto-check all descendants when all are unchecked; prompt when descendants are mixed
-  - unchecking outer id: auto-uncheck descendants when all checked or all unchecked; prompt when descendants are mixed
+  - checking outer id: auto-check all descendants when all are unchecked; for mixed descendants, show custom choice dialog (`Check this section and all nested sections` vs `Only check this section`)
+  - unchecking outer id: auto-uncheck descendants when all checked or all unchecked; for mixed descendants, show custom choice dialog (`Uncheck this section and all nested sections` vs `Only uncheck this section`)
+  - pressing `Esc` in the nested decision dialog cancels and applies no checkbox changes
 - Inline checkbox actions support undo/redo hotkeys in professor mode (`Ctrl+Z` / `Ctrl+Y`, plus macOS `Cmd+Z` / `Cmd+Shift+Z`).
 
 ### FR-6: Coverage data file format

@@ -273,8 +273,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Nested ids are logical overrides: if an outer tracked id is covered but a nested tracked id is not, the nested region is rendered as uncovered.</li>
 <li>Outer-id toggles may cascade to nested ids:
 <ul>
-<li>checking outer id: auto-check all descendants when all are unchecked; prompt when descendants are mixed</li>
-<li>unchecking outer id: auto-uncheck descendants when all checked or all unchecked; prompt when descendants are mixed</li>
+<li>checking outer id: auto-check all descendants when all are unchecked; for mixed descendants, show custom choice dialog (<code>Check this section and all nested sections</code> vs <code>Only check this section</code>)</li>
+<li>unchecking outer id: auto-uncheck descendants when all checked or all unchecked; for mixed descendants, show custom choice dialog (<code>Uncheck this section and all nested sections</code> vs <code>Only uncheck this section</code>)</li>
+<li>pressing <code>Esc</code> in the nested decision dialog cancels and applies no checkbox changes</li>
 </ul></li>
 <li>Inline checkbox actions support undo/redo hotkeys in professor mode (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, plus macOS <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code>).</li>
 </ul>

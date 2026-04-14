@@ -521,6 +521,104 @@
     return panel;
   }
 
+  /**
+   * Non-modal, draggable choice dialog used for nested-id cascade decisions.
+   * Resolves to:
+   * - "all": apply parent + descendants
+   * - "only": apply parent only
+   * - "cancel": make no changes
+   */
+  function showNestedCascadeDialog(opts) {
+    return new Promise(function (resolve) {
+      var overlay = createElement("div", { class: "ct-overlay ct-floating-overlay ct-choice-overlay" });
+      var panel = createElement("div", { class: "ct-panel ct-choice-panel" });
+      panel.style.position = "fixed";
+      panel.style.left = "220px";
+      panel.style.top = "92px";
+
+      var titlebar = createElement("div", { class: "ct-editor-titlebar" });
+      titlebar.appendChild(createElement("h2", null, opts.title || "Nested sections"));
+      var closeX = createElement("button", { type: "button", class: "ct-editor-close-x", "aria-label": "Dismiss" }, "×");
+      titlebar.appendChild(closeX);
+      panel.appendChild(titlebar);
+
+      panel.appendChild(createElement("p", null, opts.message || ""));
+      var actions = createElement("div", { class: "ct-editor-toolbar" });
+      var allBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, opts.allLabel || "Apply to all");
+      var onlyBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, opts.onlyLabel || "Only this section");
+      actions.appendChild(allBtn);
+      actions.appendChild(onlyBtn);
+      panel.appendChild(actions);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+
+      var done = false;
+      function finish(value) {
+        if (done) {
+          return;
+        }
+        done = true;
+        titlebar.removeEventListener("mousedown", onDown);
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+        document.removeEventListener("keydown", onKey);
+        document.body.classList.remove("ct-editor-dragging");
+        overlay.remove();
+        resolve(value);
+      }
+
+      allBtn.addEventListener("click", function () {
+        finish("all");
+      });
+      onlyBtn.addEventListener("click", function () {
+        finish("only");
+      });
+      closeX.addEventListener("click", function () {
+        finish("cancel");
+      });
+      function onKey(evt) {
+        if (evt.key === "Escape") {
+          evt.preventDefault();
+          finish("cancel");
+        }
+      }
+      document.addEventListener("keydown", onKey);
+
+      // Draggable
+      var drag = { active: false, startX: 0, startY: 0, left: 0, top: 0 };
+      function onDown(evt) {
+        drag.active = true;
+        drag.startX = evt.clientX;
+        drag.startY = evt.clientY;
+        drag.left = parseInt(panel.style.left || "220", 10);
+        drag.top = parseInt(panel.style.top || "92", 10);
+        document.body.classList.add("ct-editor-dragging");
+        evt.preventDefault();
+      }
+      function onMove(evt) {
+        if (!drag.active) {
+          return;
+        }
+        var nextLeft = drag.left + (evt.clientX - drag.startX);
+        var nextTop = drag.top + (evt.clientY - drag.startY);
+        var maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
+        var maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
+        panel.style.left = Math.min(maxLeft, Math.max(8, nextLeft)) + "px";
+        panel.style.top = Math.min(maxTop, Math.max(8, nextTop)) + "px";
+      }
+      function onUp() {
+        if (!drag.active) {
+          return;
+        }
+        drag.active = false;
+        document.body.classList.remove("ct-editor-dragging");
+      }
+      titlebar.addEventListener("mousedown", onDown);
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    });
+  }
+
   function getPageSectionRows() {
     return queryHeadingNodesWithIds().map(function (node) {
       var heading = targetHeadingForAnchorEl(node);
@@ -1468,55 +1566,90 @@
         applyInlineSnapshot(inlineHistory.stack[inlineHistory.index]);
       }
 
-      function onInlineCheckboxChange(evt) {
+      var nestedDialogOpen = false;
+
+      async function onInlineCheckboxChange(evt) {
         var el = evt.target;
         if (!el.classList.contains("ct-inline-checkbox")) {
           return;
         }
-        var sectionId = el.getAttribute("data-section-id");
-        var htmlId = el.getAttribute("data-html-id");
-        var pageUrl = getCanonicalPageUrl();
-        var descendants = descendantTrackableIds(htmlId, idsSet);
-        var pageCoverage = coverageStateForCurrentPage(sectionId, coverageState);
-        var checkedCount = descendants.filter(function (id) {
-          return pageCoverage[id] === true;
-        }).length;
-        var uncheckedCount = descendants.length - checkedCount;
+        if (nestedDialogOpen) {
+          // Browser already toggled this checkbox visually; restore from source of truth.
+          var blockedSectionId = el.getAttribute("data-section-id");
+          var blockedHtmlId = el.getAttribute("data-html-id");
+          var blockedCoverage = coverageStateForCurrentPage(blockedSectionId, coverageState);
+          el.checked = blockedCoverage[blockedHtmlId] === true;
+          syncInlineCheckboxesFromState(coverageState, selected);
+          return;
+        }
+        nestedDialogOpen = true;
+        try {
+          var sectionId = el.getAttribute("data-section-id");
+          var htmlId = el.getAttribute("data-html-id");
+          var pageUrl = getCanonicalPageUrl();
+          var pageCoverage = coverageStateForCurrentPage(sectionId, coverageState);
+          var previousParentChecked = pageCoverage[htmlId] === true;
+          var nextParentChecked = el.checked;
+          var descendants = descendantTrackableIds(htmlId, idsSet);
+          var checkedCount = descendants.filter(function (id) {
+            return pageCoverage[id] === true;
+          }).length;
+          var uncheckedCount = descendants.length - checkedCount;
 
-        setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, el.checked, true);
-        if (descendants.length) {
-          if (el.checked) {
-            if (uncheckedCount === descendants.length) {
-              descendants.forEach(function (id) {
-                setPageCoverageForSection(coverageState, sectionId, pageUrl, id, true, true);
+          var decision = "only";
+          if (descendants.length && checkedCount > 0 && uncheckedCount > 0) {
+            if (nextParentChecked) {
+              decision = await showNestedCascadeDialog({
+                title: "Nested sections",
+                message: "This section has mixed covered and uncovered nested ids.",
+                allLabel: "Check this section and all nested sections",
+                onlyLabel: "Only check this section"
               });
-            } else if (checkedCount > 0 && uncheckedCount > 0) {
-              if (window.confirm("This section has mixed covered and uncovered nested ids. Check all currently uncovered nested ids too?")) {
+            } else {
+              decision = await showNestedCascadeDialog({
+                title: "Nested sections",
+                message: "This section has mixed covered and uncovered nested ids.",
+                allLabel: "Uncheck this section and all nested sections",
+                onlyLabel: "Only uncheck this section"
+              });
+            }
+            if (decision === "cancel") {
+              el.checked = previousParentChecked;
+              syncInlineCheckboxesFromState(coverageState, selected);
+              return;
+            }
+          }
+
+          setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, nextParentChecked, true);
+          if (descendants.length) {
+            if (nextParentChecked) {
+              if (uncheckedCount === descendants.length) {
+                descendants.forEach(function (id) {
+                  setPageCoverageForSection(coverageState, sectionId, pageUrl, id, true, true);
+                });
+              } else if (checkedCount > 0 && uncheckedCount > 0 && decision === "all") {
                 descendants.forEach(function (id) {
                   if (pageCoverage[id] !== true) {
                     setPageCoverageForSection(coverageState, sectionId, pageUrl, id, true, true);
                   }
                 });
               }
-            }
-          } else {
-            var shouldUncheckAll = false;
-            if (checkedCount > 0 && uncheckedCount > 0) {
-              shouldUncheckAll = window.confirm("This section has mixed covered and uncovered nested ids. Uncheck all nested ids?");
             } else {
-              // Uniform descendant states (all checked or all unchecked): auto-cascade uncheck.
-              shouldUncheckAll = true;
-            }
-            if (shouldUncheckAll) {
-              descendants.forEach(function (id) {
-                setPageCoverageForSection(coverageState, sectionId, pageUrl, id, false, true);
-              });
+              var shouldUncheckAll = checkedCount > 0 && uncheckedCount > 0 ? decision === "all" : true;
+              if (shouldUncheckAll) {
+                descendants.forEach(function (id) {
+                  setPageCoverageForSection(coverageState, sectionId, pageUrl, id, false, true);
+                });
+              }
             }
           }
+          applyProfessorCoverage(selected, config, coverageState);
+          syncInlineCheckboxesFromState(coverageState, selected);
+          document.dispatchEvent(new CustomEvent("ct-coverage-changed"));
+          pushInlineHistorySnapshot();
+        } finally {
+          nestedDialogOpen = false;
         }
-        applyProfessorCoverage(selected, config, coverageState);
-        document.dispatchEvent(new CustomEvent("ct-coverage-changed"));
-        pushInlineHistorySnapshot();
       }
       professorInlineChangeListener = onInlineCheckboxChange;
       document.body.addEventListener("change", professorInlineChangeListener);

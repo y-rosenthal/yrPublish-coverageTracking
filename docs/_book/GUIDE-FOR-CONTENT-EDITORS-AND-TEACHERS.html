@@ -368,7 +368,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Nested IDs are respected:
 <ul>
 <li>if an outer id is covered but a nested tracked id is not, the nested region is rendered as uncovered</li>
-<li>checking/unchecking an outer id can cascade to nested ids (with confirmation prompts on mixed nested states)</li>
+<li>checking/unchecking an outer id can cascade to nested ids</li>
+<li>for mixed nested states, a custom draggable decision dialog appears with explicit choices (for example, <code>Check this section and all nested sections</code> vs <code>Only check this section</code>)</li>
+<li>pressing <code>Esc</code> on that decision dialog cancels and applies no checkbox changes</li>
 </ul></li>
 <li>Outside the editor dialog, professor inline checkbox actions support undo/redo hotkeys (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, and <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code> on macOS).</li>
 </ol>

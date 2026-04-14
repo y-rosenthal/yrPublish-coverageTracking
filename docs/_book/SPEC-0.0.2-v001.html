@@ -391,7 +391,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Nested-id logic:
 <ul>
 <li>uncovered nested ids visually override covered ancestors</li>
-<li>outer-id toggles may cascade to descendants with confirmation prompts when descendant states are mixed</li>
+<li>outer-id toggles may cascade to descendants</li>
+<li>mixed descendant states use a custom draggable choice dialog with explicit action labels (not browser-native confirm dialogs)</li>
+<li><code>Esc</code> in that choice dialog cancels and applies no checkbox changes</li>
 </ul></li>
 <li>Inline actions support undo/redo hotkeys while professor mode is active (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, and macOS equivalents).</li>
 </ul>

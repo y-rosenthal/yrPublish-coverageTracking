@@ -170,7 +170,9 @@ From another working directory, pass `--book-root` pointing at the book project:
 2. Toggling an inline checkbox updates highlights immediately and stays consistent with the CSV editor dialog if it is open.
 3. Nested IDs are respected:
    - if an outer id is covered but a nested tracked id is not, the nested region is rendered as uncovered
-   - checking/unchecking an outer id can cascade to nested ids (with confirmation prompts on mixed nested states)
+   - checking/unchecking an outer id can cascade to nested ids
+   - for mixed nested states, a custom draggable decision dialog appears with explicit choices (for example, `Check this section and all nested sections` vs `Only check this section`)
+   - pressing `Esc` on that decision dialog cancels and applies no checkbox changes
 4. Outside the editor dialog, professor inline checkbox actions support undo/redo hotkeys (`Ctrl+Z` / `Ctrl+Y`, and `Cmd+Z` / `Cmd+Shift+Z` on macOS).
 
 ### Edit page coverage CSV
