@@ -726,7 +726,12 @@
         if (existing) {
           existing.remove();
         }
-        var initial = localStorage.getItem(STORAGE_KEY_PROF_EDITOR_SECTION) || selected[0] || config.sections[0].id;
+        var sections = config.sections || [];
+        if (!sections.length) {
+          showTrackerLoadError("Professor editor unavailable: no sections are defined in coverage-config.json.");
+          return;
+        }
+        var initial = localStorage.getItem(STORAGE_KEY_PROF_EDITOR_SECTION) || selected[0] || sections[0].id;
         var panel = createProfessorEditorPanel(config, coverageState, initial);
         document.body.appendChild(panel);
       }
