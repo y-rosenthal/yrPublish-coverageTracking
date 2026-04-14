@@ -87,11 +87,12 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
   - set all page IDs to implicit not-covered
   - convert all not-covered rows to explicit form
   - convert all not-covered rows to implicit form
+  - undo/redo editor history (buttons + keyboard shortcuts `Ctrl+Z` / `Ctrl+Y`, recognized while the dialog is open)
   - copy CSV text
   - download CSV file (filename aligned with `yr-coverage--<page-slug>.csv` naming)
 - Implicit rows are visually grey/italic with a greyed checkbox, but still visible so users can promote them to explicit rows.
 - Manual edits to a row make it explicit; deleting/emptying a row line reverts that row to implicit not-covered (grey/italic) rather than removing it from the editor surface.
-- The dialog is draggable and non-modal; underlying page content remains scrollable while editing.
+- The dialog is draggable and non-modal; underlying page content remains scrollable while editing, and it is closed via an upper-right `×` button.
 - Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.
 
 ### FR-7b: Trackable HTML ids (`idsOnPage`)

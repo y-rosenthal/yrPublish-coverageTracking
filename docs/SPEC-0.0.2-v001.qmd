@@ -125,7 +125,8 @@ Implementations must define how IDs are collected, e.g.:
 2. **Single editor surface, one row per html-id** — The dialog uses one multi-line text-editor-like control; each `idsOnPage` entry is one CSV row with a checkbox aligned in a gutter beside that row.
 3. **Tri-state checkbox per row** — Covered -> explicit not-covered -> implicit not-covered (grey/italic row and greyed checkbox). Implicit rows are omitted from exported CSV text.
 4. **Bulk row actions** — The editor provides set-all covered / explicit not-covered / implicit not-covered plus conversions between explicit/implicit not-covered states.
-5. **No separate Build action** — Any row toggle or row-text edit updates in-memory state immediately.
+5. **Undo/redo** — The editor keeps per-section history and supports undo/redo via UI buttons and keyboard shortcuts (`Ctrl+Z` / `Ctrl+Y`, with macOS `Cmd+Z` / `Cmd+Shift+Z`).
+6. **No separate Build action** — Any row toggle or row-text edit updates in-memory state immediately.
 
 ### Inline: per-heading, per-section controls
 

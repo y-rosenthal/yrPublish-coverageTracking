@@ -564,6 +564,8 @@
     var content = createElement("div", { class: "ct-panel ct-editor-panel" });
     var titleBar = createElement("div", { class: "ct-editor-titlebar" });
     titleBar.appendChild(createElement("h2", null, "Edit page coverage CSV"));
+    var closeXBtn = createElement("button", { type: "button", class: "ct-editor-close-x", "aria-label": "Close editor" }, "×");
+    titleBar.appendChild(closeXBtn);
     content.appendChild(titleBar);
     content.appendChild(
       createElement(
@@ -607,6 +609,8 @@
     var rows = [];
     var previousEditorLines = [];
     var rowsById = {};
+    var historyBySection = {};
+    var restoringHistory = false;
 
     var toolbar = createElement("div", { class: "ct-editor-toolbar" });
     var setAllCoveredBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Set all covered");
@@ -637,12 +641,14 @@
     toolbar2.appendChild(makeAllNotCoveredExplicitBtn);
     toolbar2.appendChild(makeAllNotCoveredImplicitBtn);
     var actions = createElement("div", { class: "ct-editor-toolbar" });
+    var undoBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Undo");
+    var redoBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Redo");
     var copyBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Copy CSV");
     var downloadBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Download CSV");
-    var closeBtn = createElement("button", { type: "button" }, "Close");
+    actions.appendChild(undoBtn);
+    actions.appendChild(redoBtn);
     actions.appendChild(copyBtn);
     actions.appendChild(downloadBtn);
-    actions.appendChild(closeBtn);
 
     function defaultLineForState(state, htmlId) {
       if (state === "covered") {
@@ -662,6 +668,100 @@
         covered = false;
       }
       return { covered: covered };
+    }
+
+    function currentSectionHistory() {
+      var sectionId = sectionSelect.value;
+      if (!historyBySection[sectionId]) {
+        historyBySection[sectionId] = { stack: [], index: -1 };
+      }
+      return historyBySection[sectionId];
+    }
+
+    function snapshotRows() {
+      return rows.map(function (row) {
+        return { id: row.id, state: row.state, text: row.text };
+      });
+    }
+
+    function snapshotsEqual(a, b) {
+      if (!a || !b || a.length !== b.length) {
+        return false;
+      }
+      for (var i = 0; i < a.length; i += 1) {
+        if (a[i].id !== b[i].id || a[i].state !== b[i].state || a[i].text !== b[i].text) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function updateUndoRedoButtons() {
+      var h = currentSectionHistory();
+      undoBtn.disabled = h.index <= 0;
+      redoBtn.disabled = h.index < 0 || h.index >= h.stack.length - 1;
+    }
+
+    function pushHistorySnapshot() {
+      if (restoringHistory) {
+        return;
+      }
+      var h = currentSectionHistory();
+      var snap = snapshotRows();
+      if (h.index >= 0 && snapshotsEqual(h.stack[h.index], snap)) {
+        updateUndoRedoButtons();
+        return;
+      }
+      h.stack = h.stack.slice(0, h.index + 1);
+      h.stack.push(snap);
+      h.index = h.stack.length - 1;
+      updateUndoRedoButtons();
+    }
+
+    function ensureInitialHistorySnapshot() {
+      var h = currentSectionHistory();
+      if (h.index >= 0) {
+        updateUndoRedoButtons();
+        return;
+      }
+      h.stack.push(snapshotRows());
+      h.index = 0;
+      updateUndoRedoButtons();
+    }
+
+    function applyHistorySnapshot(snapshot) {
+      restoringHistory = true;
+      rows.forEach(function (row, idx) {
+        var from = snapshot[idx];
+        if (!from || from.id !== row.id) {
+          return;
+        }
+        row.text = from.text;
+        applyRowVisualState(row, from.state, false);
+      });
+      syncTextareaFromRows();
+      refreshFromRows();
+      restoringHistory = false;
+    }
+
+    function undoHistory() {
+      var h = currentSectionHistory();
+      if (h.index <= 0) {
+        return;
+      }
+      h.index -= 1;
+      applyHistorySnapshot(h.stack[h.index]);
+      updateUndoRedoButtons();
+    }
+
+    function redoHistory() {
+      var h = currentSectionHistory();
+      if (h.index < 0 || h.index >= h.stack.length - 1) {
+        return;
+      }
+      h.index += 1;
+      applyHistorySnapshot(h.stack[h.index]);
+      updateUndoRedoButtons();
     }
 
     function applyRowVisualState(row, state, updateText) {
@@ -879,10 +979,12 @@
           cycleRowState(rowModel);
           syncTextareaFromRows();
           refreshFromRows();
+          pushHistorySnapshot();
         });
       });
       syncTextareaFromRows();
       syncSurfaceScroll();
+      ensureInitialHistorySnapshot();
     }
 
     function onExternalCoverageChange() {
@@ -897,6 +999,7 @@
       });
       syncTextareaFromRows();
       refreshFromRows();
+      pushHistorySnapshot();
     });
     setAllExplicitNotBtn.addEventListener("click", function () {
       rows.forEach(function (row) {
@@ -904,6 +1007,7 @@
       });
       syncTextareaFromRows();
       refreshFromRows();
+      pushHistorySnapshot();
     });
     setAllImplicitNotBtn.addEventListener("click", function () {
       rows.forEach(function (row) {
@@ -911,6 +1015,7 @@
       });
       syncTextareaFromRows();
       refreshFromRows();
+      pushHistorySnapshot();
     });
     makeAllNotCoveredExplicitBtn.addEventListener("click", function () {
       rows.forEach(function (row) {
@@ -920,6 +1025,7 @@
       });
       syncTextareaFromRows();
       refreshFromRows();
+      pushHistorySnapshot();
     });
     makeAllNotCoveredImplicitBtn.addEventListener("click", function () {
       rows.forEach(function (row) {
@@ -929,21 +1035,45 @@
       });
       syncTextareaFromRows();
       refreshFromRows();
+      pushHistorySnapshot();
     });
     sectionSelect.addEventListener("change", function () {
       renderRows();
       refreshFromRows();
     });
+    function handleUndoRedoHotkey(evt) {
+      var isMod = evt.ctrlKey || evt.metaKey;
+      if (isMod && !evt.altKey && !evt.shiftKey && (evt.key === "z" || evt.key === "Z")) {
+        evt.preventDefault();
+        undoHistory();
+        return;
+      }
+      if (isMod && !evt.altKey && !evt.shiftKey && (evt.key === "y" || evt.key === "Y")) {
+        evt.preventDefault();
+        redoHistory();
+        return;
+      }
+      if (isMod && !evt.altKey && evt.shiftKey && (evt.key === "z" || evt.key === "Z")) {
+        evt.preventDefault();
+        redoHistory();
+        return;
+      }
+    }
     textarea.addEventListener("keydown", function (evt) {
+      handleUndoRedoHotkey(evt);
       if (evt.key === "Enter") {
         evt.preventDefault();
       }
     });
+    document.addEventListener("keydown", handleUndoRedoHotkey);
     textarea.addEventListener("input", function () {
       updateRowsFromTextarea();
       refreshFromRows();
+      pushHistorySnapshot();
     });
     textarea.addEventListener("scroll", syncSurfaceScroll);
+    undoBtn.addEventListener("click", undoHistory);
+    redoBtn.addEventListener("click", redoHistory);
 
     copyBtn.addEventListener("click", function () {
       var csvText = buildCsvForExport();
@@ -999,17 +1129,19 @@
       evt.preventDefault();
     }
 
-    closeBtn.addEventListener("click", function () {
+    function closeEditorPanel() {
       persistRowsToCoverage(sectionSelect.value);
       callbacks.applyHighlights();
       syncInlineCheckboxesFromState(coverageState, callbacks.getSelectedProfSections());
       document.removeEventListener("ct-coverage-changed", onExternalCoverageChange);
+      document.removeEventListener("keydown", handleUndoRedoHotkey);
       titleBar.removeEventListener("mousedown", onTitleBarDown);
       document.removeEventListener("mousemove", onDragMove);
       document.removeEventListener("mouseup", onDragUp);
       document.body.classList.remove("ct-editor-dragging");
       panel.remove();
-    });
+    }
+    closeXBtn.addEventListener("click", closeEditorPanel);
 
     content.appendChild(sectionLabel);
     content.appendChild(sectionSelect);

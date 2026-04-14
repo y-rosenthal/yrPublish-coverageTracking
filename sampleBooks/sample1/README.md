@@ -47,11 +47,13 @@ Output is written to `sampleBooks/sample1/_book/`.
     - Set all explicit not-covered
     - Set all implicit not-covered
     - Make all not-covereds explicit / implicit
+    - Undo/Redo buttons and keyboard shortcuts (`Ctrl+Z` / `Ctrl+Y`) even when focus is not in the text area
     - Individual row toggles cycle through covered / explicit not-covered / implicit not-covered (grey)
     - Edit a grey row text manually and confirm it becomes explicit (not grey)
     - Delete a row line and confirm it reverts to implicit (grey) rather than disappearing
     - Copy and download
   - Drag the dialog and confirm the underlying page remains scrollable while it is open
+  - Close the dialog with the top-right `×` button
   - With the dialog open, toggle an **inline** checkbox and confirm the dialog row state stays in sync
   - Confirm sections covered by all selected sections differ from partially covered sections
   - Confirm small colored badges indicate which section(s) covered each item

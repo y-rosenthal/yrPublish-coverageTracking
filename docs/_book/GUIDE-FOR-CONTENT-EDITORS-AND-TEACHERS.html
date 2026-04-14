@@ -381,6 +381,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 <li>Use:
 <ul>
+<li><code>Undo</code> / <code>Redo</code> (or keyboard <code>Ctrl+Z</code> / <code>Ctrl+Y</code>; <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code> on macOS)</li>
 <li><code>Set all covered</code></li>
 <li><code>Set all explicit not-covered</code></li>
 <li><code>Set all implicit not-covered</code></li>
@@ -390,8 +391,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 <li>If a line is edited to empty/deleted, that row does <strong>not disappear</strong>; it reverts to implicit not-covered (grey/italic).</li>
 <li>You can manually edit any row text. If you start editing an implicit (grey) row, it becomes explicit (not grey) so that row is included in output.</li>
-<li>The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing.</li>
-<li><strong>Copy</strong> / <strong>Download</strong> exports only explicit rows (plus header). Save/update the matching <strong><code>yr-coverage--&lt;page-slug&gt;.csv</code></strong> file in the repo under <strong><code>coverage-data/&lt;SECTION-ID&gt;/</code></strong>.</li>
+<li>The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing. Use the <strong><code>×</code></strong> button in the top-right of the dialog to close it.</li>
+<li>Undo/redo hotkeys are recognized while the dialog is open (not only when the text area is focused).</li>
+<li><strong>Copy</strong> / <strong>Download</strong> exports only explicit rows (plus header). Save/update the matching <strong><code>yr-coverage--&lt;page-slug&gt;.csv</code></strong> file in the repo under **<code>coverage-data/&lt;SECTION-ID&gt;/</code>.</li>
 </ol>
 </section>
 <section id="heading-ids-in-quarto-html" class="level3" data-number="4.8.4">

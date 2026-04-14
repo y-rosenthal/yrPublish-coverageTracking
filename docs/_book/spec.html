@@ -301,12 +301,13 @@ ul.task-list li input[type="checkbox"] {
 <li>set all page IDs to implicit not-covered</li>
 <li>convert all not-covered rows to explicit form</li>
 <li>convert all not-covered rows to implicit form</li>
+<li>undo/redo editor history (buttons + keyboard shortcuts <code>Ctrl+Z</code> / <code>Ctrl+Y</code>, recognized while the dialog is open)</li>
 <li>copy CSV text</li>
 <li>download CSV file (filename aligned with <code>yr-coverage--&lt;page-slug&gt;.csv</code> naming)</li>
 </ul></li>
 <li>Implicit rows are visually grey/italic with a greyed checkbox, but still visible so users can promote them to explicit rows.</li>
 <li>Manual edits to a row make it explicit; deleting/emptying a row line reverts that row to implicit not-covered (grey/italic) rather than removing it from the editor surface.</li>
-<li>The dialog is draggable and non-modal; underlying page content remains scrollable while editing.</li>
+<li>The dialog is draggable and non-modal; underlying page content remains scrollable while editing, and it is closed via an upper-right <code>×</code> button.</li>
 <li>Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.</li>
 </ul>
 </section>
