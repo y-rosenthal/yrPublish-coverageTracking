@@ -175,6 +175,27 @@ From another working directory, pass `--book-root` pointing at the book project:
    - pressing `Esc` on that decision dialog cancels and applies no checkbox changes
 4. Outside the editor dialog, professor inline checkbox actions support undo/redo hotkeys (`Ctrl+Z` / `Ctrl+Y`, and `Cmd+Z` / `Cmd+Shift+Z` on macOS).
 
+### Sidebar coverage icons (in left navigation)
+
+In professor mode, the left navigation shows a status icon next to current-page section links:
+
+- green check = fully covered
+- red `x` = not covered
+- yellow `~` = partially covered
+
+For a section link, status is computed from that section's tracked id subtree (the linked id and nested tracked ids), combined across all currently selected professor sections.
+
+These icons are shown across chapter/page links in the left navigation (not only the current page), and they update automatically whenever coverage is changed from:
+
+- inline professor checkboxes in page content
+- the `Edit page coverage CSV` dialog (including undo/redo and bulk actions)
+
+### Draft behavior while navigating pages
+
+Professor edits from inline checkboxes and the CSV editor are stored as browser-local draft coverage so navigation to other pages and back keeps your in-progress changes visible.
+
+To publish/share those updates, still copy/download the CSV output and save it to the repo files under `coverage-data/<SECTION-ID>/`.
+
 ### Edit page coverage CSV
 
 1. In professor mode, click `Edit page coverage CSV` in sidebar.

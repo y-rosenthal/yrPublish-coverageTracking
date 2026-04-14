@@ -194,8 +194,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#compare-mode" id="toc-compare-mode" class="nav-link" data-scroll-target="#compare-mode"><span class="header-section-number">4.8.1</span> Compare mode</a></li>
   <li><a href="#inline-toggles-in-page-content" id="toc-inline-toggles-in-page-content" class="nav-link" data-scroll-target="#inline-toggles-in-page-content"><span class="header-section-number">4.8.2</span> Inline toggles (in page content)</a></li>
-  <li><a href="#edit-page-coverage-csv" id="toc-edit-page-coverage-csv" class="nav-link" data-scroll-target="#edit-page-coverage-csv"><span class="header-section-number">4.8.3</span> Edit page coverage CSV</a></li>
-  <li><a href="#heading-ids-in-quarto-html" id="toc-heading-ids-in-quarto-html" class="nav-link" data-scroll-target="#heading-ids-in-quarto-html"><span class="header-section-number">4.8.4</span> Heading IDs in Quarto HTML</a></li>
+  <li><a href="#sidebar-coverage-icons-in-left-navigation" id="toc-sidebar-coverage-icons-in-left-navigation" class="nav-link" data-scroll-target="#sidebar-coverage-icons-in-left-navigation"><span class="header-section-number">4.8.3</span> Sidebar coverage icons (in left navigation)</a></li>
+  <li><a href="#draft-behavior-while-navigating-pages" id="toc-draft-behavior-while-navigating-pages" class="nav-link" data-scroll-target="#draft-behavior-while-navigating-pages"><span class="header-section-number">4.8.4</span> Draft behavior while navigating pages</a></li>
+  <li><a href="#edit-page-coverage-csv" id="toc-edit-page-coverage-csv" class="nav-link" data-scroll-target="#edit-page-coverage-csv"><span class="header-section-number">4.8.5</span> Edit page coverage CSV</a></li>
+  <li><a href="#heading-ids-in-quarto-html" id="toc-heading-ids-in-quarto-html" class="nav-link" data-scroll-target="#heading-ids-in-quarto-html"><span class="header-section-number">4.8.6</span> Heading IDs in Quarto HTML</a></li>
   </ul></li>
   <li><a href="#notes-on-defaults-and-new-content" id="toc-notes-on-defaults-and-new-content" class="nav-link" data-scroll-target="#notes-on-defaults-and-new-content"><span class="header-section-number">4.9</span> Notes on defaults and new content</a></li>
   <li><a href="#moving-this-feature-into-another-repository" id="toc-moving-this-feature-into-another-repository" class="nav-link" data-scroll-target="#moving-this-feature-into-another-repository"><span class="header-section-number">4.10</span> Moving this feature into another repository</a></li>
@@ -375,8 +377,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Outside the editor dialog, professor inline checkbox actions support undo/redo hotkeys (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, and <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code> on macOS).</li>
 </ol>
 </section>
-<section id="edit-page-coverage-csv" class="level3" data-number="4.8.3">
-<h3 data-number="4.8.3" class="anchored" data-anchor-id="edit-page-coverage-csv"><span class="header-section-number">4.8.3</span> Edit page coverage CSV</h3>
+<section id="sidebar-coverage-icons-in-left-navigation" class="level3" data-number="4.8.3">
+<h3 data-number="4.8.3" class="anchored" data-anchor-id="sidebar-coverage-icons-in-left-navigation"><span class="header-section-number">4.8.3</span> Sidebar coverage icons (in left navigation)</h3>
+<p>In professor mode, the left navigation shows a status icon next to current-page section links:</p>
+<ul>
+<li>green check = fully covered</li>
+<li>red <code>x</code> = not covered</li>
+<li>yellow <code>~</code> = partially covered</li>
+</ul>
+<p>For a section link, status is computed from that section’s tracked id subtree (the linked id and nested tracked ids), combined across all currently selected professor sections.</p>
+<p>These icons are shown across chapter/page links in the left navigation (not only the current page), and they update automatically whenever coverage is changed from:</p>
+<ul>
+<li>inline professor checkboxes in page content</li>
+<li>the <code>Edit page coverage CSV</code> dialog (including undo/redo and bulk actions)</li>
+</ul>
+</section>
+<section id="draft-behavior-while-navigating-pages" class="level3" data-number="4.8.4">
+<h3 data-number="4.8.4" class="anchored" data-anchor-id="draft-behavior-while-navigating-pages"><span class="header-section-number">4.8.4</span> Draft behavior while navigating pages</h3>
+<p>Professor edits from inline checkboxes and the CSV editor are stored as browser-local draft coverage so navigation to other pages and back keeps your in-progress changes visible.</p>
+<p>To publish/share those updates, still copy/download the CSV output and save it to the repo files under <code>coverage-data/&lt;SECTION-ID&gt;/</code>.</p>
+</section>
+<section id="edit-page-coverage-csv" class="level3" data-number="4.8.5">
+<h3 data-number="4.8.5" class="anchored" data-anchor-id="edit-page-coverage-csv"><span class="header-section-number">4.8.5</span> Edit page coverage CSV</h3>
 <ol type="1">
 <li>In professor mode, click <code>Edit page coverage CSV</code> in sidebar.</li>
 <li>Choose the class section to edit.</li>
@@ -406,8 +428,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Copy</strong> / <strong>Download</strong> exports only explicit rows (plus header). Save/update the matching <strong><code>yr-coverage--&lt;page-slug&gt;.csv</code></strong> file in the repo under <strong><code>coverage-data/&lt;SECTION-ID&gt;/</code></strong>.</li>
 </ol>
 </section>
-<section id="heading-ids-in-quarto-html" class="level3" data-number="4.8.4">
-<h3 data-number="4.8.4" class="anchored" data-anchor-id="heading-ids-in-quarto-html"><span class="header-section-number">4.8.4</span> Heading IDs in Quarto HTML</h3>
+<section id="heading-ids-in-quarto-html" class="level3" data-number="4.8.6">
+<h3 data-number="4.8.6" class="anchored" data-anchor-id="heading-ids-in-quarto-html"><span class="header-section-number">4.8.6</span> Heading IDs in Quarto HTML</h3>
 <p>Quarto often places the stable anchor on a <strong><code>&lt;section id="..."&gt;</code></strong> wrapper (with the visible heading inside), or on a <strong><code>&lt;span id="..."&gt;</code></strong> inside the chapter title <code>h1</code>. Use explicit <code>{#id}</code> on headings in source when possible, and ensure CSV <code>html-id</code> values match the rendered DOM ids (see the sample book).</p>
 </section>
 </section>

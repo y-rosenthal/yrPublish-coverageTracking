@@ -4,6 +4,9 @@
   var STORAGE_KEY_STUDENT = "ct_selected_section";
   var STORAGE_KEY_PROF = "ct_selected_sections";
   var STORAGE_KEY_PROF_EDITOR_SECTION = "ct_prof_editor_section";
+  var STORAGE_KEY_PROF_DRAFT = "ct_prof_coverage_draft_v1";
+  var STORAGE_KEY_SIDEBAR_CACHE = "ct_prof_sidebar_cache_v2";
+  var STORAGE_KEY_PAGE_STATUS_CACHE = "ct_prof_page_status_cache_v1";
   var professorHotkeysListener = null;
   var professorInlineChangeListener = null;
 
@@ -11,8 +14,7 @@
     return window.sessionStorage;
   }
 
-  function getPathCandidates() {
-    var pathname = window.location.pathname || "";
+  function getPathCandidatesFor(pathname) {
     var clean = pathname.replace(/\/+$/, "") || "/";
     var base = clean.split("/").pop() || "index.html";
     var baseWithSlash = "/" + base;
@@ -20,6 +22,10 @@
     return [clean, indexAsRoot, baseWithSlash, "/index.html"].filter(function (v, i, arr) {
       return v && arr.indexOf(v) === i;
     });
+  }
+
+  function getPathCandidates() {
+    return getPathCandidatesFor(window.location.pathname || "");
   }
 
   function getCanonicalPageUrl() {
@@ -31,6 +37,17 @@
       return "/index.html";
     }
     return pathname;
+  }
+
+  function canonicalizePathname(pathname) {
+    var path = pathname || "/";
+    if (path.endsWith("/")) {
+      return path + "index.html";
+    }
+    if (path === "/") {
+      return "/index.html";
+    }
+    return path;
   }
 
   function getQueryParam(name) {
@@ -177,10 +194,334 @@
     if (hasExplicitRow === false) {
       delete pageMap[pageUrl][htmlId];
       delete rawPageMap[pageUrl][htmlId];
+      persistProfessorDraftCoverage(sectionId, pageUrl, htmlId, null);
       return;
     }
     pageMap[pageUrl][htmlId] = covered;
     rawPageMap[pageUrl][htmlId] = rawLine || csvEscape(pageUrl) + "," + csvEscape(htmlId) + "," + (covered ? "covered" : "not-covered");
+    persistProfessorDraftCoverage(sectionId, pageUrl, htmlId, covered === true);
+  }
+
+  function readProfessorCoverageDraft() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY_PROF_DRAFT);
+      if (!raw) {
+        return {};
+      }
+      var parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (_err) {
+      return {};
+    }
+  }
+
+  function writeProfessorCoverageDraft(draft) {
+    try {
+      localStorage.setItem(STORAGE_KEY_PROF_DRAFT, JSON.stringify(draft || {}));
+    } catch (_err) {
+      // best effort only
+    }
+  }
+
+  function persistProfessorDraftCoverage(sectionId, pageUrl, htmlId, coveredOrNull) {
+    if (!sectionId || !pageUrl || !htmlId) {
+      return;
+    }
+    var draft = readProfessorCoverageDraft();
+    if (!draft[sectionId]) {
+      draft[sectionId] = {};
+    }
+    if (!draft[sectionId][pageUrl]) {
+      draft[sectionId][pageUrl] = {};
+    }
+    if (coveredOrNull === null) {
+      delete draft[sectionId][pageUrl][htmlId];
+      if (!Object.keys(draft[sectionId][pageUrl]).length) {
+        delete draft[sectionId][pageUrl];
+      }
+      if (!Object.keys(draft[sectionId]).length) {
+        delete draft[sectionId];
+      }
+    } else {
+      draft[sectionId][pageUrl][htmlId] = coveredOrNull === true;
+    }
+    writeProfessorCoverageDraft(draft);
+  }
+
+  function applyProfessorDraftToCoverageState(coverageState) {
+    var draft = readProfessorCoverageDraft();
+    Object.keys(draft).forEach(function (sectionId) {
+      var pages = draft[sectionId] || {};
+      Object.keys(pages).forEach(function (pageUrl) {
+        var byId = pages[pageUrl] || {};
+        Object.keys(byId).forEach(function (htmlId) {
+          var covered = byId[htmlId] === true;
+          setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, covered, true);
+        });
+      });
+    });
+  }
+
+  function sidebarCacheStorageKey(config, coverageState) {
+    var sectionIds = (config.sections || [])
+      .map(function (s) {
+        return s.id;
+      })
+      .sort()
+      .join("|");
+    return STORAGE_KEY_SIDEBAR_CACHE + "::" + (coverageState.basePath || "") + "::" + sectionIds;
+  }
+
+  function readSidebarCoverageCache(config, coverageState) {
+    try {
+      var raw = localStorage.getItem(sidebarCacheStorageKey(config, coverageState));
+      if (!raw) {
+        return null;
+      }
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") {
+        return null;
+      }
+      return parsed;
+    } catch (_err) {
+      return null;
+    }
+  }
+
+  function writeSidebarCoverageCache(config, coverageState) {
+    try {
+      localStorage.setItem(
+        sidebarCacheStorageKey(config, coverageState),
+        JSON.stringify({
+          trackableMetaByPage: coverageState.trackableMetaByPage || {},
+          bySection: coverageState.bySection || {},
+          rawBySection: coverageState.rawBySection || {}
+        })
+      );
+    } catch (_err) {
+      // best effort only
+    }
+  }
+
+  function hydrateSidebarCacheIntoState(config, coverageState, pageUrls) {
+    var cached = readSidebarCoverageCache(config, coverageState);
+    if (!cached) {
+      return;
+    }
+    var wanted = {};
+    pageUrls.forEach(function (p) {
+      wanted[canonicalizePathname(p)] = true;
+    });
+    Object.keys(cached.trackableMetaByPage || {}).forEach(function (pageUrl) {
+      if (!wanted[pageUrl]) {
+        return;
+      }
+      if (!coverageState.trackableMetaByPage[pageUrl]) {
+        coverageState.trackableMetaByPage[pageUrl] = cached.trackableMetaByPage[pageUrl];
+      }
+    });
+    (config.sections || []).forEach(function (section) {
+      var sid = section.id;
+      if (!coverageState.bySection[sid]) {
+        coverageState.bySection[sid] = {};
+      }
+      if (!coverageState.rawBySection[sid]) {
+        coverageState.rawBySection[sid] = {};
+      }
+      var cachedSection = (cached.bySection && cached.bySection[sid]) || {};
+      var cachedRawSection = (cached.rawBySection && cached.rawBySection[sid]) || {};
+      Object.keys(cachedSection).forEach(function (pageUrl) {
+        if (!wanted[pageUrl]) {
+          return;
+        }
+        if (!coverageState.bySection[sid][pageUrl]) {
+          coverageState.bySection[sid][pageUrl] = cachedSection[pageUrl] || {};
+        }
+      });
+      Object.keys(cachedRawSection).forEach(function (pageUrl) {
+        if (!wanted[pageUrl]) {
+          return;
+        }
+        if (!coverageState.rawBySection[sid][pageUrl]) {
+          coverageState.rawBySection[sid][pageUrl] = cachedRawSection[pageUrl] || {};
+        }
+      });
+    });
+  }
+
+  function pageStatusCacheKey(config, coverageState, selectedSectionIds) {
+    var sectionIds = (config.sections || [])
+      .map(function (s) {
+        return s.id;
+      })
+      .sort()
+      .join("|");
+    var selected = (selectedSectionIds || [])
+      .slice()
+      .sort()
+      .join("|");
+    return STORAGE_KEY_PAGE_STATUS_CACHE + "::" + (coverageState.basePath || "") + "::" + sectionIds + "::" + selected;
+  }
+
+  function readPageStatusCache(config, coverageState, selectedSectionIds) {
+    try {
+      var raw = localStorage.getItem(pageStatusCacheKey(config, coverageState, selectedSectionIds));
+      if (!raw) {
+        return {};
+      }
+      var parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (_err) {
+      return {};
+    }
+  }
+
+  function writePageStatusCache(config, coverageState, selectedSectionIds, statusByPage) {
+    try {
+      localStorage.setItem(pageStatusCacheKey(config, coverageState, selectedSectionIds), JSON.stringify(statusByPage || {}));
+    } catch (_err) {
+      // best effort only
+    }
+  }
+
+  function getSidebarPageUrls() {
+    var sidebar = document.getElementById("quarto-sidebar");
+    if (!sidebar) {
+      return [];
+    }
+    var urls = {};
+    sidebar.querySelectorAll("a[href]").forEach(function (link) {
+      var rawHref = link.getAttribute("href");
+      if (!rawHref || rawHref.startsWith("#")) {
+        return;
+      }
+      if (rawHref.startsWith("mailto:") || rawHref.startsWith("tel:") || rawHref.startsWith("javascript:")) {
+        return;
+      }
+      var url;
+      try {
+        url = new URL(rawHref, window.location.href);
+      } catch (_err) {
+        return;
+      }
+      if (url.origin !== window.location.origin) {
+        return;
+      }
+      urls[canonicalizePathname(url.pathname || "/")] = true;
+    });
+    return Object.keys(urls);
+  }
+
+  function extractTrackableMetaFromDocument(doc) {
+    var nodes = [];
+    doc.querySelectorAll("#quarto-content .quarto-title-block h1 span[id]").forEach(function (span) {
+      nodes.push(span);
+    });
+    doc.querySelectorAll("#quarto-content section[id]").forEach(function (sec) {
+      if (
+        sec.querySelector(":scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6")
+      ) {
+        nodes.push(sec);
+      }
+    });
+    var idsSet = {};
+    var ids = [];
+    nodes.forEach(function (node) {
+      if (!node.id || idsSet[node.id]) {
+        return;
+      }
+      idsSet[node.id] = true;
+      ids.push(node.id);
+    });
+    var descendantsById = {};
+    nodes.forEach(function (node) {
+      if (!node.id || !idsSet[node.id]) {
+        return;
+      }
+      var descendants = [];
+      node.querySelectorAll("[id]").forEach(function (el) {
+        if (el.id !== node.id && idsSet[el.id]) {
+          descendants.push(el.id);
+        }
+      });
+      descendantsById[node.id] = descendants.filter(function (id, idx, arr) {
+        return arr.indexOf(id) === idx;
+      });
+    });
+    return { ids: ids, descendantsById: descendantsById };
+  }
+
+  function loadTrackableMetaByPage(pageUrls) {
+    var metaByPage = {};
+    var tasks = pageUrls.map(function (pageUrl) {
+      var fetchUrl = pageUrl;
+      return fetchText(fetchUrl)
+        .then(function (html) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, "text/html");
+          metaByPage[pageUrl] = extractTrackableMetaFromDocument(doc);
+        })
+        .catch(function () {
+          metaByPage[pageUrl] = { ids: [], descendantsById: {} };
+        });
+    });
+    return Promise.all(tasks).then(function () {
+      return metaByPage;
+    });
+  }
+
+  function preloadCoverageForSidebarPages(config, coverageState) {
+    var currentPageUrl = getCanonicalPageUrl();
+    var pagesToLoad = {};
+    getSidebarPageUrls().forEach(function (pageUrl) {
+      var canon = canonicalizePathname(pageUrl);
+      if (canon !== currentPageUrl) {
+        pagesToLoad[canon] = true;
+      }
+    });
+    var pageUrls = Object.keys(pagesToLoad);
+    if (!pageUrls.length) {
+      return Promise.resolve();
+    }
+
+    return loadTrackableMetaByPage(pageUrls)
+      .then(function (metaByPage) {
+        Object.keys(metaByPage).forEach(function (pageUrl) {
+          coverageState.trackableMetaByPage[pageUrl] = metaByPage[pageUrl];
+        });
+        var tasks = [];
+        (config.sections || []).forEach(function (section) {
+          if (!coverageState.bySection[section.id]) {
+            coverageState.bySection[section.id] = {};
+          }
+          if (!coverageState.rawBySection[section.id]) {
+            coverageState.rawBySection[section.id] = {};
+          }
+          pageUrls.forEach(function (pageUrl) {
+            if (coverageState.bySection[section.id][pageUrl] && coverageState.rawBySection[section.id][pageUrl]) {
+              return;
+            }
+            var csvUrl = coverageCsvUrlForPage(section, coverageState.basePath, pageUrl);
+            tasks.push(
+              fetchText(csvUrl)
+                .then(function (text) {
+                  var parsed = parseCoverageCsv(text);
+                  coverageState.bySection[section.id][pageUrl] = parsed.byUrl[pageUrl] || {};
+                  coverageState.rawBySection[section.id][pageUrl] = parsed.rawByUrl[pageUrl] || {};
+                })
+                .catch(function () {
+                  coverageState.bySection[section.id][pageUrl] = {};
+                  coverageState.rawBySection[section.id][pageUrl] = {};
+                })
+            );
+          });
+        });
+        return Promise.all(tasks);
+      })
+      .then(function () {
+        applyProfessorDraftToCoverageState(coverageState);
+        writeSidebarCoverageCache(config, coverageState);
+      });
   }
 
   /**
@@ -247,23 +588,33 @@
   }
 
   function loadCoverageState(config, basePath) {
-    var pageUrl = getCanonicalPageUrl();
-    var state = { bySection: {}, rawBySection: {}, pageUrl: pageUrl };
-    var tasks = (config.sections || []).map(function (section) {
-      var csvUrl = coverageCsvUrlForPage(section, basePath, pageUrl);
-      return fetchText(csvUrl)
-        .then(function (text) {
-          var parsed = parseCoverageCsv(text);
-          state.bySection[section.id] = parsed.byUrl;
-          state.rawBySection[section.id] = parsed.rawByUrl;
-        })
-        .catch(function (err) {
-          console.warn("Coverage CSV missing or unreadable: " + csvUrl, err);
-          state.bySection[section.id] = {};
-          state.rawBySection[section.id] = {};
-        });
+    var currentPageUrl = getCanonicalPageUrl();
+    var state = { bySection: {}, rawBySection: {}, pageUrl: currentPageUrl, trackableMetaByPage: {}, basePath: basePath };
+    state.trackableMetaByPage[currentPageUrl] = extractTrackableMetaFromDocument(document);
+    hydrateSidebarCacheIntoState(config, state, getSidebarPageUrls());
+
+    var tasks = [];
+    (config.sections || []).forEach(function (section) {
+      state.bySection[section.id] = {};
+      state.rawBySection[section.id] = {};
+      var csvUrl = coverageCsvUrlForPage(section, basePath, currentPageUrl);
+      tasks.push(
+        fetchText(csvUrl)
+          .then(function (text) {
+            var parsed = parseCoverageCsv(text);
+            state.bySection[section.id][currentPageUrl] = parsed.byUrl[currentPageUrl] || {};
+            state.rawBySection[section.id][currentPageUrl] = parsed.rawByUrl[currentPageUrl] || {};
+          })
+          .catch(function (err) {
+            console.warn("Coverage CSV missing or unreadable: " + csvUrl, err);
+            state.bySection[section.id][currentPageUrl] = {};
+            state.rawBySection[section.id][currentPageUrl] = {};
+          })
+      );
     });
     return Promise.all(tasks).then(function () {
+      applyProfessorDraftToCoverageState(state);
+      writeSidebarCoverageCache(config, state);
       return state;
     });
   }
@@ -299,8 +650,12 @@
   }
 
   function coverageStateForCurrentPage(sectionId, coverageState) {
+    return coverageStateForPage(sectionId, coverageState, getCanonicalPageUrl());
+  }
+
+  function coverageStateForPage(sectionId, coverageState, pageUrl) {
     var pageMap = (coverageState.bySection && coverageState.bySection[sectionId]) || {};
-    var candidates = getPathCandidates();
+    var candidates = getPathCandidatesFor(canonicalizePathname(pageUrl || "/"));
     var merged = {};
     candidates.forEach(function (pathKey) {
       var byId = pageMap[pathKey];
@@ -1522,6 +1877,144 @@
     sidebarMenu.prepend(createProfessorControlItem("Edit page coverage CSV", "", openEditor));
   }
 
+  function clearSidebarCoverageIcons() {
+    document.querySelectorAll(".ct-nav-coverage-icon").forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  function coverageSummaryForTrackableIds(sectionIds, pageUrl, trackableIds, coverageState) {
+    if (!sectionIds || !sectionIds.length || !trackableIds || !trackableIds.length) {
+      return null;
+    }
+    var total = 0;
+    var covered = 0;
+    sectionIds.forEach(function (sectionId) {
+      var byId = coverageStateForPage(sectionId, coverageState, pageUrl);
+      trackableIds.forEach(function (id) {
+        total += 1;
+        if (byId[id] === true) {
+          covered += 1;
+        }
+      });
+    });
+    if (total === 0) {
+      return null;
+    }
+    if (covered === 0) {
+      return "none";
+    }
+    if (covered === total) {
+      return "full";
+    }
+    return "partial";
+  }
+
+  function setSidebarLinkCoverageIcon(link, status) {
+    var icon = link.querySelector(".ct-nav-coverage-icon");
+    if (!status) {
+      if (icon) {
+        icon.remove();
+      }
+      return;
+    }
+    if (!icon) {
+      icon = createElement("span", { class: "ct-nav-coverage-icon", "aria-hidden": "true" });
+      var menuText = link.querySelector(".menu-text");
+      if (menuText) {
+        link.insertBefore(icon, menuText);
+      } else {
+        link.prepend(icon);
+      }
+    }
+    icon.className = "ct-nav-coverage-icon ct-nav-coverage-" + status;
+    icon.textContent = status === "full" ? "✓" : status === "none" ? "x" : "~";
+  }
+
+  function updateSidebarCoverageIcons(selectedSectionIds, coverageState, config) {
+    clearSidebarCoverageIcons();
+    if (!selectedSectionIds || !selectedSectionIds.length) {
+      return;
+    }
+    var sidebar = document.getElementById("quarto-sidebar");
+    if (!sidebar) {
+      return;
+    }
+
+    var currentPagePath = getCanonicalPageUrl();
+    var currentRows = getPageSectionRows();
+    var currentIdsSet = {};
+    currentRows.forEach(function (row) {
+      currentIdsSet[row.id] = true;
+    });
+    var currentMeta = {
+      ids: currentRows.map(function (row) {
+        return row.id;
+      }),
+      descendantsById: {}
+    };
+    currentMeta.ids.forEach(function (id) {
+      currentMeta.descendantsById[id] = descendantTrackableIds(id, currentIdsSet);
+    });
+    coverageState.trackableMetaByPage[currentPagePath] = currentMeta;
+    var cachedPageStatus = readPageStatusCache(config, coverageState, selectedSectionIds);
+    if (currentMeta.ids.length) {
+      cachedPageStatus[currentPagePath] = coverageSummaryForTrackableIds(
+        selectedSectionIds,
+        currentPagePath,
+        currentMeta.ids,
+        coverageState
+      );
+      writePageStatusCache(config, coverageState, selectedSectionIds, cachedPageStatus);
+    }
+
+    sidebar.querySelectorAll("a[href]").forEach(function (link) {
+      if (link.closest(".ct-prof-sidebar-item") || link.closest(".ct-sidebar-item")) {
+        return;
+      }
+      var rawHref = link.getAttribute("href");
+      if (!rawHref || rawHref.startsWith("mailto:") || rawHref.startsWith("tel:") || rawHref.startsWith("javascript:")) {
+        return;
+      }
+
+      var url;
+      try {
+        url = new URL(rawHref, window.location.href);
+      } catch (_err) {
+        return;
+      }
+      if (url.origin !== window.location.origin) {
+        return;
+      }
+      var targetPage = canonicalizePathname(url.pathname || "/");
+      var meta = coverageState.trackableMetaByPage[targetPage] || { ids: [], descendantsById: {} };
+
+      var hash = (url.hash || "").replace(/^#/, "");
+      if (hash) {
+        hash = decodeURIComponent(hash);
+      }
+      var ids = null;
+      if (hash) {
+        if (targetPage === currentPagePath && currentIdsSet[hash]) {
+          ids = [hash].concat(descendantTrackableIds(hash, currentIdsSet));
+        } else if (meta.ids.indexOf(hash) > -1) {
+          ids = [hash].concat(meta.descendantsById[hash] || []);
+        }
+      } else {
+        if (targetPage !== currentPagePath && cachedPageStatus[targetPage]) {
+          setSidebarLinkCoverageIcon(link, cachedPageStatus[targetPage]);
+          return;
+        }
+        ids = meta.ids;
+      }
+      if (!ids || !ids.length) {
+        return;
+      }
+      var status = coverageSummaryForTrackableIds(selectedSectionIds, targetPage, ids, coverageState);
+      setSidebarLinkCoverageIcon(link, status);
+    });
+  }
+
   function mountStudentControls(controlElement) {
     if (document.querySelector(".ct-sidebar-item")) {
       return;
@@ -1578,6 +2071,7 @@
           localStorage.setItem(STORAGE_KEY_PROF, JSON.stringify(ids));
           mountInlineProfessorControls(config, ids, coverageState);
           applyProfessorCoverage(ids, config, coverageState);
+          updateSidebarCoverageIcons(ids, coverageState, config);
           mountProfessorControls(config, ids, openChooser, openEditor);
         });
         document.body.appendChild(panel);
@@ -1587,6 +2081,7 @@
         mountInlineProfessorControls(config, selected, coverageState);
         applyProfessorCoverage(selected, config, coverageState);
         syncInlineCheckboxesFromState(coverageState, selected);
+        updateSidebarCoverageIcons(selected, coverageState, config);
       }
 
       function openEditor() {
@@ -1658,8 +2153,7 @@
             }
           });
         });
-        applyProfessorCoverage(selected, config, coverageState);
-        syncInlineCheckboxesFromState(coverageState, selected);
+        syncProfessorUi();
       }
 
       function undoInline() {
@@ -1757,6 +2251,7 @@
           }
           applyProfessorCoverage(selected, config, coverageState);
           syncInlineCheckboxesFromState(coverageState, selected);
+          updateSidebarCoverageIcons(selected, coverageState, config);
           localStorage.setItem(STORAGE_KEY_PROF_EDITOR_SECTION, sectionId);
           document.dispatchEvent(new CustomEvent("ct-coverage-changed"));
           pushInlineHistorySnapshot();
@@ -1794,6 +2289,9 @@
       document.addEventListener("keydown", professorHotkeysListener);
 
       syncProfessorUi();
+      preloadCoverageForSidebarPages(config, coverageState).then(function () {
+        updateSidebarCoverageIcons(selected, coverageState, config);
+      });
       mountProfessorControls(config, selected, openChooser, openEditor);
       pushInlineHistorySnapshot();
       return;

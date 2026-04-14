@@ -129,6 +129,34 @@ body.ct-needs-selection #quarto-content {
   font-weight: 700;
 }
 
+.ct-nav-coverage-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-right: 0.32rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  vertical-align: middle;
+}
+
+.ct-nav-coverage-full {
+  background: #2e7d32;
+}
+
+.ct-nav-coverage-none {
+  background: #b42318;
+}
+
+.ct-nav-coverage-partial {
+  background: #f5b301;
+  color: #1f2937;
+}
+
 .ct-editor-panel {
   max-width: 52rem;
   width: min(52rem, calc(100vw - 2rem));

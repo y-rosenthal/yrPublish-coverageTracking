@@ -155,10 +155,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#fr-4-professor-mode-and-navigation" id="toc-fr-4-professor-mode-and-navigation" class="nav-link" data-scroll-target="#fr-4-professor-mode-and-navigation"><span class="header-section-number">2.3.4</span> FR-4: Professor mode and navigation</a></li>
   <li><a href="#fr-5-professor-sidebar-controls" id="toc-fr-5-professor-sidebar-controls" class="nav-link" data-scroll-target="#fr-5-professor-sidebar-controls"><span class="header-section-number">2.3.5</span> FR-5: Professor sidebar controls</a></li>
   <li><a href="#fr-5b-professor-inline-coverage-toggles" id="toc-fr-5b-professor-inline-coverage-toggles" class="nav-link" data-scroll-target="#fr-5b-professor-inline-coverage-toggles"><span class="header-section-number">2.3.6</span> FR-5b: Professor inline coverage toggles</a></li>
-  <li><a href="#fr-6-coverage-data-file-format" id="toc-fr-6-coverage-data-file-format" class="nav-link" data-scroll-target="#fr-6-coverage-data-file-format"><span class="header-section-number">2.3.7</span> FR-6: Coverage data file format</a></li>
-  <li><a href="#fr-7-professor-csv-editing-ui" id="toc-fr-7-professor-csv-editing-ui" class="nav-link" data-scroll-target="#fr-7-professor-csv-editing-ui"><span class="header-section-number">2.3.8</span> FR-7: Professor CSV editing UI</a></li>
-  <li><a href="#fr-7b-trackable-html-ids-idsonpage" id="toc-fr-7b-trackable-html-ids-idsonpage" class="nav-link" data-scroll-target="#fr-7b-trackable-html-ids-idsonpage"><span class="header-section-number">2.3.9</span> FR-7b: Trackable HTML ids (<code>idsOnPage</code>)</a></li>
-  <li><a href="#fr-8-helper-scripts" id="toc-fr-8-helper-scripts" class="nav-link" data-scroll-target="#fr-8-helper-scripts"><span class="header-section-number">2.3.10</span> FR-8: Helper scripts</a></li>
+  <li><a href="#fr-5c-professor-left-navigation-coverage-icons" id="toc-fr-5c-professor-left-navigation-coverage-icons" class="nav-link" data-scroll-target="#fr-5c-professor-left-navigation-coverage-icons"><span class="header-section-number">2.3.7</span> FR-5c: Professor left-navigation coverage icons</a></li>
+  <li><a href="#fr-7c-in-browser-professor-draft-persistence" id="toc-fr-7c-in-browser-professor-draft-persistence" class="nav-link" data-scroll-target="#fr-7c-in-browser-professor-draft-persistence"><span class="header-section-number">2.3.8</span> FR-7c: In-browser professor draft persistence</a></li>
+  <li><a href="#fr-6-coverage-data-file-format" id="toc-fr-6-coverage-data-file-format" class="nav-link" data-scroll-target="#fr-6-coverage-data-file-format"><span class="header-section-number">2.3.9</span> FR-6: Coverage data file format</a></li>
+  <li><a href="#fr-7-professor-csv-editing-ui" id="toc-fr-7-professor-csv-editing-ui" class="nav-link" data-scroll-target="#fr-7-professor-csv-editing-ui"><span class="header-section-number">2.3.10</span> FR-7: Professor CSV editing UI</a></li>
+  <li><a href="#fr-7b-trackable-html-ids-idsonpage" id="toc-fr-7b-trackable-html-ids-idsonpage" class="nav-link" data-scroll-target="#fr-7b-trackable-html-ids-idsonpage"><span class="header-section-number">2.3.11</span> FR-7b: Trackable HTML ids (<code>idsOnPage</code>)</a></li>
+  <li><a href="#fr-8-helper-scripts" id="toc-fr-8-helper-scripts" class="nav-link" data-scroll-target="#fr-8-helper-scripts"><span class="header-section-number">2.3.12</span> FR-8: Helper scripts</a></li>
   </ul></li>
   <li><a href="#proposed-file-structure" id="toc-proposed-file-structure" class="nav-link" data-scroll-target="#proposed-file-structure"><span class="header-section-number">2.4</span> Proposed file structure</a></li>
   <li><a href="#csv-semantics" id="toc-csv-semantics" class="nav-link" data-scroll-target="#csv-semantics"><span class="header-section-number">2.5</span> CSV semantics</a></li>
@@ -280,8 +282,30 @@ ul.task-list li input[type="checkbox"] {
 <li>Inline checkbox actions support undo/redo hotkeys in professor mode (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, plus macOS <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code>).</li>
 </ul>
 </section>
-<section id="fr-6-coverage-data-file-format" class="level3" data-number="2.3.7">
-<h3 data-number="2.3.7" class="anchored" data-anchor-id="fr-6-coverage-data-file-format"><span class="header-section-number">2.3.7</span> FR-6: Coverage data file format</h3>
+<section id="fr-5c-professor-left-navigation-coverage-icons" class="level3" data-number="2.3.7">
+<h3 data-number="2.3.7" class="anchored" data-anchor-id="fr-5c-professor-left-navigation-coverage-icons"><span class="header-section-number">2.3.7</span> FR-5c: Professor left-navigation coverage icons</h3>
+<ul>
+<li>In professor mode, left sidebar navigation links for the current page show section-coverage status icons.</li>
+<li>Icon states:
+<ul>
+<li>green check: all tracked ids in that sidebar section scope are covered across all selected professor sections</li>
+<li>red x: none of the tracked ids in scope are covered</li>
+<li>yellow <code>~</code>: mixed coverage (partial)</li>
+</ul></li>
+<li>Sidebar icons are shown for links across all book chapters/pages (not only the currently viewed page).</li>
+<li>Sidebar icons recompute whenever in-memory coverage changes (inline heading checkbox actions, editor dialog changes, and undo/redo).</li>
+</ul>
+</section>
+<section id="fr-7c-in-browser-professor-draft-persistence" class="level3" data-number="2.3.8">
+<h3 data-number="2.3.8" class="anchored" data-anchor-id="fr-7c-in-browser-professor-draft-persistence"><span class="header-section-number">2.3.8</span> FR-7c: In-browser professor draft persistence</h3>
+<ul>
+<li>Professor coverage edits are persisted in browser <code>localStorage</code> draft state so changes survive page-to-page navigation during a session.</li>
+<li>Draft state overlays loaded CSV data on each page load, and stays synchronized with inline toggles and editor dialog actions.</li>
+<li>Export/download remains the publish mechanism; no server-side writes are introduced.</li>
+</ul>
+</section>
+<section id="fr-6-coverage-data-file-format" class="level3" data-number="2.3.9">
+<h3 data-number="2.3.9" class="anchored" data-anchor-id="fr-6-coverage-data-file-format"><span class="header-section-number">2.3.9</span> FR-6: Coverage data file format</h3>
 <ul>
 <li><code>coverage-config.json</code> remains JSON and defines sections and colors (optional <code>coverageDataDir</code> per section).</li>
 <li>Coverage data is stored under <code>coverage-data/&lt;SECTION-ID&gt;/</code> with one CSV per HTML page: <code>yr-coverage--&lt;page-slug&gt;.csv</code> (see proposed file structure). The runtime loads only the current page’s files.</li>
@@ -295,8 +319,8 @@ ul.task-list li input[type="checkbox"] {
 <li>If <code>(URL,html-id)</code> is missing from the relevant page’s CSV for that section, default is not covered.</li>
 </ul>
 </section>
-<section id="fr-7-professor-csv-editing-ui" class="level3" data-number="2.3.8">
-<h3 data-number="2.3.8" class="anchored" data-anchor-id="fr-7-professor-csv-editing-ui"><span class="header-section-number">2.3.8</span> FR-7: Professor CSV editing UI</h3>
+<section id="fr-7-professor-csv-editing-ui" class="level3" data-number="2.3.10">
+<h3 data-number="2.3.10" class="anchored" data-anchor-id="fr-7-professor-csv-editing-ui"><span class="header-section-number">2.3.10</span> FR-7: Professor CSV editing UI</h3>
 <ul>
 <li>Professor can open page-level coverage editor in the UI.</li>
 <li>Editor supports:
@@ -322,14 +346,14 @@ ul.task-list li input[type="checkbox"] {
 <li>Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.</li>
 </ul>
 </section>
-<section id="fr-7b-trackable-html-ids-idsonpage" class="level3" data-number="2.3.9">
-<h3 data-number="2.3.9" class="anchored" data-anchor-id="fr-7b-trackable-html-ids-idsonpage"><span class="header-section-number">2.3.9</span> FR-7b: Trackable HTML ids (<code>idsOnPage</code>)</h3>
+<section id="fr-7b-trackable-html-ids-idsonpage" class="level3" data-number="2.3.11">
+<h3 data-number="2.3.11" class="anchored" data-anchor-id="fr-7b-trackable-html-ids-idsonpage"><span class="header-section-number">2.3.11</span> FR-7b: Trackable HTML ids (<code>idsOnPage</code>)</h3>
 <ul>
 <li>The runtime collects the same set of ids for highlighting, inline toggles, and the editor. In Quarto HTML books this typically includes elements with ids on <strong>section</strong> wrappers and <strong>chapter title</strong> <code>h1 span[id]</code> nodes, not only <code>h1[id]</code> / <code>h2[id]</code> on the heading element itself.</li>
 </ul>
 </section>
-<section id="fr-8-helper-scripts" class="level3" data-number="2.3.10">
-<h3 data-number="2.3.10" class="anchored" data-anchor-id="fr-8-helper-scripts"><span class="header-section-number">2.3.10</span> FR-8: Helper scripts</h3>
+<section id="fr-8-helper-scripts" class="level3" data-number="2.3.12">
+<h3 data-number="2.3.12" class="anchored" data-anchor-id="fr-8-helper-scripts"><span class="header-section-number">2.3.12</span> FR-8: Helper scripts</h3>
 <ul>
 <li><code>tools/yrAddSectionsIds.sh</code>
 <ul>
@@ -385,6 +409,7 @@ tools/
 <li>professor compare mode</li>
 <li>professor sidebar controls</li>
 <li>professor inline per-section checkboxes in page content (when at least one section is selected)</li>
+<li>professor sidebar section icons (green full / red none / yellow partial) that update live from inline and editor changes</li>
 <li>professor CSV editor/export workflow (tri-state per-line rows and inline CSV text editing)</li>
 <li>per-page CSV coverage loading (lazy fetch per page)</li>
 </ul>

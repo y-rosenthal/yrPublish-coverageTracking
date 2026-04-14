@@ -70,6 +70,22 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
   - pressing `Esc` in the nested decision dialog cancels and applies no checkbox changes
 - Inline checkbox actions support undo/redo hotkeys in professor mode (`Ctrl+Z` / `Ctrl+Y`, plus macOS `Cmd+Z` / `Cmd+Shift+Z`).
 
+### FR-5c: Professor left-navigation coverage icons
+
+- In professor mode, left sidebar navigation links for the current page show section-coverage status icons.
+- Icon states:
+  - green check: all tracked ids in that sidebar section scope are covered across all selected professor sections
+  - red x: none of the tracked ids in scope are covered
+  - yellow `~`: mixed coverage (partial)
+- Sidebar icons are shown for links across all book chapters/pages (not only the currently viewed page).
+- Sidebar icons recompute whenever in-memory coverage changes (inline heading checkbox actions, editor dialog changes, and undo/redo).
+
+### FR-7c: In-browser professor draft persistence
+
+- Professor coverage edits are persisted in browser `localStorage` draft state so changes survive page-to-page navigation during a session.
+- Draft state overlays loaded CSV data on each page load, and stays synchronized with inline toggles and editor dialog actions.
+- Export/download remains the publish mechanism; no server-side writes are introduced.
+
 ### FR-6: Coverage data file format
 
 - `coverage-config.json` remains JSON and defines sections and colors (optional `coverageDataDir` per section).
@@ -163,6 +179,7 @@ The sample implementation is in `sampleBooks/sample1/` and demonstrates:
 - professor compare mode
 - professor sidebar controls
 - professor inline per-section checkboxes in page content (when at least one section is selected)
+- professor sidebar section icons (green full / red none / yellow partial) that update live from inline and editor changes
 - professor CSV editor/export workflow (tri-state per-line rows and inline CSV text editing)
 - per-page CSV coverage loading (lazy fetch per page)
 
