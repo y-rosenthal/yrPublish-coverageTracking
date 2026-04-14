@@ -270,6 +270,13 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>When professor mode is active and <strong>at least one</strong> class section is selected, the tracker shows <strong>per-section checkboxes</strong> next to each trackable heading (or chapter title span) in the page content, color-coded by section.</li>
 <li>Toggling an inline checkbox updates in-memory coverage, refreshes highlights, and stays in sync with the CSV editor dialog when it is open.</li>
+<li>Nested ids are logical overrides: if an outer tracked id is covered but a nested tracked id is not, the nested region is rendered as uncovered.</li>
+<li>Outer-id toggles may cascade to nested ids:
+<ul>
+<li>checking outer id: auto-check all descendants when all are unchecked; prompt when descendants are mixed</li>
+<li>unchecking outer id: auto-uncheck descendants when all checked or all unchecked; prompt when descendants are mixed</li>
+</ul></li>
+<li>Inline checkbox actions support undo/redo hotkeys in professor mode (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, plus macOS <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code>).</li>
 </ul>
 </section>
 <section id="fr-6-coverage-data-file-format" class="level3" data-number="2.3.7">

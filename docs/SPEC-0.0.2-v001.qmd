@@ -134,6 +134,10 @@ When professor mode is active and **N ≥ 1** class sections are selected:
 
 - For each `htmlId` in `idsOnPage` and each selected `sectionId`, show **one** checkbox (or a grouped row of N), **color-coded** to `coverage-config.json` `color` for that section.
 - Toggle updates in-memory state, refreshes highlights, and any open CSV preview/export for that section.
+- Nested-id logic:
+  - uncovered nested ids visually override covered ancestors
+  - outer-id toggles may cascade to descendants with confirmation prompts when descendant states are mixed
+- Inline actions support undo/redo hotkeys while professor mode is active (`Ctrl+Z` / `Ctrl+Y`, and macOS equivalents).
 
 ### Export semantics with tri-state rows
 

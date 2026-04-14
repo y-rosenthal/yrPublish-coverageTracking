@@ -4,6 +4,8 @@
   var STORAGE_KEY_STUDENT = "ct_selected_section";
   var STORAGE_KEY_PROF = "ct_selected_sections";
   var STORAGE_KEY_PROF_EDITOR_SECTION = "ct_prof_editor_section";
+  var professorHotkeysListener = null;
+  var professorInlineChangeListener = null;
 
   function getStudentStorage() {
     return window.sessionStorage;
@@ -267,8 +269,8 @@
   }
 
   function clearCoverageStyles() {
-    document.querySelectorAll(".ct-covered, .ct-covered-all, .ct-covered-some").forEach(function (el) {
-      el.classList.remove("ct-covered", "ct-covered-all", "ct-covered-some");
+    document.querySelectorAll(".ct-covered, .ct-covered-all, .ct-covered-some, .ct-not-covered-override").forEach(function (el) {
+      el.classList.remove("ct-covered", "ct-covered-all", "ct-covered-some", "ct-not-covered-override");
       el.removeAttribute("data-ct-covered-by");
     });
     document.querySelectorAll(".ct-badge-row").forEach(function (el) {
@@ -334,10 +336,27 @@
       return;
     }
     var covered = resolveCoverageSetForSection(sectionId, coverageState);
+    var coveredById = {};
     covered.forEach(function (id) {
       var node = document.getElementById(id);
       if (node) {
         node.classList.add("ct-covered");
+        coveredById[id] = true;
+      }
+    });
+
+    // If an outer section is covered but a nested tracked id is not, force nested area to appear uncovered.
+    queryHeadingNodesWithIds().forEach(function (node) {
+      if (coveredById[node.id]) {
+        return;
+      }
+      var parent = node.parentElement;
+      while (parent && parent !== document.body) {
+        if (parent.id && coveredById[parent.id]) {
+          node.classList.add("ct-not-covered-override");
+          break;
+        }
+        parent = parent.parentElement;
       }
     });
   }
@@ -391,6 +410,25 @@
         node.classList.add("ct-covered-all");
       } else {
         node.classList.add("ct-covered-some");
+      }
+    });
+
+    // Nested override: if parent has coverage but child id has none, child should appear uncovered.
+    var coveredCountById = {};
+    Object.keys(coverageIndex).forEach(function (id) {
+      coveredCountById[id] = coverageIndex[id].length;
+    });
+    queryHeadingNodesWithIds().forEach(function (node) {
+      if ((coveredCountById[node.id] || 0) > 0) {
+        return;
+      }
+      var parent = node.parentElement;
+      while (parent && parent !== document.body) {
+        if ((coveredCountById[parent.id] || 0) > 0) {
+          node.classList.add("ct-not-covered-override");
+          break;
+        }
+        parent = parent.parentElement;
       }
     });
   }
@@ -489,6 +527,28 @@
       var text = headingLabelText(heading);
       return { id: node.id, label: text ? node.id + " - " + text : node.id };
     });
+  }
+
+  function trackableIdsOnPageSet() {
+    var set = {};
+    getPageSectionRows().forEach(function (row) {
+      set[row.id] = true;
+    });
+    return set;
+  }
+
+  function descendantTrackableIds(htmlId, idsSet) {
+    var root = document.getElementById(htmlId);
+    if (!root) {
+      return [];
+    }
+    var out = [];
+    root.querySelectorAll("[id]").forEach(function (el) {
+      if (el.id !== htmlId && idsSet[el.id]) {
+        out.push(el.id);
+      }
+    });
+    return out;
   }
 
   function clearInlineProfessorControls() {
@@ -1283,6 +1343,16 @@
   }
 
   function init(config, coverageState) {
+    // Defensive cleanup so repeated init() calls cannot stack listeners.
+    if (professorHotkeysListener) {
+      document.removeEventListener("keydown", professorHotkeysListener);
+      professorHotkeysListener = null;
+    }
+    if (professorInlineChangeListener) {
+      document.body.removeEventListener("change", professorInlineChangeListener);
+      professorInlineChangeListener = null;
+    }
+
     if (isProfessorMode()) {
       preserveProfessorParamInLinks();
       clearStudentControls();
@@ -1334,6 +1404,70 @@
         document.body.appendChild(panel);
       }
 
+      var idsSet = trackableIdsOnPageSet();
+      var inlineHistory = { stack: [], index: -1 };
+
+      function snapshotInlineState() {
+        var snap = {};
+        (config.sections || []).forEach(function (s) {
+          var page = coverageStateForCurrentPage(s.id, coverageState);
+          var sectionSnap = {};
+          Object.keys(idsSet).forEach(function (id) {
+            if (!Object.prototype.hasOwnProperty.call(page, id)) {
+              sectionSnap[id] = null; // implicit / omitted row
+            } else {
+              sectionSnap[id] = page[id] === true;
+            }
+          });
+          snap[s.id] = sectionSnap;
+        });
+        return snap;
+      }
+
+      function pushInlineHistorySnapshot() {
+        var snap = snapshotInlineState();
+        var encoded = JSON.stringify(snap);
+        if (inlineHistory.index >= 0 && JSON.stringify(inlineHistory.stack[inlineHistory.index]) === encoded) {
+          return;
+        }
+        inlineHistory.stack = inlineHistory.stack.slice(0, inlineHistory.index + 1);
+        inlineHistory.stack.push(snap);
+        inlineHistory.index = inlineHistory.stack.length - 1;
+      }
+
+      function applyInlineSnapshot(snap) {
+        var pageUrl = getCanonicalPageUrl();
+        Object.keys(snap).forEach(function (sectionId) {
+          var byId = snap[sectionId] || {};
+          Object.keys(byId).forEach(function (id) {
+            var v = byId[id];
+            if (v === null) {
+              setPageCoverageForSection(coverageState, sectionId, pageUrl, id, false, false);
+            } else {
+              setPageCoverageForSection(coverageState, sectionId, pageUrl, id, v === true, true);
+            }
+          });
+        });
+        applyProfessorCoverage(selected, config, coverageState);
+        syncInlineCheckboxesFromState(coverageState, selected);
+      }
+
+      function undoInline() {
+        if (inlineHistory.index <= 0) {
+          return;
+        }
+        inlineHistory.index -= 1;
+        applyInlineSnapshot(inlineHistory.stack[inlineHistory.index]);
+      }
+
+      function redoInline() {
+        if (inlineHistory.index < 0 || inlineHistory.index >= inlineHistory.stack.length - 1) {
+          return;
+        }
+        inlineHistory.index += 1;
+        applyInlineSnapshot(inlineHistory.stack[inlineHistory.index]);
+      }
+
       function onInlineCheckboxChange(evt) {
         var el = evt.target;
         if (!el.classList.contains("ct-inline-checkbox")) {
@@ -1342,15 +1476,81 @@
         var sectionId = el.getAttribute("data-section-id");
         var htmlId = el.getAttribute("data-html-id");
         var pageUrl = getCanonicalPageUrl();
-        setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, el.checked);
+        var descendants = descendantTrackableIds(htmlId, idsSet);
+        var pageCoverage = coverageStateForCurrentPage(sectionId, coverageState);
+        var checkedCount = descendants.filter(function (id) {
+          return pageCoverage[id] === true;
+        }).length;
+        var uncheckedCount = descendants.length - checkedCount;
+
+        setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, el.checked, true);
+        if (descendants.length) {
+          if (el.checked) {
+            if (uncheckedCount === descendants.length) {
+              descendants.forEach(function (id) {
+                setPageCoverageForSection(coverageState, sectionId, pageUrl, id, true, true);
+              });
+            } else if (checkedCount > 0 && uncheckedCount > 0) {
+              if (window.confirm("This section has mixed covered and uncovered nested ids. Check all currently uncovered nested ids too?")) {
+                descendants.forEach(function (id) {
+                  if (pageCoverage[id] !== true) {
+                    setPageCoverageForSection(coverageState, sectionId, pageUrl, id, true, true);
+                  }
+                });
+              }
+            }
+          } else {
+            var shouldUncheckAll = false;
+            if (checkedCount > 0 && uncheckedCount > 0) {
+              shouldUncheckAll = window.confirm("This section has mixed covered and uncovered nested ids. Uncheck all nested ids?");
+            } else {
+              // Uniform descendant states (all checked or all unchecked): auto-cascade uncheck.
+              shouldUncheckAll = true;
+            }
+            if (shouldUncheckAll) {
+              descendants.forEach(function (id) {
+                setPageCoverageForSection(coverageState, sectionId, pageUrl, id, false, true);
+              });
+            }
+          }
+        }
         applyProfessorCoverage(selected, config, coverageState);
         document.dispatchEvent(new CustomEvent("ct-coverage-changed"));
+        pushInlineHistorySnapshot();
       }
-      document.body.addEventListener("change", onInlineCheckboxChange);
+      professorInlineChangeListener = onInlineCheckboxChange;
+      document.body.addEventListener("change", professorInlineChangeListener);
+
+      function onProfessorHotkeys(evt) {
+        if (!isProfessorMode()) {
+          return;
+        }
+        if (document.getElementById("ct-editor-overlay")) {
+          return; // dialog handles its own undo/redo
+        }
+        var isMod = evt.ctrlKey || evt.metaKey;
+        if (isMod && !evt.altKey && !evt.shiftKey && (evt.key === "z" || evt.key === "Z")) {
+          evt.preventDefault();
+          undoInline();
+          return;
+        }
+        if (isMod && !evt.altKey && !evt.shiftKey && (evt.key === "y" || evt.key === "Y")) {
+          evt.preventDefault();
+          redoInline();
+          return;
+        }
+        if (isMod && !evt.altKey && evt.shiftKey && (evt.key === "z" || evt.key === "Z")) {
+          evt.preventDefault();
+          redoInline();
+        }
+      }
+      professorHotkeysListener = onProfessorHotkeys;
+      document.addEventListener("keydown", professorHotkeysListener);
 
       mountInlineProfessorControls(config, selected, coverageState);
       applyProfessorCoverage(selected, config, coverageState);
       mountProfessorControls(config, selected, openChooser, openEditor);
+      pushInlineHistorySnapshot();
       return;
     }
 

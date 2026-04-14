@@ -168,6 +168,10 @@ From another working directory, pass `--book-root` pointing at the book project:
 
 1. After **at least one** class section is selected, each trackable heading on the page shows **small checkboxes** (one per selected section), color-coded by section.
 2. Toggling an inline checkbox updates highlights immediately and stays consistent with the CSV editor dialog if it is open.
+3. Nested IDs are respected:
+   - if an outer id is covered but a nested tracked id is not, the nested region is rendered as uncovered
+   - checking/unchecking an outer id can cascade to nested ids (with confirmation prompts on mixed nested states)
+4. Outside the editor dialog, professor inline checkbox actions support undo/redo hotkeys (`Ctrl+Z` / `Ctrl+Y`, and `Cmd+Z` / `Cmd+Shift+Z` on macOS).
 
 ### Edit page coverage CSV
 
@@ -190,7 +194,7 @@ From another working directory, pass `--book-root` pointing at the book project:
 7. You can manually edit any row text. If you start editing an implicit (grey) row, it becomes explicit (not grey) so that row is included in output.
 8. The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing. Use the **`×`** button in the top-right of the dialog to close it.
 9. Undo/redo hotkeys are recognized while the dialog is open (not only when the text area is focused).
-10. **Copy** / **Download** exports only explicit rows (plus header). Save/update the matching **`yr-coverage--<page-slug>.csv`** file in the repo under **`coverage-data/<SECTION-ID>/`.
+10. **Copy** / **Download** exports only explicit rows (plus header). Save/update the matching **`yr-coverage--<page-slug>.csv`** file in the repo under **`coverage-data/<SECTION-ID>/`**.
 
 ### Heading IDs in Quarto HTML
 

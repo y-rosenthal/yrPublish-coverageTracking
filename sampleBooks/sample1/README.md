@@ -41,6 +41,9 @@ Output is written to `sampleBooks/sample1/_book/`.
   - If no sections are selected, confirm one left-sidebar entry is shown as `Choose section(s)` and **no** inline checkboxes appear in the body
   - Click any professor sidebar entry and confirm the chooser popup opens again
   - Press `Esc` in the chooser and confirm it closes without applying changes
+  - Test nested-id behavior (if a nested tracked id is uncovered inside a covered parent, nested region appears uncovered)
+  - Toggle outer ids and confirm nested cascade + prompt behavior for mixed descendant states
+  - Outside the editor dialog, test professor inline undo/redo hotkeys (`Ctrl+Z` / `Ctrl+Y`)
   - Click `Edit page coverage CSV`, then test:
     - Confirm rows are shown in a single editor-like multiline control with gutter checkboxes
     - Set all covered

@@ -388,6 +388,12 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>For each <code>htmlId</code> in <code>idsOnPage</code> and each selected <code>sectionId</code>, show <strong>one</strong> checkbox (or a grouped row of N), <strong>color-coded</strong> to <code>coverage-config.json</code> <code>color</code> for that section.</li>
 <li>Toggle updates in-memory state, refreshes highlights, and any open CSV preview/export for that section.</li>
+<li>Nested-id logic:
+<ul>
+<li>uncovered nested ids visually override covered ancestors</li>
+<li>outer-id toggles may cascade to descendants with confirmation prompts when descendant states are mixed</li>
+</ul></li>
+<li>Inline actions support undo/redo hotkeys while professor mode is active (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, and macOS equivalents).</li>
 </ul>
 </section>
 <section id="export-semantics-with-tri-state-rows" class="level3" data-number="3.8.3">
