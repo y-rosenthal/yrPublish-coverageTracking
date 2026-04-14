@@ -42,12 +42,17 @@ Output is written to `sampleBooks/sample1/_book/`.
   - Click any professor sidebar entry and confirm the chooser popup opens again
   - Press `Esc` in the chooser and confirm it closes without applying changes
   - Click `Edit page coverage CSV`, then test:
-    - **Maximize CSV** vs **Minimize CSV** (textarea should change format)
-    - Select all on page
-    - Clear all on page
-    - Individual toggles (textarea should update immediately; there is no “Build CSV” button)
+    - Confirm rows are shown in a single editor-like multiline control with gutter checkboxes
+    - Set all covered
+    - Set all explicit not-covered
+    - Set all implicit not-covered
+    - Make all not-covereds explicit / implicit
+    - Individual row toggles cycle through covered / explicit not-covered / implicit not-covered (grey)
+    - Edit a grey row text manually and confirm it becomes explicit (not grey)
+    - Delete a row line and confirm it reverts to implicit (grey) rather than disappearing
     - Copy and download
-  - With the dialog open, toggle an **inline** checkbox and confirm the dialog checklist and textarea stay in sync
+  - Drag the dialog and confirm the underlying page remains scrollable while it is open
+  - With the dialog open, toggle an **inline** checkbox and confirm the dialog row state stays in sync
   - Confirm sections covered by all selected sections differ from partially covered sections
   - Confirm small colored badges indicate which section(s) covered each item
 

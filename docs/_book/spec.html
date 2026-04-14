@@ -293,14 +293,20 @@ ul.task-list li input[type="checkbox"] {
 <li>Professor can open page-level coverage editor in the UI.</li>
 <li>Editor supports:
 <ul>
-<li>select all page IDs as covered</li>
-<li>clear all page IDs as not covered</li>
-<li>individually toggle each page ID (each toggle updates the textarea immediately; there is no separate “Build CSV” button)</li>
-<li><strong>Maximize CSV</strong> vs <strong>Minimize CSV</strong> export mode (radio buttons; default <strong>Maximize</strong> for the current page)</li>
+<li>a <strong>single multi-line text-editor-style</strong> control for all rows on the page</li>
+<li>one visible CSV row per trackable <code>html-id</code>, with the checkbox aligned in a gutter directly next to that row text</li>
+<li>tri-state row status cycle: covered -&gt; explicit not-covered -&gt; implicit not-covered (omitted from CSV output)</li>
+<li>set all page IDs to covered</li>
+<li>set all page IDs to explicit not-covered</li>
+<li>set all page IDs to implicit not-covered</li>
+<li>convert all not-covered rows to explicit form</li>
+<li>convert all not-covered rows to implicit form</li>
 <li>copy CSV text</li>
 <li>download CSV file (filename aligned with <code>yr-coverage--&lt;page-slug&gt;.csv</code> naming)</li>
 </ul></li>
-<li>Manual edits in the textarea are copied or downloaded as-is; switching export mode or toggling checkboxes regenerates the textarea from the checklist.</li>
+<li>Implicit rows are visually grey/italic with a greyed checkbox, but still visible so users can promote them to explicit rows.</li>
+<li>Manual edits to a row make it explicit; deleting/emptying a row line reverts that row to implicit not-covered (grey/italic) rather than removing it from the editor surface.</li>
+<li>The dialog is draggable and non-modal; underlying page content remains scrollable while editing.</li>
 <li>Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.</li>
 </ul>
 </section>
@@ -366,7 +372,8 @@ tools/
 <li>student picker and highlighting</li>
 <li>professor compare mode</li>
 <li>professor sidebar controls</li>
-<li>professor CSV editor/export workflow</li>
+<li>professor inline per-section checkboxes in page content (when at least one section is selected)</li>
+<li>professor CSV editor/export workflow (tri-state per-line rows and inline CSV text editing)</li>
 <li>per-page CSV coverage loading (lazy fetch per page)</li>
 </ul>
 </section>

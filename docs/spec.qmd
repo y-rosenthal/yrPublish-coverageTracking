@@ -79,13 +79,19 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 
 - Professor can open page-level coverage editor in the UI.
 - Editor supports:
-  - select all page IDs as covered
-  - clear all page IDs as not covered
-  - individually toggle each page ID (each toggle updates the textarea immediately; there is no separate “Build CSV” button)
-  - **Maximize CSV** vs **Minimize CSV** export mode (radio buttons; default **Maximize** for the current page)
+  - a **single multi-line text-editor-style** control for all rows on the page
+  - one visible CSV row per trackable `html-id`, with the checkbox aligned in a gutter directly next to that row text
+  - tri-state row status cycle: covered -> explicit not-covered -> implicit not-covered (omitted from CSV output)
+  - set all page IDs to covered
+  - set all page IDs to explicit not-covered
+  - set all page IDs to implicit not-covered
+  - convert all not-covered rows to explicit form
+  - convert all not-covered rows to implicit form
   - copy CSV text
   - download CSV file (filename aligned with `yr-coverage--<page-slug>.csv` naming)
-- Manual edits in the textarea are copied or downloaded as-is; switching export mode or toggling checkboxes regenerates the textarea from the checklist.
+- Implicit rows are visually grey/italic with a greyed checkbox, but still visible so users can promote them to explicit rows.
+- Manual edits to a row make it explicit; deleting/emptying a row line reverts that row to implicit not-covered (grey/italic) rather than removing it from the editor surface.
+- The dialog is draggable and non-modal; underlying page content remains scrollable while editing.
 - Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.
 
 ### FR-7b: Trackable HTML ids (`idsOnPage`)
@@ -147,7 +153,7 @@ The sample implementation is in `sampleBooks/sample1/` and demonstrates:
 - professor compare mode
 - professor sidebar controls
 - professor inline per-section checkboxes in page content (when at least one section is selected)
-- professor CSV editor/export workflow (maximize vs minimize export, live textarea)
+- professor CSV editor/export workflow (tri-state per-line rows and inline CSV text editing)
 - per-page CSV coverage loading (lazy fetch per page)
 
 ## Risks and mitigations

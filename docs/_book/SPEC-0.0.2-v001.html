@@ -158,15 +158,14 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#modal-edit-page-coverage-csv" id="toc-modal-edit-page-coverage-csv" class="nav-link" data-scroll-target="#modal-edit-page-coverage-csv"><span class="header-section-number">3.8.1</span> Modal: “Edit page coverage CSV”</a></li>
   <li><a href="#inline-per-heading-per-section-controls" id="toc-inline-per-heading-per-section-controls" class="nav-link" data-scroll-target="#inline-per-heading-per-section-controls"><span class="header-section-number">3.8.2</span> Inline: per-heading, per-section controls</a></li>
-  <li><a href="#export-minimize-vs-maximize" id="toc-export-minimize-vs-maximize" class="nav-link" data-scroll-target="#export-minimize-vs-maximize"><span class="header-section-number">3.8.3</span> Export: minimize vs maximize</a></li>
+  <li><a href="#export-semantics-with-tri-state-rows" id="toc-export-semantics-with-tri-state-rows" class="nav-link" data-scroll-target="#export-semantics-with-tri-state-rows"><span class="header-section-number">3.8.3</span> Export semantics with tri-state rows</a></li>
   </ul></li>
-  <li><a href="#minimize-csv-normative-details" id="toc-minimize-csv-normative-details" class="nav-link" data-scroll-target="#minimize-csv-normative-details"><span class="header-section-number">3.9</span> Minimize CSV (normative details)</a></li>
-  <li><a href="#maximize-csv-normative-details" id="toc-maximize-csv-normative-details" class="nav-link" data-scroll-target="#maximize-csv-normative-details"><span class="header-section-number">3.10</span> Maximize CSV (normative details)</a></li>
-  <li><a href="#architecture-layers" id="toc-architecture-layers" class="nav-link" data-scroll-target="#architecture-layers"><span class="header-section-number">3.11</span> Architecture (layers)</a></li>
-  <li><a href="#accessibility" id="toc-accessibility" class="nav-link" data-scroll-target="#accessibility"><span class="header-section-number">3.12</span> Accessibility</a></li>
-  <li><a href="#implementation-checklist" id="toc-implementation-checklist" class="nav-link" data-scroll-target="#implementation-checklist"><span class="header-section-number">3.13</span> Implementation checklist</a></li>
-  <li><a href="#open-decisions-record-in-project-when-resolved" id="toc-open-decisions-record-in-project-when-resolved" class="nav-link" data-scroll-target="#open-decisions-record-in-project-when-resolved"><span class="header-section-number">3.14</span> Open decisions (record in project when resolved)</a></li>
-  <li><a href="#changelog-this-file" id="toc-changelog-this-file" class="nav-link" data-scroll-target="#changelog-this-file"><span class="header-section-number">3.15</span> Changelog (this file)</a></li>
+  <li><a href="#row-state-details-normative" id="toc-row-state-details-normative" class="nav-link" data-scroll-target="#row-state-details-normative"><span class="header-section-number">3.9</span> Row-state details (normative)</a></li>
+  <li><a href="#architecture-layers" id="toc-architecture-layers" class="nav-link" data-scroll-target="#architecture-layers"><span class="header-section-number">3.10</span> Architecture (layers)</a></li>
+  <li><a href="#accessibility" id="toc-accessibility" class="nav-link" data-scroll-target="#accessibility"><span class="header-section-number">3.11</span> Accessibility</a></li>
+  <li><a href="#implementation-checklist" id="toc-implementation-checklist" class="nav-link" data-scroll-target="#implementation-checklist"><span class="header-section-number">3.12</span> Implementation checklist</a></li>
+  <li><a href="#open-decisions-record-in-project-when-resolved" id="toc-open-decisions-record-in-project-when-resolved" class="nav-link" data-scroll-target="#open-decisions-record-in-project-when-resolved"><span class="header-section-number">3.13</span> Open decisions (record in project when resolved)</a></li>
+  <li><a href="#changelog-this-file" id="toc-changelog-this-file" class="nav-link" data-scroll-target="#changelog-this-file"><span class="header-section-number">3.14</span> Changelog (this file)</a></li>
   </ul>
 </nav>
     </div>
@@ -176,7 +175,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Coverage tracking — Specification v0.0.2 (pseudo-v001)</span></h1>
-<p class="subtitle lead">Professor CSV editor, inline toggles, minimize/maximize CSV export</p>
+<p class="subtitle lead">Professor CSV editor, inline toggles, tri-state per-line CSV editing</p>
 </div>
 
 
@@ -197,7 +196,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 data-number="3.1" class="anchored" data-anchor-id="document-purpose"><span class="header-section-number">3.1</span> Document purpose</h2>
 <p>This document specifies <strong>version 0.0.2</strong> of the coverage-tracking feature. The <strong>pseudo-version</strong> <code>v001</code> allows multiple revisions of this spec to coexist in the Quarto docs book (e.g.&nbsp;<code>SPEC-0.0.2-v002.qmd</code> later) without replacing prior text.</p>
 <p><strong>Audience:</strong> implementers and technical editors; professors who need to know how professor-mode editing and export behave.</p>
-<p><strong>Scope</strong> (v0.0.2): behavior of the <strong>“Edit page coverage CSV”</strong> dialog, <strong>live CSV updates</strong>, <strong>inline</strong> per-section checkboxes in professor mode, and <strong>minimize</strong> vs <strong>maximize</strong> CSV serialization.</p>
+<p><strong>Scope</strong> (v0.0.2): behavior of the <strong>“Edit page coverage CSV”</strong> dialog, <strong>live CSV updates</strong>, <strong>inline</strong> per-section checkboxes in professor mode, and <strong>tri-state per-line</strong> CSV serialization semantics.</p>
 <hr>
 </section>
 <section id="relationship-to-other-docs" class="level2" data-number="3.2">
@@ -346,7 +345,7 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>Normative:</strong> <code>idsOnPage</code> must be the <strong>same set</strong> used for:</p>
 <ul>
 <li>student/professor highlighting,</li>
-<li>the modal editor checklist,</li>
+<li>the modal editor row list,</li>
 <li>inline professor checkboxes.</li>
 </ul>
 <p>If the DOM query for <code>idsOnPage</code> is narrower than the IDs used for highlights (e.g.&nbsp;headings in <code>#quarto-content</code> vs IDs only in margin TOC), the editor and CSV preview can <strong>omit</strong> rows that still drive colors — the section dropdown will then appear not to change the CSV. <strong>v0.0.2</strong> requires a <strong>single</strong> definition of trackable IDs (see below).</p>
@@ -375,9 +374,11 @@ ul.task-list li input[type="checkbox"] {
 <section id="modal-edit-page-coverage-csv" class="level3" data-number="3.8.1">
 <h3 data-number="3.8.1" class="anchored" data-anchor-id="modal-edit-page-coverage-csv"><span class="header-section-number">3.8.1</span> Modal: “Edit page coverage CSV”</h3>
 <ol type="1">
-<li><strong>Class section dropdown</strong> — Changing selection reloads checkbox state from in-memory coverage for <code>(selectedSectionId, pageUrl, htmlId)</code> and <strong>immediately</strong> rebuilds the CSV textarea.</li>
-<li><strong>Every checkbox</strong> — Any toggle (including after re-render) <strong>immediately</strong> rebuilds the CSV textarea. Use <strong>event delegation</strong> on the checklist container (<code>input</code>/<code>change</code> → rebuild) so dynamically created inputs do not miss listeners.</li>
-<li><strong>No “Build CSV” button</strong> — The textarea is always live from checkboxes and export mode; there is no separate build action.</li>
+<li><strong>Class section dropdown</strong> — Changing selection reloads row state from in-memory coverage for <code>(selectedSectionId, pageUrl, htmlId)</code> and <strong>immediately</strong> refreshes highlights and export output.</li>
+<li><strong>Single editor surface, one row per html-id</strong> — The dialog uses one multi-line text-editor-like control; each <code>idsOnPage</code> entry is one CSV row with a checkbox aligned in a gutter beside that row.</li>
+<li><strong>Tri-state checkbox per row</strong> — Covered -&gt; explicit not-covered -&gt; implicit not-covered (grey/italic row and greyed checkbox). Implicit rows are omitted from exported CSV text.</li>
+<li><strong>Bulk row actions</strong> — The editor provides set-all covered / explicit not-covered / implicit not-covered plus conversions between explicit/implicit not-covered states.</li>
+<li><strong>No separate Build action</strong> — Any row toggle or row-text edit updates in-memory state immediately.</li>
 </ol>
 </section>
 <section id="inline-per-heading-per-section-controls" class="level3" data-number="3.8.2">
@@ -388,102 +389,78 @@ ul.task-list li input[type="checkbox"] {
 <li>Toggle updates in-memory state, refreshes highlights, and any open CSV preview/export for that section.</li>
 </ul>
 </section>
-<section id="export-minimize-vs-maximize" class="level3" data-number="3.8.3">
-<h3 data-number="3.8.3" class="anchored" data-anchor-id="export-minimize-vs-maximize"><span class="header-section-number">3.8.3</span> Export: minimize vs maximize</h3>
-<p>Two named modes in the export UI (labels should match in the product):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 27%">
-<col style="width: 27%">
-<col style="width: 45%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Mode</th>
-<th>Name</th>
-<th>Behavior</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Minimize CSV</strong></td>
-<td>Omit non-covered rows where the format allows; for remaining rows use short <code>URL,html-id</code> or <code>URL,html-id,</code> when the state is <strong>covered</strong> (omit the literal word <code>covered</code> in the third column). Header row <code>URL,html-id,covered</code> may still be emitted.</td>
-<td></td>
-</tr>
-<tr class="even">
-<td><strong>Maximize CSV</strong></td>
-<td>One row per <code>(pageUrl, htmlId)</code> in scope (default scope: <strong>current page</strong>), third column always <code>covered</code> or <code>not-covered</code>.</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Default</strong> when opening export for the current page: <strong>maximize</strong> (full explicit grid) unless the user chooses <strong>minimize</strong>.</p>
-<p><strong>Scope note:</strong> maximize for the <strong>whole book</strong> is a separate product decision (optional); default is <strong>current page</strong> only.</p>
-<hr>
-</section>
-</section>
-<section id="minimize-csv-normative-details" class="level2" data-number="3.9">
-<h2 data-number="3.9" class="anchored" data-anchor-id="minimize-csv-normative-details"><span class="header-section-number">3.9</span> Minimize CSV (normative details)</h2>
+<section id="export-semantics-with-tri-state-rows" class="level3" data-number="3.8.3">
+<h3 data-number="3.8.3" class="anchored" data-anchor-id="export-semantics-with-tri-state-rows"><span class="header-section-number">3.8.3</span> Export semantics with tri-state rows</h3>
 <ul>
-<li><strong>Rows:</strong> include only rows where coverage is <strong>covered</strong>, <strong>or</strong> omit rows that are not covered (so the file stays short). Rows that are explicitly <code>not-covered</code> may be omitted unless the editor needs to record them.</li>
-<li><strong>Short form:</strong> for covered rows, prefer <code>URL,html-id</code> or <code>URL,html-id,</code> per the persistent CSV rules.</li>
-<li>Align with the on-disk CSV format so pasted output is valid.</li>
+<li>Export writes header <code>URL,html-id,covered</code>.</li>
+<li>Export includes <strong>explicit rows only</strong>:
+<ul>
+<li>explicit covered rows (e.g.&nbsp;<code>URL,html-id,covered</code>, or user-edited equivalent)</li>
+<li>explicit not-covered rows (e.g.&nbsp;<code>URL,html-id,not-covered</code>, or user-edited equivalent)</li>
+</ul></li>
+<li>Export omits <strong>implicit not-covered</strong> rows.</li>
+<li>Users can still reach former “maximize” behavior by making all rows explicit, and former “minimize” behavior by leaving many rows implicit.</li>
 </ul>
 <hr>
 </section>
-<section id="maximize-csv-normative-details" class="level2" data-number="3.10">
-<h2 data-number="3.10" class="anchored" data-anchor-id="maximize-csv-normative-details"><span class="header-section-number">3.10</span> Maximize CSV (normative details)</h2>
+</section>
+<section id="row-state-details-normative" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="row-state-details-normative"><span class="header-section-number">3.9</span> Row-state details (normative)</h2>
 <ul>
-<li><strong>Rows:</strong> every <code>htmlId</code> in <code>idsOnPage</code> for the <strong>current page</strong> (unless whole-book scope is explicitly selected).</li>
-<li><strong>Columns:</strong> <code>URL,html-id,covered</code></li>
-<li><strong>Third column:</strong> always <code>covered</code> or <code>not-covered</code>.</li>
+<li><strong>Covered (explicit):</strong> row is included; checkbox appears checked.</li>
+<li><strong>Not-covered (explicit):</strong> row is included with explicit non-covered semantics.</li>
+<li><strong>Not-covered (implicit):</strong> row is visible but grey/italic and omitted from exported CSV.</li>
+<li>If a user begins editing an implicit row text manually, that row becomes explicit.</li>
+<li>If a user deletes/empties a row line, that row reverts to implicit (grey/italic) rather than disappearing from the editor.</li>
+<li>The editor is draggable and non-modal so the underlying page can still be scrolled and read during editing.</li>
 </ul>
 <hr>
 </section>
-<section id="architecture-layers" class="level2" data-number="3.11">
-<h2 data-number="3.11" class="anchored" data-anchor-id="architecture-layers"><span class="header-section-number">3.11</span> Architecture (layers)</h2>
+<section id="architecture-layers" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="architecture-layers"><span class="header-section-number">3.10</span> Architecture (layers)</h2>
 <ol type="1">
 <li><strong>Load</strong> — for the current page only, fetch <code>yr-coverage--&lt;PAGE-SLUG&gt;.csv</code> under each section directory (parallel).</li>
 <li><strong>Parse</strong> — build <code>sectionId → pageUrl → htmlId → boolean</code> (same structure as before; only current page keys populated from network).</li>
 <li><strong>Render highlights</strong> — existing overlap / badge behavior.</li>
 <li><strong>Edit</strong> — modal and inline toggles write the same in-memory state.</li>
-<li><strong>Export</strong> — serialize with <strong>minimize</strong> or <strong>maximize</strong> rules; copy/download.</li>
+<li><strong>Export</strong> — serialize explicit rows; copy/download.</li>
 </ol>
 <hr>
 </section>
-<section id="accessibility" class="level2" data-number="3.12">
-<h2 data-number="3.12" class="anchored" data-anchor-id="accessibility"><span class="header-section-number">3.12</span> Accessibility</h2>
+<section id="accessibility" class="level2" data-number="3.11">
+<h2 data-number="3.11" class="anchored" data-anchor-id="accessibility"><span class="header-section-number">3.11</span> Accessibility</h2>
 <ul>
 <li>Checkboxes: <code>aria-label</code> including section name and heading id where helpful.</li>
 </ul>
 <hr>
 </section>
-<section id="implementation-checklist" class="level2" data-number="3.13">
-<h2 data-number="3.13" class="anchored" data-anchor-id="implementation-checklist"><span class="header-section-number">3.13</span> Implementation checklist</h2>
+<section id="implementation-checklist" class="level2" data-number="3.12">
+<h2 data-number="3.12" class="anchored" data-anchor-id="implementation-checklist"><span class="header-section-number">3.12</span> Implementation checklist</h2>
 <ul class="task-list">
 <li><label><input type="checkbox" checked=""><code>idsOnPage</code> query matches highlight coverage IDs (section ids + chapter title span ids; TOC excluded).</label></li>
 <li><label><input type="checkbox" checked=""><code>pageUrl</code> + merge logic shared everywhere.</label></li>
-<li><label><input type="checkbox" checked="">Editor: <code>change</code> on section <code>&lt;select&gt;</code> → persist previous section → <code>renderCheckboxes()</code> + rebuild CSV.</label></li>
-<li><label><input type="checkbox" checked="">Editor: event delegation on checklist → rebuild CSV on any checkbox <code>input</code>/<code>change</code>.</label></li>
+<li><label><input type="checkbox" checked="">Editor: <code>change</code> on section <code>&lt;select&gt;</code> keeps row state synced for previous and new section.</label></li>
+<li><label><input type="checkbox" checked="">Editor: one row per <code>idsOnPage</code> item with inline checkbox + editable CSV line text.</label></li>
+<li><label><input type="checkbox" checked="">Editor: tri-state row cycle (covered / explicit not-covered / implicit not-covered).</label></li>
 <li><label><input type="checkbox" checked="">Inline checkbox component bound to same state as modal.</label></li>
-<li><label><input type="checkbox" checked="">Export UI: <strong>Minimize CSV</strong> vs <strong>Maximize CSV</strong> (radio group); copy; download; default maximize for current page.</label></li>
-<li><label><input type="checkbox" checked="">Sample: two sections, three pages, multiple ids per page — dropdown and textarea reflect each section.</label></li>
+<li><label><input type="checkbox" checked="">Export serializes header + explicit rows; copy; download.</label></li>
+<li><label><input type="checkbox" checked="">Sample: two sections, three pages, multiple ids per page — section dropdown and per-row editor state reflect each section.</label></li>
 </ul>
 <hr>
 </section>
-<section id="open-decisions-record-in-project-when-resolved" class="level2" data-number="3.14">
-<h2 data-number="3.14" class="anchored" data-anchor-id="open-decisions-record-in-project-when-resolved"><span class="header-section-number">3.14</span> Open decisions (record in project when resolved)</h2>
+<section id="open-decisions-record-in-project-when-resolved" class="level2" data-number="3.13">
+<h2 data-number="3.13" class="anchored" data-anchor-id="open-decisions-record-in-project-when-resolved"><span class="header-section-number">3.13</span> Open decisions (record in project when resolved)</h2>
 <ol type="1">
-<li>Maximize scope: <strong>current page</strong> vs <strong>whole book</strong>.</li>
+<li>Whole-book export in UI: keep current-page only, or add multi-page export later.</li>
 <li>Include or exclude <code>toc-title</code> (and similar) in <code>idsOnPage</code> consistently.</li>
 <li>If modal and inline editor are both visible: sync rules or single source of truth.</li>
 </ol>
 <hr>
 </section>
-<section id="changelog-this-file" class="level2" data-number="3.15">
-<h2 data-number="3.15" class="anchored" data-anchor-id="changelog-this-file"><span class="header-section-number">3.15</span> Changelog (this file)</h2>
+<section id="changelog-this-file" class="level2" data-number="3.14">
+<h2 data-number="3.14" class="anchored" data-anchor-id="changelog-this-file"><span class="header-section-number">3.14</span> Changelog (this file)</h2>
 <ul>
-<li><strong>v0.0.2 / v001:</strong> Professor CSV editor (live updates, unified <code>idsOnPage</code>), inline per-section checkboxes, <strong>minimize</strong> CSV vs <strong>maximize</strong> CSV export naming and semantics.</li>
+<li><strong>v0.0.2 / v001:</strong> Professor CSV editor (live updates, unified <code>idsOnPage</code>), inline per-section checkboxes, tri-state per-line CSV editing semantics.</li>
 <li><strong>v0.0.2 / v001 (revision):</strong> Per-page CSV layout <strong>option A</strong>: <code>coverage-data/&lt;SECTION-ID&gt;/yr-coverage--&lt;page-slug&gt;.csv</code>, lazy load per page, optional <code>coverageDataDir</code>.</li>
 </ul>
 

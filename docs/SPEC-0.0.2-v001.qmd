@@ -1,6 +1,6 @@
 ---
 title: "Coverage tracking — Specification v0.0.2 (pseudo-v001)"
-subtitle: "Professor CSV editor, inline toggles, minimize/maximize CSV export"
+subtitle: "Professor CSV editor, inline toggles, tri-state per-line CSV editing"
 ---
 
 ## Document purpose
@@ -9,7 +9,7 @@ This document specifies **version 0.0.2** of the coverage-tracking feature. The 
 
 **Audience:** implementers and technical editors; professors who need to know how professor-mode editing and export behave.
 
-**Scope** (v0.0.2): behavior of the **“Edit page coverage CSV”** dialog, **live CSV updates**, **inline** per-section checkboxes in professor mode, and **minimize** vs **maximize** CSV serialization.
+**Scope** (v0.0.2): behavior of the **“Edit page coverage CSV”** dialog, **live CSV updates**, **inline** per-section checkboxes in professor mode, and **tri-state per-line** CSV serialization semantics.
 
 ---
 
@@ -93,7 +93,7 @@ Static sites cannot write to Git; **export** is copy/download. Persisting change
 **Normative:** `idsOnPage` must be the **same set** used for:
 
 - student/professor highlighting,
-- the modal editor checklist,
+- the modal editor row list,
 - inline professor checkboxes.
 
 If the DOM query for `idsOnPage` is narrower than the IDs used for highlights (e.g. headings in `#quarto-content` vs IDs only in margin TOC), the editor and CSV preview can **omit** rows that still drive colors — the section dropdown will then appear not to change the CSV. **v0.0.2** requires a **single** definition of trackable IDs (see below).
@@ -121,9 +121,11 @@ Implementations must define how IDs are collected, e.g.:
 
 ### Modal: “Edit page coverage CSV”
 
-1. **Class section dropdown** — Changing selection reloads checkbox state from in-memory coverage for `(selectedSectionId, pageUrl, htmlId)` and **immediately** rebuilds the CSV textarea.
-2. **Every checkbox** — Any toggle (including after re-render) **immediately** rebuilds the CSV textarea. Use **event delegation** on the checklist container (`input`/`change` → rebuild) so dynamically created inputs do not miss listeners.
-3. **No “Build CSV” button** — The textarea is always live from checkboxes and export mode; there is no separate build action.
+1. **Class section dropdown** — Changing selection reloads row state from in-memory coverage for `(selectedSectionId, pageUrl, htmlId)` and **immediately** refreshes highlights and export output.
+2. **Single editor surface, one row per html-id** — The dialog uses one multi-line text-editor-like control; each `idsOnPage` entry is one CSV row with a checkbox aligned in a gutter beside that row.
+3. **Tri-state checkbox per row** — Covered -> explicit not-covered -> implicit not-covered (grey/italic row and greyed checkbox). Implicit rows are omitted from exported CSV text.
+4. **Bulk row actions** — The editor provides set-all covered / explicit not-covered / implicit not-covered plus conversions between explicit/implicit not-covered states.
+5. **No separate Build action** — Any row toggle or row-text edit updates in-memory state immediately.
 
 ### Inline: per-heading, per-section controls
 
@@ -132,34 +134,25 @@ When professor mode is active and **N ≥ 1** class sections are selected:
 - For each `htmlId` in `idsOnPage` and each selected `sectionId`, show **one** checkbox (or a grouped row of N), **color-coded** to `coverage-config.json` `color` for that section.
 - Toggle updates in-memory state, refreshes highlights, and any open CSV preview/export for that section.
 
-### Export: minimize vs maximize
+### Export semantics with tri-state rows
 
-Two named modes in the export UI (labels should match in the product):
-
-| Mode | Name | Behavior |
-|------|------|----------|
-| **Minimize CSV** | Omit non-covered rows where the format allows; for remaining rows use short `URL,html-id` or `URL,html-id,` when the state is **covered** (omit the literal word `covered` in the third column). Header row `URL,html-id,covered` may still be emitted. |
-| **Maximize CSV** | One row per `(pageUrl, htmlId)` in scope (default scope: **current page**), third column always `covered` or `not-covered`. |
-
-**Default** when opening export for the current page: **maximize** (full explicit grid) unless the user chooses **minimize**.
-
-**Scope note:** maximize for the **whole book** is a separate product decision (optional); default is **current page** only.
+- Export writes header `URL,html-id,covered`.
+- Export includes **explicit rows only**:
+  - explicit covered rows (e.g. `URL,html-id,covered`, or user-edited equivalent)
+  - explicit not-covered rows (e.g. `URL,html-id,not-covered`, or user-edited equivalent)
+- Export omits **implicit not-covered** rows.
+- Users can still reach former “maximize” behavior by making all rows explicit, and former “minimize” behavior by leaving many rows implicit.
 
 ---
 
-## Minimize CSV (normative details)
+## Row-state details (normative)
 
-- **Rows:** include only rows where coverage is **covered**, **or** omit rows that are not covered (so the file stays short). Rows that are explicitly `not-covered` may be omitted unless the editor needs to record them.
-- **Short form:** for covered rows, prefer `URL,html-id` or `URL,html-id,` per the persistent CSV rules.
-- Align with the on-disk CSV format so pasted output is valid.
-
----
-
-## Maximize CSV (normative details)
-
-- **Rows:** every `htmlId` in `idsOnPage` for the **current page** (unless whole-book scope is explicitly selected).
-- **Columns:** `URL,html-id,covered`
-- **Third column:** always `covered` or `not-covered`.
+- **Covered (explicit):** row is included; checkbox appears checked.
+- **Not-covered (explicit):** row is included with explicit non-covered semantics.
+- **Not-covered (implicit):** row is visible but grey/italic and omitted from exported CSV.
+- If a user begins editing an implicit row text manually, that row becomes explicit.
+- If a user deletes/empties a row line, that row reverts to implicit (grey/italic) rather than disappearing from the editor.
+- The editor is draggable and non-modal so the underlying page can still be scrolled and read during editing.
 
 ---
 
@@ -169,7 +162,7 @@ Two named modes in the export UI (labels should match in the product):
 2. **Parse** — build `sectionId → pageUrl → htmlId → boolean` (same structure as before; only current page keys populated from network).
 3. **Render highlights** — existing overlap / badge behavior.
 4. **Edit** — modal and inline toggles write the same in-memory state.
-5. **Export** — serialize with **minimize** or **maximize** rules; copy/download.
+5. **Export** — serialize explicit rows; copy/download.
 
 ---
 
@@ -183,17 +176,18 @@ Two named modes in the export UI (labels should match in the product):
 
 - [x] `idsOnPage` query matches highlight coverage IDs (section ids + chapter title span ids; TOC excluded).
 - [x] `pageUrl` + merge logic shared everywhere.
-- [x] Editor: `change` on section `<select>` → persist previous section → `renderCheckboxes()` + rebuild CSV.
-- [x] Editor: event delegation on checklist → rebuild CSV on any checkbox `input`/`change`.
+- [x] Editor: `change` on section `<select>` keeps row state synced for previous and new section.
+- [x] Editor: one row per `idsOnPage` item with inline checkbox + editable CSV line text.
+- [x] Editor: tri-state row cycle (covered / explicit not-covered / implicit not-covered).
 - [x] Inline checkbox component bound to same state as modal.
-- [x] Export UI: **Minimize CSV** vs **Maximize CSV** (radio group); copy; download; default maximize for current page.
-- [x] Sample: two sections, three pages, multiple ids per page — dropdown and textarea reflect each section.
+- [x] Export serializes header + explicit rows; copy; download.
+- [x] Sample: two sections, three pages, multiple ids per page — section dropdown and per-row editor state reflect each section.
 
 ---
 
 ## Open decisions (record in project when resolved)
 
-1. Maximize scope: **current page** vs **whole book**.
+1. Whole-book export in UI: keep current-page only, or add multi-page export later.
 2. Include or exclude `toc-title` (and similar) in `idsOnPage` consistently.
 3. If modal and inline editor are both visible: sync rules or single source of truth.
 
@@ -201,5 +195,5 @@ Two named modes in the export UI (labels should match in the product):
 
 ## Changelog (this file)
 
-- **v0.0.2 / v001:** Professor CSV editor (live updates, unified `idsOnPage`), inline per-section checkboxes, **minimize** CSV vs **maximize** CSV export naming and semantics.
+- **v0.0.2 / v001:** Professor CSV editor (live updates, unified `idsOnPage`), inline per-section checkboxes, tri-state per-line CSV editing semantics.
 - **v0.0.2 / v001 (revision):** Per-page CSV layout **option A**: `coverage-data/<SECTION-ID>/yr-coverage--<page-slug>.csv`, lazy load per page, optional `coverageDataDir`.

@@ -372,15 +372,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>In professor mode, click <code>Edit page coverage CSV</code> in sidebar.</li>
 <li>Choose the class section to edit.</li>
-<li>Choose <strong>Maximize CSV</strong> (full grid with explicit <code>covered</code> / <code>not-covered</code>) or <strong>Minimize CSV</strong> (omit not-covered rows; short <code>URL,html-id</code> for covered). Default is <strong>Maximize</strong>.</li>
+<li>The dialog uses a <strong>single multi-line text-editor-style</strong> control. Each HTML id maps to one row, with a checkbox aligned in a left gutter next to that row text.</li>
+<li>Checkbox state is <strong>tri-state</strong> per row:
+<ul>
+<li>checked = explicit <code>covered</code></li>
+<li>unchecked = explicit <code>not-covered</code></li>
+<li>grey/italic (indeterminate) = <strong>implicit not-covered</strong> (line is omitted from CSV output)</li>
+</ul></li>
 <li>Use:
 <ul>
-<li><code>Select all on page</code></li>
-<li><code>Clear all on page</code></li>
-<li>individual checkbox toggles per section ID (the textarea updates immediately; there is no separate “Build CSV” step)</li>
+<li><code>Set all covered</code></li>
+<li><code>Set all explicit not-covered</code></li>
+<li><code>Set all implicit not-covered</code></li>
+<li><code>Make all not-covereds explicit</code></li>
+<li><code>Make all not-covereds implicit</code></li>
+<li>individual row toggles (cycle through covered → explicit not-covered → implicit not-covered)</li>
 </ul></li>
-<li>You may paste or type into the textarea manually; <strong>Copy</strong> / <strong>Download</strong> use the textarea as shown. Changing checkboxes or export mode regenerates the textarea from the checklist.</li>
-<li>Copy or download output and save/update the matching <strong><code>yr-coverage--&lt;page-slug&gt;.csv</code></strong> file in the repo under <strong><code>coverage-data/&lt;SECTION-ID&gt;/</code></strong>.</li>
+<li>If a line is edited to empty/deleted, that row does <strong>not disappear</strong>; it reverts to implicit not-covered (grey/italic).</li>
+<li>You can manually edit any row text. If you start editing an implicit (grey) row, it becomes explicit (not grey) so that row is included in output.</li>
+<li>The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing.</li>
+<li><strong>Copy</strong> / <strong>Download</strong> exports only explicit rows (plus header). Save/update the matching <strong><code>yr-coverage--&lt;page-slug&gt;.csv</code></strong> file in the repo under <strong><code>coverage-data/&lt;SECTION-ID&gt;/</code></strong>.</li>
 </ol>
 </section>
 <section id="heading-ids-in-quarto-html" class="level3" data-number="4.8.4">
