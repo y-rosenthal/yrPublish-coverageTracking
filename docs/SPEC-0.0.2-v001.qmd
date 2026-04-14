@@ -1,0 +1,205 @@
+---
+title: "Coverage tracking — Specification v0.0.2 (pseudo-v001)"
+subtitle: "Professor CSV editor, inline toggles, minimize/maximize CSV export"
+---
+
+## Document purpose
+
+This document specifies **version 0.0.2** of the coverage-tracking feature. The **pseudo-version** `v001` allows multiple revisions of this spec to coexist in the Quarto docs book (e.g. `SPEC-0.0.2-v002.qmd` later) without replacing prior text.
+
+**Audience:** implementers and technical editors; professors who need to know how professor-mode editing and export behave.
+
+**Scope** (v0.0.2): behavior of the **“Edit page coverage CSV”** dialog, **live CSV updates**, **inline** per-section checkboxes in professor mode, and **minimize** vs **maximize** CSV serialization.
+
+---
+
+## Relationship to other docs
+
+| File | Role |
+|------|------|
+| `spec.qmd` | Living consolidated specification; may evolve. |
+| `GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd` | Setup, file paths, and day-to-day workflows. |
+| This file | Frozen snapshot for **0.0.2** + **v001**: professor editing UX and export semantics. |
+
+---
+
+## Persistent data
+
+- **Config:** `coverage-config.json` (JSON) — class sections, labels, colors, optional `coverageDataDir` override per section.
+- **Coverage (option A — per HTML page, per class section):** one CSV file per rendered page per section, using a fixed directory and filename pattern (large-book friendly; lazy-load one file per page in the browser).
+
+### Directory and filename convention
+
+For each class section id `<SECTION-ID>` and canonical page URL path `<PAGE>` (e.g. `/chapter1.html` or `/part-a/chapter.html`):
+
+- **Directory:** `assets/coverage-tracking/coverage-data/<SECTION-ID>/`
+- **Filename:** `yr-coverage--<PAGE-SLUG>.csv`
+
+**`<PAGE-SLUG>`** is derived from `<PAGE>` by:
+
+1. Strip a leading `/`.
+2. Replace every `/` with `--` (so nested paths stay in one filename segment).
+
+Examples:
+
+| Canonical page URL | PAGE-SLUG | Filename |
+|--------------------|-----------|----------|
+| `/index.html` | `index.html` | `yr-coverage--index.html.csv` |
+| `/chapter1.html` | `chapter1.html` | `yr-coverage--chapter1.html.csv` |
+| `/part-a/chapter.html` | `part-a--chapter.html` | `yr-coverage--part-a--chapter.html.csv` |
+
+Optional per-section override in JSON: `"coverageDataDir": "assets/coverage-tracking/coverage-data/MATH101-01/"` (must resolve to the section’s directory; trailing slash optional). If omitted, the implementation uses `assets/coverage-tracking/coverage-data/<SECTION-ID>/`.
+
+### Runtime loading
+
+- On each page load, the tracker **fetches only** the CSV files for the **current** canonical page URL—one request per class section (parallel `fetch`). No single multi-megabyte whole-book CSV is required in memory.
+- Navigating to another HTML page loads a new set of per-page files (full page navigation reloads the script; same-origin `fetch` applies).
+
+### Row format (unchanged)
+
+Per-file content still uses the same row semantics as the global format; each file typically contains rows whose `URL` column matches that page (and may repeat the same `URL` on every row for clarity).
+
+### CSV row semantics (normative)
+
+| Row shape | Meaning |
+|-----------|---------|
+| No row for `(URL, html-id)` | **Not covered** (default). |
+| `URL,html-id` | **Covered** (short form; third column omitted). |
+| `URL,html-id,` | **Covered** (empty third column). |
+| `URL,html-id,covered` | **Covered** (explicit). |
+| `URL,html-id,not-covered` | **Not covered** (explicit). |
+
+Optional header row `URL,html-id,covered` may be present; parsers should skip it when detected.
+
+---
+
+## Runtime state (in-memory)
+
+After loading CSVs, the implementation holds a structure equivalent to:
+
+`sectionId → { pageUrl → { htmlId → boolean } }`
+
+where `boolean` is **true** iff that `(URL, html-id)` is **covered** under the rules above.
+
+Static sites cannot write to Git; **export** is copy/download. Persisting changes is an offline editor workflow.
+
+---
+
+## URL and page identity
+
+- **`pageUrl`:** canonical first column for the current HTML page (e.g. `/chapter1.html`). Use one shared implementation: canonical path + `getPathCandidates()` (or equivalent) so merging matches CSV keys.
+- **`idsOnPage`:** ordered list of HTML `id` values that are **editable** in coverage UI on this page.
+
+**Normative:** `idsOnPage` must be the **same set** used for:
+
+- student/professor highlighting,
+- the modal editor checklist,
+- inline professor checkboxes.
+
+If the DOM query for `idsOnPage` is narrower than the IDs used for highlights (e.g. headings in `#quarto-content` vs IDs only in margin TOC), the editor and CSV preview can **omit** rows that still drive colors — the section dropdown will then appear not to change the CSV. **v0.0.2** requires a **single** definition of trackable IDs (see below).
+
+---
+
+## Canonical `idsOnPage` (v0.0.2)
+
+Implementations must define how IDs are collected, e.g.:
+
+- In Quarto book HTML, **section** wrappers often carry the anchor `id` (with `h2` inside without a duplicate `id`), and **chapter titles** may use `h1 span[id]`. The runtime should treat **those** elements as the trackable anchors so `idsOnPage` matches `getElementById` / CSV keys.
+- Policy for elements outside `#quarto-content` (e.g. `h2#toc-title` in the margin TOC): **include everywhere** or **exclude everywhere** — choose one and document it in the editor guide.
+
+---
+
+## Professor mode: class section selection
+
+- Activated with `?prof` or `?prof=true`.
+- Professor selects **zero or more** class sections (checkbox chooser).
+- Sidebar shows color-coded entries; internal links preserve `prof`.
+
+---
+
+## Goals (v0.0.2)
+
+### Modal: “Edit page coverage CSV”
+
+1. **Class section dropdown** — Changing selection reloads checkbox state from in-memory coverage for `(selectedSectionId, pageUrl, htmlId)` and **immediately** rebuilds the CSV textarea.
+2. **Every checkbox** — Any toggle (including after re-render) **immediately** rebuilds the CSV textarea. Use **event delegation** on the checklist container (`input`/`change` → rebuild) so dynamically created inputs do not miss listeners.
+3. **No “Build CSV” button** — The textarea is always live from checkboxes and export mode; there is no separate build action.
+
+### Inline: per-heading, per-section controls
+
+When professor mode is active and **N ≥ 1** class sections are selected:
+
+- For each `htmlId` in `idsOnPage` and each selected `sectionId`, show **one** checkbox (or a grouped row of N), **color-coded** to `coverage-config.json` `color` for that section.
+- Toggle updates in-memory state, refreshes highlights, and any open CSV preview/export for that section.
+
+### Export: minimize vs maximize
+
+Two named modes in the export UI (labels should match in the product):
+
+| Mode | Name | Behavior |
+|------|------|----------|
+| **Minimize CSV** | Omit non-covered rows where the format allows; for remaining rows use short `URL,html-id` or `URL,html-id,` when the state is **covered** (omit the literal word `covered` in the third column). Header row `URL,html-id,covered` may still be emitted. |
+| **Maximize CSV** | One row per `(pageUrl, htmlId)` in scope (default scope: **current page**), third column always `covered` or `not-covered`. |
+
+**Default** when opening export for the current page: **maximize** (full explicit grid) unless the user chooses **minimize**.
+
+**Scope note:** maximize for the **whole book** is a separate product decision (optional); default is **current page** only.
+
+---
+
+## Minimize CSV (normative details)
+
+- **Rows:** include only rows where coverage is **covered**, **or** omit rows that are not covered (so the file stays short). Rows that are explicitly `not-covered` may be omitted unless the editor needs to record them.
+- **Short form:** for covered rows, prefer `URL,html-id` or `URL,html-id,` per the persistent CSV rules.
+- Align with the on-disk CSV format so pasted output is valid.
+
+---
+
+## Maximize CSV (normative details)
+
+- **Rows:** every `htmlId` in `idsOnPage` for the **current page** (unless whole-book scope is explicitly selected).
+- **Columns:** `URL,html-id,covered`
+- **Third column:** always `covered` or `not-covered`.
+
+---
+
+## Architecture (layers)
+
+1. **Load** — for the current page only, fetch `yr-coverage--<PAGE-SLUG>.csv` under each section directory (parallel).
+2. **Parse** — build `sectionId → pageUrl → htmlId → boolean` (same structure as before; only current page keys populated from network).
+3. **Render highlights** — existing overlap / badge behavior.
+4. **Edit** — modal and inline toggles write the same in-memory state.
+5. **Export** — serialize with **minimize** or **maximize** rules; copy/download.
+
+---
+
+## Accessibility
+
+- Checkboxes: `aria-label` including section name and heading id where helpful.
+
+---
+
+## Implementation checklist
+
+- [x] `idsOnPage` query matches highlight coverage IDs (section ids + chapter title span ids; TOC excluded).
+- [x] `pageUrl` + merge logic shared everywhere.
+- [x] Editor: `change` on section `<select>` → persist previous section → `renderCheckboxes()` + rebuild CSV.
+- [x] Editor: event delegation on checklist → rebuild CSV on any checkbox `input`/`change`.
+- [x] Inline checkbox component bound to same state as modal.
+- [x] Export UI: **Minimize CSV** vs **Maximize CSV** (radio group); copy; download; default maximize for current page.
+- [x] Sample: two sections, three pages, multiple ids per page — dropdown and textarea reflect each section.
+
+---
+
+## Open decisions (record in project when resolved)
+
+1. Maximize scope: **current page** vs **whole book**.
+2. Include or exclude `toc-title` (and similar) in `idsOnPage` consistently.
+3. If modal and inline editor are both visible: sync rules or single source of truth.
+
+---
+
+## Changelog (this file)
+
+- **v0.0.2 / v001:** Professor CSV editor (live updates, unified `idsOnPage`), inline per-section checkboxes, **minimize** CSV vs **maximize** CSV export naming and semantics.
+- **v0.0.2 / v001 (revision):** Per-page CSV layout **option A**: `coverage-data/<SECTION-ID>/yr-coverage--<page-slug>.csv`, lazy load per page, optional `coverageDataDir`.

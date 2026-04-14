@@ -152,24 +152,91 @@
     return byUrl;
   }
 
-  function coverageCsvPathForSection(section, basePath) {
-    if (section.coverageCsv) {
-      return section.coverageCsv;
+  function setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, covered) {
+    if (!coverageState.bySection[sectionId]) {
+      coverageState.bySection[sectionId] = {};
     }
-    return basePath + "coverage-data/" + section.id + ".csv";
+    var pageMap = coverageState.bySection[sectionId];
+    if (!pageMap[pageUrl]) {
+      pageMap[pageUrl] = {};
+    }
+    pageMap[pageUrl][htmlId] = covered;
+  }
+
+  /**
+   * Trackable anchors: Quarto book HTML often puts the id on a wrapping <section>,
+   * and chapter titles on <h1><span id="...">. We collect both so idsOnPage matches CSV and highlights.
+   */
+  function queryHeadingNodesWithIds() {
+    var out = [];
+    document.querySelectorAll("#quarto-content .quarto-title-block h1 span[id]").forEach(function (span) {
+      out.push(span);
+    });
+    document.querySelectorAll("#quarto-content section[id]").forEach(function (sec) {
+      if (
+        sec.querySelector(":scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6")
+      ) {
+        out.push(sec);
+      }
+    });
+    return out;
+  }
+
+  function headingLabelText(node) {
+    if (!node) {
+      return "";
+    }
+    var clone = node.cloneNode(true);
+    clone.querySelectorAll(".ct-badge-row, .ct-inline-row").forEach(function (el) {
+      el.remove();
+    });
+    return (clone.textContent || "").trim().replace(/\s+/g, " ");
+  }
+
+  function targetHeadingForAnchorEl(anchorEl) {
+    if (anchorEl.tagName === "SECTION") {
+      return anchorEl.querySelector(":scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6");
+    }
+    return anchorEl.closest("h1, h2, h3, h4, h5, h6") || anchorEl.parentElement;
+  }
+
+  /**
+   * Maps canonical page URL path to the filename stem after yr-coverage--.
+   * Example: /chapter1.html -> chapter1.html ; /part-a/chapter.html -> part-a--chapter.html
+   */
+  function pageUrlToFileSlug(pageUrl) {
+    var p = (pageUrl || "/").replace(/^\/+/, "");
+    return p.replace(/\//g, "--");
+  }
+
+  function coverageDataDirForSection(section, basePath) {
+    if (section.coverageDataDir) {
+      var d = section.coverageDataDir;
+      if (!d.endsWith("/")) {
+        d += "/";
+      }
+      return d;
+    }
+    return basePath + "coverage-data/" + section.id + "/";
+  }
+
+  /** Per-page CSV: .../coverage-data/<SECTION-ID>/yr-coverage--<page-slug>.csv */
+  function coverageCsvUrlForPage(section, basePath, pageUrl) {
+    var slug = pageUrlToFileSlug(pageUrl);
+    return coverageDataDirForSection(section, basePath) + "yr-coverage--" + slug + ".csv";
   }
 
   function loadCoverageState(config, basePath) {
-    var state = { bySection: {}, csvPathBySection: {} };
+    var pageUrl = getCanonicalPageUrl();
+    var state = { bySection: {}, pageUrl: pageUrl };
     var tasks = (config.sections || []).map(function (section) {
-      var csvPath = coverageCsvPathForSection(section, basePath);
-      state.csvPathBySection[section.id] = csvPath;
-      return fetchText(csvPath)
+      var csvUrl = coverageCsvUrlForPage(section, basePath, pageUrl);
+      return fetchText(csvUrl)
         .then(function (text) {
           state.bySection[section.id] = parseCoverageCsv(text);
         })
         .catch(function (err) {
-          console.warn("Coverage CSV missing or unreadable for section " + section.id, err);
+          console.warn("Coverage CSV missing or unreadable: " + csvUrl, err);
           state.bySection[section.id] = {};
         });
     });
@@ -389,12 +456,63 @@
   }
 
   function getPageSectionRows() {
-    return Array.from(document.querySelectorAll("#quarto-content h1[id], #quarto-content h2[id], #quarto-content h3[id], #quarto-content h4[id], #quarto-content h5[id], #quarto-content h6[id]")).map(
-      function (node) {
-        var text = (node.textContent || "").trim().replace(/\s+/g, " ");
-        return { id: node.id, label: text ? node.id + " - " + text : node.id };
+    return queryHeadingNodesWithIds().map(function (node) {
+      var heading = targetHeadingForAnchorEl(node);
+      var text = headingLabelText(heading);
+      return { id: node.id, label: text ? node.id + " - " + text : node.id };
+    });
+  }
+
+  function clearInlineProfessorControls() {
+    document.querySelectorAll(".ct-inline-row").forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  function syncInlineCheckboxesFromState(coverageState, selectedSectionIds) {
+    if (!selectedSectionIds || !selectedSectionIds.length) {
+      return;
+    }
+    document.querySelectorAll(".ct-inline-checkbox").forEach(function (el) {
+      var sid = el.getAttribute("data-section-id");
+      var hid = el.getAttribute("data-html-id");
+      var cov = coverageStateForCurrentPage(sid, coverageState);
+      el.checked = cov[hid] === true;
+    });
+  }
+
+  function mountInlineProfessorControls(config, selectedSectionIds, coverageState) {
+    clearInlineProfessorControls();
+    if (!selectedSectionIds.length) {
+      return;
+    }
+    var colors = sectionColorMap(config);
+    queryHeadingNodesWithIds().forEach(function (anchorEl) {
+      var heading = targetHeadingForAnchorEl(anchorEl);
+      if (!heading) {
+        return;
       }
-    );
+      var row = createElement("span", { class: "ct-inline-row" });
+      selectedSectionIds.forEach(function (sectionId) {
+        var cov = coverageStateForCurrentPage(sectionId, coverageState);
+        var cb = createElement("input", {
+          type: "checkbox",
+          class: "ct-inline-checkbox",
+          "data-section-id": sectionId,
+          "data-html-id": anchorEl.id
+        });
+        cb.setAttribute(
+          "aria-label",
+          (getSectionLabel(config, sectionId) || sectionId) + " coverage for " + anchorEl.id
+        );
+        cb.checked = cov[anchorEl.id] === true;
+        cb.style.accentColor = colors[sectionId] || "#666";
+        var lab = createElement("label", { class: "ct-inline-cb-wrap" });
+        lab.appendChild(cb);
+        row.appendChild(lab);
+      });
+      heading.appendChild(row);
+    });
   }
 
   function csvEscape(value) {
@@ -404,11 +522,15 @@
     return '"' + value.replace(/"/g, '""') + '"';
   }
 
-  function buildCoverageCsvForPage(url, sectionIds, checkedMap, compact) {
+  function buildCoverageCsvForPage(url, sectionIds, checkedMap, minimize) {
     var lines = ["URL,html-id,covered"];
     sectionIds.forEach(function (id) {
       var checked = !!checkedMap[id];
-      if (compact && !checked) {
+      if (minimize) {
+        if (!checked) {
+          return;
+        }
+        lines.push(csvEscape(url) + "," + csvEscape(id));
         return;
       }
       lines.push(csvEscape(url) + "," + csvEscape(id) + "," + (checked ? "covered" : "not-covered"));
@@ -416,7 +538,7 @@
     return lines.join("\n");
   }
 
-  function createProfessorEditorPanel(config, coverageState, initialSectionId) {
+  function createProfessorEditorPanel(config, coverageState, initialSectionId, callbacks) {
     var panel = createElement("div", { class: "ct-overlay", id: "ct-editor-overlay" });
     var content = createElement("div", { class: "ct-panel ct-editor-panel" });
     content.appendChild(createElement("h2", null, "Edit page coverage CSV"));
@@ -424,7 +546,7 @@
       createElement(
         "p",
         null,
-        "Select a class section, mark coverage for this page, then copy or download the CSV output."
+        "Select a class section, mark coverage for this page, then copy or download the CSV output. Checkboxes in the page text stay in sync when this dialog is open."
       )
     );
 
@@ -444,24 +566,50 @@
     var allRows = getPageSectionRows();
     var list = createElement("div", { class: "ct-prof-checklist ct-editor-checklist" });
 
-    var compactRow = createElement("label", { class: "ct-prof-check-item" });
-    var compactCheckbox = createElement("input", { type: "checkbox", id: "ct-editor-compact" });
-    compactRow.appendChild(compactCheckbox);
-    compactRow.appendChild(createElement("span", null, "Compact output (omit not-covered rows)"));
+    var exportFieldset = createElement("fieldset", { class: "ct-export-fieldset" });
+    var exportLegend = createElement("legend", null, "CSV export format");
+    exportFieldset.appendChild(exportLegend);
+    var exportMaxRow = createElement("label", { class: "ct-export-radio-row" });
+    var exportMaxRadio = createElement("input", {
+      type: "radio",
+      name: "ct-editor-export-mode",
+      id: "ct-editor-export-max",
+      value: "maximize"
+    });
+    exportMaxRadio.checked = true;
+    exportMaxRow.appendChild(exportMaxRadio);
+    exportMaxRow.appendChild(
+      createElement("span", null, "Maximize CSV — one row per heading on this page; third column always covered or not-covered")
+    );
+    var exportMinRow = createElement("label", { class: "ct-export-radio-row" });
+    var exportMinRadio = createElement("input", {
+      type: "radio",
+      name: "ct-editor-export-mode",
+      id: "ct-editor-export-min",
+      value: "minimize"
+    });
+    exportMinRow.appendChild(exportMinRadio);
+    exportMinRow.appendChild(
+      createElement(
+        "span",
+        null,
+        "Minimize CSV — omit not-covered rows; covered rows as URL,html-id (short form)"
+      )
+    );
+    exportFieldset.appendChild(exportMaxRow);
+    exportFieldset.appendChild(exportMinRow);
 
     var toolbar = createElement("div", { class: "ct-editor-toolbar" });
     var selectAllBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Select all on page");
     var clearAllBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Clear all on page");
-    var buildBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Build CSV");
     toolbar.appendChild(selectAllBtn);
     toolbar.appendChild(clearAllBtn);
-    toolbar.appendChild(buildBtn);
 
     var output = createElement("textarea", {
       id: "ct-editor-output",
       rows: "10",
       class: "ct-editor-output",
-      placeholder: "CSV output will appear here..."
+      placeholder: "CSV output updates when checkboxes or export format changes..."
     });
     var actions = createElement("div", { class: "ct-editor-toolbar" });
     var copyBtn = createElement("button", { type: "button", class: "ct-btn-secondary" }, "Copy CSV");
@@ -470,6 +618,16 @@
     actions.appendChild(copyBtn);
     actions.appendChild(downloadBtn);
     actions.appendChild(closeBtn);
+
+    var currentEditorSection = initialSectionId;
+
+    function persistEditorPanelToStateForSection(sectionId) {
+      var pageUrl = getCanonicalPageUrl();
+      list.querySelectorAll("input[type='checkbox']").forEach(function (el) {
+        var id = el.getAttribute("data-html-id");
+        setPageCoverageForSection(coverageState, sectionId, pageUrl, id, el.checked);
+      });
+    }
 
     function renderCheckboxes() {
       list.innerHTML = "";
@@ -495,8 +653,15 @@
       });
     }
 
+    function isMinimizeExportMode() {
+      return exportMinRadio.checked;
+    }
+
     function buildCsv() {
       var selectedSectionId = sectionSelect.value;
+      persistEditorPanelToStateForSection(selectedSectionId);
+      callbacks.applyHighlights();
+      syncInlineCheckboxesFromState(coverageState, callbacks.getSelectedProfSections());
       var checkedMap = {};
       var sectionIds = [];
       list.querySelectorAll("input[type='checkbox']").forEach(function (el) {
@@ -504,9 +669,15 @@
         sectionIds.push(id);
         checkedMap[id] = el.checked;
       });
-      output.value = buildCoverageCsvForPage(url, sectionIds, checkedMap, compactCheckbox.checked);
+      output.value = buildCoverageCsvForPage(url, sectionIds, checkedMap, isMinimizeExportMode());
       localStorage.setItem(STORAGE_KEY_PROF_EDITOR_SECTION, selectedSectionId);
     }
+
+    function onExternalCoverageChange() {
+      renderCheckboxes();
+      buildCsv();
+    }
+    document.addEventListener("ct-coverage-changed", onExternalCoverageChange);
 
     selectAllBtn.addEventListener("click", function () {
       setAllCheckboxes(true);
@@ -516,11 +687,20 @@
       setAllCheckboxes(false);
       buildCsv();
     });
-    buildBtn.addEventListener("click", buildCsv);
-    compactCheckbox.addEventListener("change", buildCsv);
+    exportMaxRadio.addEventListener("change", buildCsv);
+    exportMinRadio.addEventListener("change", buildCsv);
     sectionSelect.addEventListener("change", function () {
+      persistEditorPanelToStateForSection(currentEditorSection);
+      callbacks.applyHighlights();
+      syncInlineCheckboxesFromState(coverageState, callbacks.getSelectedProfSections());
+      currentEditorSection = sectionSelect.value;
       renderCheckboxes();
       buildCsv();
+    });
+    list.addEventListener("change", function (e) {
+      if (e.target && e.target.matches("input[type='checkbox']")) {
+        buildCsv();
+      }
     });
 
     copyBtn.addEventListener("click", function () {
@@ -539,11 +719,10 @@
       if (!output.value) {
         buildCsv();
       }
-      var selectedSectionId = sectionSelect.value;
       var blob = new Blob([output.value + "\n"], { type: "text/csv;charset=utf-8" });
       var link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = selectedSectionId + "-page-coverage.csv";
+      link.download = "yr-coverage--" + pageUrlToFileSlug(url) + ".csv";
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -551,12 +730,16 @@
     });
 
     closeBtn.addEventListener("click", function () {
+      persistEditorPanelToStateForSection(sectionSelect.value);
+      callbacks.applyHighlights();
+      syncInlineCheckboxesFromState(coverageState, callbacks.getSelectedProfSections());
+      document.removeEventListener("ct-coverage-changed", onExternalCoverageChange);
       panel.remove();
     });
 
     content.appendChild(sectionLabel);
     content.appendChild(sectionSelect);
-    content.appendChild(compactRow);
+    content.appendChild(exportFieldset);
     content.appendChild(toolbar);
     content.appendChild(list);
     content.appendChild(output);
@@ -715,6 +898,7 @@
         var panel = createProfessorChooserPanel(config, selected, function (ids) {
           selected = ids;
           localStorage.setItem(STORAGE_KEY_PROF, JSON.stringify(ids));
+          mountInlineProfessorControls(config, ids, coverageState);
           applyProfessorCoverage(ids, config, coverageState);
           mountProfessorControls(config, ids, openChooser, openEditor);
         });
@@ -732,10 +916,32 @@
           return;
         }
         var initial = localStorage.getItem(STORAGE_KEY_PROF_EDITOR_SECTION) || selected[0] || sections[0].id;
-        var panel = createProfessorEditorPanel(config, coverageState, initial);
+        var panel = createProfessorEditorPanel(config, coverageState, initial, {
+          applyHighlights: function () {
+            applyProfessorCoverage(selected, config, coverageState);
+          },
+          getSelectedProfSections: function () {
+            return selected;
+          }
+        });
         document.body.appendChild(panel);
       }
 
+      function onInlineCheckboxChange(evt) {
+        var el = evt.target;
+        if (!el.classList.contains("ct-inline-checkbox")) {
+          return;
+        }
+        var sectionId = el.getAttribute("data-section-id");
+        var htmlId = el.getAttribute("data-html-id");
+        var pageUrl = getCanonicalPageUrl();
+        setPageCoverageForSection(coverageState, sectionId, pageUrl, htmlId, el.checked);
+        applyProfessorCoverage(selected, config, coverageState);
+        document.dispatchEvent(new CustomEvent("ct-coverage-changed"));
+      }
+      document.body.addEventListener("change", onInlineCheckboxChange);
+
+      mountInlineProfessorControls(config, selected, coverageState);
       applyProfessorCoverage(selected, config, coverageState);
       mountProfessorControls(config, selected, openChooser, openEditor);
       return;

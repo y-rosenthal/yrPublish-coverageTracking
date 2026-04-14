@@ -10,7 +10,7 @@ Students do not need special documentation to consume the book.
 
 - Students pick a class section and see covered content highlighted.
 - Professors can compare multiple sections in `?prof` mode.
-- Coverage data is maintained in section-specific CSV files.
+- Coverage data is maintained in **per-class-section** directories, with **one CSV per rendered HTML page** (see naming below).
 - Professors can generate updated CSV content from the website UI.
 
 ## Required directory structure
@@ -21,11 +21,16 @@ In your Quarto book project, include:
 assets/coverage-tracking/
   coverage-config.json
   coverage-data/
-    <SECTION-ID>.csv
+    <SECTION-ID>/
+      yr-coverage--index.html.csv
+      yr-coverage--chapter1.html.csv
+      yr-coverage--part-a--chapter.html.csv
   coverage-tracker.js
   coverage-tracker.css
   coverage-tracker.html
 ```
+
+**Filename rule:** `yr-coverage--` + slug + `.csv`, where **slug** is the page path without a leading slash, with `/` replaced by `--` (e.g. `/chapter1.html` → `chapter1.html`; `/part-a/chapter.html` → `part-a--chapter.html`).
 
 Optional helper scripts:
 
@@ -47,16 +52,17 @@ Defines available sections and styling.
     {
       "id": "MATH101-01",
       "label": "MATH101 Section 01",
-      "color": "#2e7d32",
-      "coverageCsv": "assets/coverage-tracking/coverage-data/MATH101-01.csv"
+      "color": "#2e7d32"
     }
   ]
 }
 ```
 
-### `coverage-data/<SECTION-ID>.csv` (CSV, required per section)
+Optional: `"coverageDataDir": "assets/coverage-tracking/coverage-data/MATH101-01/"` if the section directory is not the default `coverage-data/<SECTION-ID>/`.
 
-Each class section has its own coverage file.
+### `coverage-data/<SECTION-ID>/yr-coverage--<page-slug>.csv` (CSV, required per page you track)
+
+Each class section has its own **directory**. Each rendered page you care about has its own CSV file in that directory. Large books stay maintainable: you edit only the files for the pages you change.
 
 Accepted row formats:
 
@@ -133,14 +139,20 @@ Usage:
 
 Purpose:
 
-- read one section CSV plus one or more `.qmd` files
-- add missing `(URL,html-id)` rows to a new output CSV
-- missing rows are added as `not-covered`
+- For a given **class section**, update one **per-page** CSV per `.qmd` file.
+- Adds missing `(URL,html-id)` rows as `not-covered`.
+- Writes `yr-coverage--<page-slug>.updated.csv` next to each target `yr-coverage--<page-slug>.csv`.
 
-Usage:
+Usage (from your **Quarto book root**, so URLs resolve to `/index.html`, `/chapter1.html`, etc.):
 
 ```bash
-./tools/yrUpdateCoverage.sh --coverage assets/coverage-tracking/coverage-data/MATH101-01.csv chapter1.qmd chapter2.qmd
+./tools/yrUpdateCoverage.sh --section MATH101-01 --data-dir assets/coverage-tracking/coverage-data index.qmd chapter1.qmd
+```
+
+From another working directory, pass `--book-root` pointing at the book project:
+
+```bash
+./tools/yrUpdateCoverage.sh --section MATH101-01 --book-root path/to/book --data-dir path/to/book/assets/coverage-tracking/coverage-data path/to/book/index.qmd
 ```
 
 ## Professor workflow in UI
@@ -152,16 +164,26 @@ Usage:
 3. Select zero or more sections with checkboxes.
 4. Apply and review highlighted overlap.
 
+### Inline toggles (in page content)
+
+1. After **at least one** class section is selected, each trackable heading on the page shows **small checkboxes** (one per selected section), color-coded by section.
+2. Toggling an inline checkbox updates highlights immediately and stays consistent with the CSV editor dialog if it is open.
+
 ### Edit page coverage CSV
 
 1. In professor mode, click `Edit page coverage CSV` in sidebar.
 2. Choose the class section to edit.
-3. Use:
+3. Choose **Maximize CSV** (full grid with explicit `covered` / `not-covered`) or **Minimize CSV** (omit not-covered rows; short `URL,html-id` for covered). Default is **Maximize**.
+4. Use:
    - `Select all on page`
    - `Clear all on page`
-   - individual checkbox toggles per section ID
-4. Click `Build CSV`.
-5. Copy or download output and save/update the section CSV offline.
+   - individual checkbox toggles per section ID (the textarea updates immediately; there is no separate “Build CSV” step)
+5. You may paste or type into the textarea manually; **Copy** / **Download** use the textarea as shown. Changing checkboxes or export mode regenerates the textarea from the checklist.
+6. Copy or download output and save/update the matching **`yr-coverage--<page-slug>.csv`** file in the repo under **`coverage-data/<SECTION-ID>/`**.
+
+### Heading IDs in Quarto HTML
+
+Quarto often places the stable anchor on a **`<section id="...">`** wrapper (with the visible heading inside), or on a **`<span id="...">`** inside the chapter title `h1`. Use explicit `{#id}` on headings in source when possible, and ensure CSV `html-id` values match the rendered DOM ids (see the sample book).
 
 ## Notes on defaults and new content
 

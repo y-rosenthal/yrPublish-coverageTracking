@@ -1,0 +1,13 @@
+# Chapter 2 {#chapter-two}
+
+## Integration intro {#sec-integration-intro}
+
+Antiderivatives and the idea of accumulation appear throughout this chapter.
+
+## Series topics {#sec-series-topics}
+
+Sequences and series give a different lens on representing functions.
+
+## Applications in physics {#sec-physics-applications}
+
+Motion and work examples connect integrals to measurable quantities.

@@ -2,7 +2,13 @@
 
 This sample book demonstrates section-level coverage tracking in a portable Quarto setup.
 
-Coverage data is stored as one CSV file per class section under `assets/coverage-tracking/coverage-data/`.
+Coverage data is stored under **`assets/coverage-tracking/coverage-data/<SECTION-ID>/`**, with **one CSV per rendered HTML page**, named:
+
+`yr-coverage--<page-slug>.csv`
+
+Example: `/chapter1.html` → `yr-coverage--chapter1.html.csv`. Nested paths use `--` instead of `/` (e.g. `/part-a/chapter.html` → `yr-coverage--part-a--chapter.html.csv`).
+
+The browser loads **only the current page’s** CSV files (one fetch per class section per page).
 
 ## Render
 
@@ -30,22 +36,24 @@ Output is written to `sampleBooks/sample1/_book/`.
   - Open `sampleBooks/sample1/_book/index.html?prof=true` or `sampleBooks/sample1/_book/index.html?prof`
   - Navigate to another chapter and confirm the `prof` query parameter remains in the URL
   - After sections are applied, navigate pages and confirm the chooser does not auto-open
-  - Select zero or more sections using checkboxes
+  - Select **one or more** sections using checkboxes, apply, then confirm **inline checkboxes** appear next to headings in the main content (color per section)
   - Confirm selected sections appear at the top of the left sidebar as color-coded entries
-  - If no sections are selected, confirm one left-sidebar entry is shown as `Choose section(s)`
+  - If no sections are selected, confirm one left-sidebar entry is shown as `Choose section(s)` and **no** inline checkboxes appear in the body
   - Click any professor sidebar entry and confirm the chooser popup opens again
   - Press `Esc` in the chooser and confirm it closes without applying changes
   - Click `Edit page coverage CSV`, then test:
+    - **Maximize CSV** vs **Minimize CSV** (textarea should change format)
     - Select all on page
     - Clear all on page
-    - Individual toggles
-    - Build CSV, copy, and download
+    - Individual toggles (textarea should update immediately; there is no “Build CSV” button)
+    - Copy and download
+  - With the dialog open, toggle an **inline** checkbox and confirm the dialog checklist and textarea stay in sync
   - Confirm sections covered by all selected sections differ from partially covered sections
   - Confirm small colored badges indicate which section(s) covered each item
 
 ## Update coverage
 
-Edit the relevant file in `assets/coverage-tracking/coverage-data/<SECTION-ID>.csv` and render again.
+Edit the relevant **`yr-coverage--<page-slug>.csv`** under `assets/coverage-tracking/coverage-data/<SECTION-ID>/` and render again.
 
 CSV supports rows like:
 
@@ -60,5 +68,13 @@ Missing rows default to not covered.
 
 - Add missing heading IDs in one file:
   - `./tools/yrAddSectionsIds.sh sampleBooks/sample1/chapter1.qmd`
-- Update one section CSV from one or more `.qmd` files:
-  - `./tools/yrUpdateCoverage.sh --coverage sampleBooks/sample1/assets/coverage-tracking/coverage-data/MATH101-01.csv sampleBooks/sample1/index.qmd sampleBooks/sample1/chapter1.qmd`
+- Update per-page CSVs for one section from `.qmd` files (run with `--book-root` pointing at this book):
+
+```bash
+./tools/yrUpdateCoverage.sh --section MATH101-01 \
+  --book-root sampleBooks/sample1 \
+  --data-dir sampleBooks/sample1/assets/coverage-tracking/coverage-data \
+  sampleBooks/sample1/index.qmd sampleBooks/sample1/chapter1.qmd sampleBooks/sample1/chapter2.qmd
+```
+
+This writes `yr-coverage--<page-slug>.updated.csv` next to each existing `yr-coverage--<page-slug>.csv` for review.

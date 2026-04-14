@@ -1,6 +1,6 @@
 URL,html-id,covered
-/index.html,sec-how-to-use,not-covered
-/index.html,sec-reading-plan,covered
+/chapter1.html,chapter-one,covered
 /chapter1.html,sec-limits-review,covered
 /chapter1.html,sec-continuity-basics,not-covered
 /chapter1.html,sec-derivatives-preview,covered
+/chapter1.html,sec-applications,not-covered

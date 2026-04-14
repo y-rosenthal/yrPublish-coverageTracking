@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; Guide for Content Editors and Teachers – Quarto Coverage Tracking</title>
+<title>4&nbsp; Guide for Content Editors and Teachers – Quarto Coverage Tracking</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./spec.html" rel="prev">
+<link href="./SPEC-0.0.2-v001.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -116,7 +116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Guide for Content Editors and Teachers</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Guide for Content Editors and Teachers</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -155,8 +155,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./SPEC-0.0.2-v001.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Coverage tracking — Specification v0.0.2 (pseudo-v001)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Guide for Content Editors and Teachers</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Guide for Content Editors and Teachers</span></span></a>
   </div>
 </li>
     </ul>
@@ -169,28 +175,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#who-this-guide-is-for" id="toc-who-this-guide-is-for" class="nav-link active" data-scroll-target="#who-this-guide-is-for"><span class="header-section-number">3.1</span> Who this guide is for</a></li>
-  <li><a href="#what-this-system-does" id="toc-what-this-system-does" class="nav-link" data-scroll-target="#what-this-system-does"><span class="header-section-number">3.2</span> What this system does</a></li>
-  <li><a href="#required-directory-structure" id="toc-required-directory-structure" class="nav-link" data-scroll-target="#required-directory-structure"><span class="header-section-number">3.3</span> Required directory structure</a></li>
-  <li><a href="#file-formats" id="toc-file-formats" class="nav-link" data-scroll-target="#file-formats"><span class="header-section-number">3.4</span> File formats</a>
+  <li><a href="#who-this-guide-is-for" id="toc-who-this-guide-is-for" class="nav-link active" data-scroll-target="#who-this-guide-is-for"><span class="header-section-number">4.1</span> Who this guide is for</a></li>
+  <li><a href="#what-this-system-does" id="toc-what-this-system-does" class="nav-link" data-scroll-target="#what-this-system-does"><span class="header-section-number">4.2</span> What this system does</a></li>
+  <li><a href="#required-directory-structure" id="toc-required-directory-structure" class="nav-link" data-scroll-target="#required-directory-structure"><span class="header-section-number">4.3</span> Required directory structure</a></li>
+  <li><a href="#file-formats" id="toc-file-formats" class="nav-link" data-scroll-target="#file-formats"><span class="header-section-number">4.4</span> File formats</a>
   <ul class="collapse">
-  <li><a href="#coverage-config.json-json-required" id="toc-coverage-config.json-json-required" class="nav-link" data-scroll-target="#coverage-config.json-json-required"><span class="header-section-number">3.4.1</span> <code>coverage-config.json</code> (JSON, required)</a></li>
-  <li><a href="#coverage-datasection-id.csv-csv-required-per-section" id="toc-coverage-datasection-id.csv-csv-required-per-section" class="nav-link" data-scroll-target="#coverage-datasection-id.csv-csv-required-per-section"><span class="header-section-number">3.4.2</span> <code>coverage-data/&lt;SECTION-ID&gt;.csv</code> (CSV, required per section)</a></li>
+  <li><a href="#coverage-config.json-json-required" id="toc-coverage-config.json-json-required" class="nav-link" data-scroll-target="#coverage-config.json-json-required"><span class="header-section-number">4.4.1</span> <code>coverage-config.json</code> (JSON, required)</a></li>
+  <li><a href="#coverage-datasection-idyr-coverage--page-slug.csv-csv-required-per-page-you-track" id="toc-coverage-datasection-idyr-coverage--page-slug.csv-csv-required-per-page-you-track" class="nav-link" data-scroll-target="#coverage-datasection-idyr-coverage--page-slug.csv-csv-required-per-page-you-track"><span class="header-section-number">4.4.2</span> <code>coverage-data/&lt;SECTION-ID&gt;/yr-coverage--&lt;page-slug&gt;.csv</code> (CSV, required per page you track)</a></li>
   </ul></li>
-  <li><a href="#quarto-integration-steps" id="toc-quarto-integration-steps" class="nav-link" data-scroll-target="#quarto-integration-steps"><span class="header-section-number">3.5</span> Quarto integration steps</a></li>
-  <li><a href="#authoring-content-safely" id="toc-authoring-content-safely" class="nav-link" data-scroll-target="#authoring-content-safely"><span class="header-section-number">3.6</span> Authoring content safely</a></li>
-  <li><a href="#helper-tools" id="toc-helper-tools" class="nav-link" data-scroll-target="#helper-tools"><span class="header-section-number">3.7</span> Helper tools</a>
+  <li><a href="#quarto-integration-steps" id="toc-quarto-integration-steps" class="nav-link" data-scroll-target="#quarto-integration-steps"><span class="header-section-number">4.5</span> Quarto integration steps</a></li>
+  <li><a href="#authoring-content-safely" id="toc-authoring-content-safely" class="nav-link" data-scroll-target="#authoring-content-safely"><span class="header-section-number">4.6</span> Authoring content safely</a></li>
+  <li><a href="#helper-tools" id="toc-helper-tools" class="nav-link" data-scroll-target="#helper-tools"><span class="header-section-number">4.7</span> Helper tools</a>
   <ul class="collapse">
-  <li><a href="#yraddsectionsids.sh" id="toc-yraddsectionsids.sh" class="nav-link" data-scroll-target="#yraddsectionsids.sh"><span class="header-section-number">3.7.1</span> <code>yrAddSectionsIds.sh</code></a></li>
-  <li><a href="#yrupdatecoverage.sh" id="toc-yrupdatecoverage.sh" class="nav-link" data-scroll-target="#yrupdatecoverage.sh"><span class="header-section-number">3.7.2</span> <code>yrUpdateCoverage.sh</code></a></li>
+  <li><a href="#yraddsectionsids.sh" id="toc-yraddsectionsids.sh" class="nav-link" data-scroll-target="#yraddsectionsids.sh"><span class="header-section-number">4.7.1</span> <code>yrAddSectionsIds.sh</code></a></li>
+  <li><a href="#yrupdatecoverage.sh" id="toc-yrupdatecoverage.sh" class="nav-link" data-scroll-target="#yrupdatecoverage.sh"><span class="header-section-number">4.7.2</span> <code>yrUpdateCoverage.sh</code></a></li>
   </ul></li>
-  <li><a href="#professor-workflow-in-ui" id="toc-professor-workflow-in-ui" class="nav-link" data-scroll-target="#professor-workflow-in-ui"><span class="header-section-number">3.8</span> Professor workflow in UI</a>
+  <li><a href="#professor-workflow-in-ui" id="toc-professor-workflow-in-ui" class="nav-link" data-scroll-target="#professor-workflow-in-ui"><span class="header-section-number">4.8</span> Professor workflow in UI</a>
   <ul class="collapse">
-  <li><a href="#compare-mode" id="toc-compare-mode" class="nav-link" data-scroll-target="#compare-mode"><span class="header-section-number">3.8.1</span> Compare mode</a></li>
-  <li><a href="#edit-page-coverage-csv" id="toc-edit-page-coverage-csv" class="nav-link" data-scroll-target="#edit-page-coverage-csv"><span class="header-section-number">3.8.2</span> Edit page coverage CSV</a></li>
+  <li><a href="#compare-mode" id="toc-compare-mode" class="nav-link" data-scroll-target="#compare-mode"><span class="header-section-number">4.8.1</span> Compare mode</a></li>
+  <li><a href="#inline-toggles-in-page-content" id="toc-inline-toggles-in-page-content" class="nav-link" data-scroll-target="#inline-toggles-in-page-content"><span class="header-section-number">4.8.2</span> Inline toggles (in page content)</a></li>
+  <li><a href="#edit-page-coverage-csv" id="toc-edit-page-coverage-csv" class="nav-link" data-scroll-target="#edit-page-coverage-csv"><span class="header-section-number">4.8.3</span> Edit page coverage CSV</a></li>
+  <li><a href="#heading-ids-in-quarto-html" id="toc-heading-ids-in-quarto-html" class="nav-link" data-scroll-target="#heading-ids-in-quarto-html"><span class="header-section-number">4.8.4</span> Heading IDs in Quarto HTML</a></li>
   </ul></li>
-  <li><a href="#notes-on-defaults-and-new-content" id="toc-notes-on-defaults-and-new-content" class="nav-link" data-scroll-target="#notes-on-defaults-and-new-content"><span class="header-section-number">3.9</span> Notes on defaults and new content</a></li>
-  <li><a href="#moving-this-feature-into-another-repository" id="toc-moving-this-feature-into-another-repository" class="nav-link" data-scroll-target="#moving-this-feature-into-another-repository"><span class="header-section-number">3.10</span> Moving this feature into another repository</a></li>
+  <li><a href="#notes-on-defaults-and-new-content" id="toc-notes-on-defaults-and-new-content" class="nav-link" data-scroll-target="#notes-on-defaults-and-new-content"><span class="header-section-number">4.9</span> Notes on defaults and new content</a></li>
+  <li><a href="#moving-this-feature-into-another-repository" id="toc-moving-this-feature-into-another-repository" class="nav-link" data-scroll-target="#moving-this-feature-into-another-repository"><span class="header-section-number">4.10</span> Moving this feature into another repository</a></li>
   </ul>
 </nav>
     </div>
@@ -199,7 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Guide for Content Editors and Teachers</span></h1>
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Guide for Content Editors and Teachers</span></h1>
 </div>
 
 
@@ -216,54 +224,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="who-this-guide-is-for" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="who-this-guide-is-for"><span class="header-section-number">3.1</span> Who this guide is for</h2>
+<section id="who-this-guide-is-for" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="who-this-guide-is-for"><span class="header-section-number">4.1</span> Who this guide is for</h2>
 <p>This guide is for people who maintain Quarto books and track class coverage.</p>
 <p>Students do not need special documentation to consume the book.</p>
 </section>
-<section id="what-this-system-does" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="what-this-system-does"><span class="header-section-number">3.2</span> What this system does</h2>
+<section id="what-this-system-does" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="what-this-system-does"><span class="header-section-number">4.2</span> What this system does</h2>
 <ul>
 <li>Students pick a class section and see covered content highlighted.</li>
 <li>Professors can compare multiple sections in <code>?prof</code> mode.</li>
-<li>Coverage data is maintained in section-specific CSV files.</li>
+<li>Coverage data is maintained in <strong>per-class-section</strong> directories, with <strong>one CSV per rendered HTML page</strong> (see naming below).</li>
 <li>Professors can generate updated CSV content from the website UI.</li>
 </ul>
 </section>
-<section id="required-directory-structure" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="required-directory-structure"><span class="header-section-number">3.3</span> Required directory structure</h2>
+<section id="required-directory-structure" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="required-directory-structure"><span class="header-section-number">4.3</span> Required directory structure</h2>
 <p>In your Quarto book project, include:</p>
 <pre class="text"><code>assets/coverage-tracking/
   coverage-config.json
   coverage-data/
-    &lt;SECTION-ID&gt;.csv
+    &lt;SECTION-ID&gt;/
+      yr-coverage--index.html.csv
+      yr-coverage--chapter1.html.csv
+      yr-coverage--part-a--chapter.html.csv
   coverage-tracker.js
   coverage-tracker.css
   coverage-tracker.html</code></pre>
+<p><strong>Filename rule:</strong> <code>yr-coverage--</code> + slug + <code>.csv</code>, where <strong>slug</strong> is the page path without a leading slash, with <code>/</code> replaced by <code>--</code> (e.g.&nbsp;<code>/chapter1.html</code> → <code>chapter1.html</code>; <code>/part-a/chapter.html</code> → <code>part-a--chapter.html</code>).</p>
 <p>Optional helper scripts:</p>
 <pre class="text"><code>tools/
   yrAddSectionsIds.sh
   yrUpdateCoverage.sh</code></pre>
 </section>
-<section id="file-formats" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="file-formats"><span class="header-section-number">3.4</span> File formats</h2>
-<section id="coverage-config.json-json-required" class="level3" data-number="3.4.1">
-<h3 data-number="3.4.1" class="anchored" data-anchor-id="coverage-config.json-json-required"><span class="header-section-number">3.4.1</span> <code>coverage-config.json</code> (JSON, required)</h3>
+<section id="file-formats" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="file-formats"><span class="header-section-number">4.4</span> File formats</h2>
+<section id="coverage-config.json-json-required" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="coverage-config.json-json-required"><span class="header-section-number">4.4.1</span> <code>coverage-config.json</code> (JSON, required)</h3>
 <p>Defines available sections and styling.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"sections"</span><span class="fu">:</span> <span class="ot">[</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"MATH101-01"</span><span class="fu">,</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"label"</span><span class="fu">:</span> <span class="st">"MATH101 Section 01"</span><span class="fu">,</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"color"</span><span class="fu">:</span> <span class="st">"#2e7d32"</span><span class="fu">,</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"coverageCsv"</span><span class="fu">:</span> <span class="st">"assets/coverage-tracking/coverage-data/MATH101-01.csv"</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"color"</span><span class="fu">:</span> <span class="st">"#2e7d32"</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Optional: <code>"coverageDataDir": "assets/coverage-tracking/coverage-data/MATH101-01/"</code> if the section directory is not the default <code>coverage-data/&lt;SECTION-ID&gt;/</code>.</p>
 </section>
-<section id="coverage-datasection-id.csv-csv-required-per-section" class="level3" data-number="3.4.2">
-<h3 data-number="3.4.2" class="anchored" data-anchor-id="coverage-datasection-id.csv-csv-required-per-section"><span class="header-section-number">3.4.2</span> <code>coverage-data/&lt;SECTION-ID&gt;.csv</code> (CSV, required per section)</h3>
-<p>Each class section has its own coverage file.</p>
+<section id="coverage-datasection-idyr-coverage--page-slug.csv-csv-required-per-page-you-track" class="level3" data-number="4.4.2">
+<h3 data-number="4.4.2" class="anchored" data-anchor-id="coverage-datasection-idyr-coverage--page-slug.csv-csv-required-per-page-you-track"><span class="header-section-number">4.4.2</span> <code>coverage-data/&lt;SECTION-ID&gt;/yr-coverage--&lt;page-slug&gt;.csv</code> (CSV, required per page you track)</h3>
+<p>Each class section has its own <strong>directory</strong>. Each rendered page you care about has its own CSV file in that directory. Large books stay maintainable: you edit only the files for the pages you change.</p>
 <p>Accepted row formats:</p>
 <ul>
 <li><code>URL,html-id,covered</code></li>
@@ -283,8 +295,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 /chapter1.html,sec-derivatives-preview,</code></pre>
 </section>
 </section>
-<section id="quarto-integration-steps" class="level2" data-number="3.5">
-<h2 data-number="3.5" class="anchored" data-anchor-id="quarto-integration-steps"><span class="header-section-number">3.5</span> Quarto integration steps</h2>
+<section id="quarto-integration-steps" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="quarto-integration-steps"><span class="header-section-number">4.5</span> Quarto integration steps</h2>
 <p>In your book <code>_quarto.yml</code>:</p>
 <ol type="1">
 <li>Include coverage config and CSV directory as project resources.</li>
@@ -305,16 +317,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">include-after-body</span><span class="kw">:</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> assets/coverage-tracking/coverage-tracker.html</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="authoring-content-safely" class="level2" data-number="3.6">
-<h2 data-number="3.6" class="anchored" data-anchor-id="authoring-content-safely"><span class="header-section-number">3.6</span> Authoring content safely</h2>
+<section id="authoring-content-safely" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="authoring-content-safely"><span class="header-section-number">4.6</span> Authoring content safely</h2>
 <p>Coverage is based on HTML IDs, so section headings should have explicit IDs:</p>
 <pre class="qmd"><code>## Limits Review {#sec-limits-review}</code></pre>
 <p>This makes coverage stable and portable across edits.</p>
 </section>
-<section id="helper-tools" class="level2" data-number="3.7">
-<h2 data-number="3.7" class="anchored" data-anchor-id="helper-tools"><span class="header-section-number">3.7</span> Helper tools</h2>
-<section id="yraddsectionsids.sh" class="level3" data-number="3.7.1">
-<h3 data-number="3.7.1" class="anchored" data-anchor-id="yraddsectionsids.sh"><span class="header-section-number">3.7.1</span> <code>yrAddSectionsIds.sh</code></h3>
+<section id="helper-tools" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="helper-tools"><span class="header-section-number">4.7</span> Helper tools</h2>
+<section id="yraddsectionsids.sh" class="level3" data-number="4.7.1">
+<h3 data-number="4.7.1" class="anchored" data-anchor-id="yraddsectionsids.sh"><span class="header-section-number">4.7.1</span> <code>yrAddSectionsIds.sh</code></h3>
 <p>Purpose:</p>
 <ul>
 <li>add missing heading IDs in a <code>.qmd</code> file</li>
@@ -323,22 +335,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Usage:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./tools/yrAddSectionsIds.sh</span> input.qmd <span class="pp">[</span><span class="ss">output.qmd</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="yrupdatecoverage.sh" class="level3" data-number="3.7.2">
-<h3 data-number="3.7.2" class="anchored" data-anchor-id="yrupdatecoverage.sh"><span class="header-section-number">3.7.2</span> <code>yrUpdateCoverage.sh</code></h3>
+<section id="yrupdatecoverage.sh" class="level3" data-number="4.7.2">
+<h3 data-number="4.7.2" class="anchored" data-anchor-id="yrupdatecoverage.sh"><span class="header-section-number">4.7.2</span> <code>yrUpdateCoverage.sh</code></h3>
 <p>Purpose:</p>
 <ul>
-<li>read one section CSV plus one or more <code>.qmd</code> files</li>
-<li>add missing <code>(URL,html-id)</code> rows to a new output CSV</li>
-<li>missing rows are added as <code>not-covered</code></li>
+<li>For a given <strong>class section</strong>, update one <strong>per-page</strong> CSV per <code>.qmd</code> file.</li>
+<li>Adds missing <code>(URL,html-id)</code> rows as <code>not-covered</code>.</li>
+<li>Writes <code>yr-coverage--&lt;page-slug&gt;.updated.csv</code> next to each target <code>yr-coverage--&lt;page-slug&gt;.csv</code>.</li>
 </ul>
-<p>Usage:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./tools/yrUpdateCoverage.sh</span> <span class="at">--coverage</span> assets/coverage-tracking/coverage-data/MATH101-01.csv chapter1.qmd chapter2.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Usage (from your <strong>Quarto book root</strong>, so URLs resolve to <code>/index.html</code>, <code>/chapter1.html</code>, etc.):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./tools/yrUpdateCoverage.sh</span> <span class="at">--section</span> MATH101-01 <span class="at">--data-dir</span> assets/coverage-tracking/coverage-data index.qmd chapter1.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>From another working directory, pass <code>--book-root</code> pointing at the book project:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./tools/yrUpdateCoverage.sh</span> <span class="at">--section</span> MATH101-01 <span class="at">--book-root</span> path/to/book <span class="at">--data-dir</span> path/to/book/assets/coverage-tracking/coverage-data path/to/book/index.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="professor-workflow-in-ui" class="level2" data-number="3.8">
-<h2 data-number="3.8" class="anchored" data-anchor-id="professor-workflow-in-ui"><span class="header-section-number">3.8</span> Professor workflow in UI</h2>
-<section id="compare-mode" class="level3" data-number="3.8.1">
-<h3 data-number="3.8.1" class="anchored" data-anchor-id="compare-mode"><span class="header-section-number">3.8.1</span> Compare mode</h3>
+<section id="professor-workflow-in-ui" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="professor-workflow-in-ui"><span class="header-section-number">4.8</span> Professor workflow in UI</h2>
+<section id="compare-mode" class="level3" data-number="4.8.1">
+<h3 data-number="4.8.1" class="anchored" data-anchor-id="compare-mode"><span class="header-section-number">4.8.1</span> Compare mode</h3>
 <ol type="1">
 <li>Open book with <code>?prof</code> or <code>?prof=true</code>.</li>
 <li>Use sidebar entry to open section chooser.</li>
@@ -346,31 +360,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Apply and review highlighted overlap.</li>
 </ol>
 </section>
-<section id="edit-page-coverage-csv" class="level3" data-number="3.8.2">
-<h3 data-number="3.8.2" class="anchored" data-anchor-id="edit-page-coverage-csv"><span class="header-section-number">3.8.2</span> Edit page coverage CSV</h3>
+<section id="inline-toggles-in-page-content" class="level3" data-number="4.8.2">
+<h3 data-number="4.8.2" class="anchored" data-anchor-id="inline-toggles-in-page-content"><span class="header-section-number">4.8.2</span> Inline toggles (in page content)</h3>
+<ol type="1">
+<li>After <strong>at least one</strong> class section is selected, each trackable heading on the page shows <strong>small checkboxes</strong> (one per selected section), color-coded by section.</li>
+<li>Toggling an inline checkbox updates highlights immediately and stays consistent with the CSV editor dialog if it is open.</li>
+</ol>
+</section>
+<section id="edit-page-coverage-csv" class="level3" data-number="4.8.3">
+<h3 data-number="4.8.3" class="anchored" data-anchor-id="edit-page-coverage-csv"><span class="header-section-number">4.8.3</span> Edit page coverage CSV</h3>
 <ol type="1">
 <li>In professor mode, click <code>Edit page coverage CSV</code> in sidebar.</li>
 <li>Choose the class section to edit.</li>
+<li>Choose <strong>Maximize CSV</strong> (full grid with explicit <code>covered</code> / <code>not-covered</code>) or <strong>Minimize CSV</strong> (omit not-covered rows; short <code>URL,html-id</code> for covered). Default is <strong>Maximize</strong>.</li>
 <li>Use:
 <ul>
 <li><code>Select all on page</code></li>
 <li><code>Clear all on page</code></li>
-<li>individual checkbox toggles per section ID</li>
+<li>individual checkbox toggles per section ID (the textarea updates immediately; there is no separate “Build CSV” step)</li>
 </ul></li>
-<li>Click <code>Build CSV</code>.</li>
-<li>Copy or download output and save/update the section CSV offline.</li>
+<li>You may paste or type into the textarea manually; <strong>Copy</strong> / <strong>Download</strong> use the textarea as shown. Changing checkboxes or export mode regenerates the textarea from the checklist.</li>
+<li>Copy or download output and save/update the matching <strong><code>yr-coverage--&lt;page-slug&gt;.csv</code></strong> file in the repo under <strong><code>coverage-data/&lt;SECTION-ID&gt;/</code></strong>.</li>
 </ol>
 </section>
+<section id="heading-ids-in-quarto-html" class="level3" data-number="4.8.4">
+<h3 data-number="4.8.4" class="anchored" data-anchor-id="heading-ids-in-quarto-html"><span class="header-section-number">4.8.4</span> Heading IDs in Quarto HTML</h3>
+<p>Quarto often places the stable anchor on a <strong><code>&lt;section id="..."&gt;</code></strong> wrapper (with the visible heading inside), or on a <strong><code>&lt;span id="..."&gt;</code></strong> inside the chapter title <code>h1</code>. Use explicit <code>{#id}</code> on headings in source when possible, and ensure CSV <code>html-id</code> values match the rendered DOM ids (see the sample book).</p>
 </section>
-<section id="notes-on-defaults-and-new-content" class="level2" data-number="3.9">
-<h2 data-number="3.9" class="anchored" data-anchor-id="notes-on-defaults-and-new-content"><span class="header-section-number">3.9</span> Notes on defaults and new content</h2>
+</section>
+<section id="notes-on-defaults-and-new-content" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="notes-on-defaults-and-new-content"><span class="header-section-number">4.9</span> Notes on defaults and new content</h2>
 <ul>
 <li>If a new heading is added but not listed in CSV, it is interpreted as not covered.</li>
 <li>This default is useful during course progression because coverage accumulates over time.</li>
 </ul>
 </section>
-<section id="moving-this-feature-into-another-repository" class="level2" data-number="3.10">
-<h2 data-number="3.10" class="anchored" data-anchor-id="moving-this-feature-into-another-repository"><span class="header-section-number">3.10</span> Moving this feature into another repository</h2>
+<section id="moving-this-feature-into-another-repository" class="level2" data-number="4.10">
+<h2 data-number="4.10" class="anchored" data-anchor-id="moving-this-feature-into-another-repository"><span class="header-section-number">4.10</span> Moving this feature into another repository</h2>
 <p>To copy this feature into a larger Quarto feature collection:</p>
 <ol type="1">
 <li>Copy <code>assets/coverage-tracking/</code>.</li>
@@ -784,8 +810,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./spec.html" class="pagination-link" aria-label="Coverage Tracking Spec">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Coverage Tracking Spec</span></span>
+      <a href="./SPEC-0.0.2-v001.html" class="pagination-link" aria-label="Coverage tracking — Specification v0.0.2 (pseudo-v001)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Coverage tracking — Specification v0.0.2 (pseudo-v001)</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

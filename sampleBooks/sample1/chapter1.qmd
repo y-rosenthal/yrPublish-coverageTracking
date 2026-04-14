@@ -1,4 +1,4 @@
-# Chapter 1
+# Chapter 1 {#chapter-one}
 
 ## Limits review {#sec-limits-review}
 
@@ -11,3 +11,7 @@ This section is only covered in section 01.
 ## Derivatives preview {#sec-derivatives-preview}
 
 This section is only covered in section 02.
+
+## Applications {#sec-applications}
+
+Short applied examples tie the definitions to word problems.

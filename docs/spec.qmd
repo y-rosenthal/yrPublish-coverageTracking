@@ -12,7 +12,7 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 
 - Section-level coverage keyed by page URL + HTML section ID.
 - Student and professor modes in one JavaScript/CSS add-on.
-- CSV-based coverage data (one file per class section).
+- CSV-based coverage data (one file per rendered HTML page per class section; see file layout below).
 - Professor UI tools for selecting coverage and exporting CSV text.
 - Helper scripts for adding missing heading IDs and updating coverage CSVs.
 
@@ -59,16 +59,21 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 - If none selected, show `Choose section(s)` entry.
 - Include `Edit page coverage CSV` entry to open CSV editor.
 
+### FR-5b: Professor inline coverage toggles
+
+- When professor mode is active and **at least one** class section is selected, the tracker shows **per-section checkboxes** next to each trackable heading (or chapter title span) in the page content, color-coded by section.
+- Toggling an inline checkbox updates in-memory coverage, refreshes highlights, and stays in sync with the CSV editor dialog when it is open.
+
 ### FR-6: Coverage data file format
 
-- `coverage-config.json` remains JSON and defines sections and colors.
-- Coverage data is stored as one CSV file per class section.
+- `coverage-config.json` remains JSON and defines sections and colors (optional `coverageDataDir` per section).
+- Coverage data is stored under `coverage-data/<SECTION-ID>/` with one CSV per HTML page: `yr-coverage--<page-slug>.csv` (see proposed file structure). The runtime loads only the current page’s files.
 - CSV row formats:
   - `URL,html-id,covered`
   - `URL,html-id,not-covered`
   - `URL,html-id` (defaults to covered)
   - `URL,html-id,` (defaults to covered)
-- If `(URL,html-id)` is missing from a section CSV, default is not covered.
+- If `(URL,html-id)` is missing from the relevant page’s CSV for that section, default is not covered.
 
 ### FR-7: Professor CSV editing UI
 
@@ -76,11 +81,16 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 - Editor supports:
   - select all page IDs as covered
   - clear all page IDs as not covered
-  - individually toggle each page ID
-  - generate CSV output
+  - individually toggle each page ID (each toggle updates the textarea immediately; there is no separate “Build CSV” button)
+  - **Maximize CSV** vs **Minimize CSV** export mode (radio buttons; default **Maximize** for the current page)
   - copy CSV text
-  - download CSV file
-- Workflow remains static-first: professor can copy/download and save offline.
+  - download CSV file (filename aligned with `yr-coverage--<page-slug>.csv` naming)
+- Manual edits in the textarea are copied or downloaded as-is; switching export mode or toggling checkboxes regenerates the textarea from the checklist.
+- Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.
+
+### FR-7b: Trackable HTML ids (`idsOnPage`)
+
+- The runtime collects the same set of ids for highlighting, inline toggles, and the editor. In Quarto HTML books this typically includes elements with ids on **section** wrappers and **chapter title** `h1 span[id]` nodes, not only `h1[id]` / `h2[id]` on the heading element itself.
 
 ### FR-8: Helper scripts
 
@@ -89,9 +99,9 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
   - output: new `.qmd` with missing heading IDs inserted
   - skips fenced code blocks so `#` inside code is ignored
 - `tools/yrUpdateCoverage.sh`
-  - input: section coverage CSV + one or more `.qmd` files
-  - output: new `.csv` with missing `(URL,html-id)` rows added
-  - adds missing rows as `not-covered`
+  - input: section id, book root, data dir, one or more `.qmd` files
+  - output: per-page `yr-coverage--<page-slug>.updated.csv` next to each target `yr-coverage--<page-slug>.csv`
+  - adds missing `(URL,html-id)` rows as `not-covered`
 
 ## Proposed file structure
 
@@ -99,7 +109,10 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 assets/coverage-tracking/
   coverage-config.json
   coverage-data/
-    <SECTION-ID>.csv
+    <SECTION-ID>/
+      yr-coverage--index.html.csv
+      yr-coverage--chapter1.html.csv
+      yr-coverage--part-a--chapter.html.csv
   coverage-tracker.js
   coverage-tracker.css
   coverage-tracker.html
@@ -133,8 +146,9 @@ The sample implementation is in `sampleBooks/sample1/` and demonstrates:
 - student picker and highlighting
 - professor compare mode
 - professor sidebar controls
-- professor CSV editor/export workflow
-- CSV-per-section coverage loading
+- professor inline per-section checkboxes in page content (when at least one section is selected)
+- professor CSV editor/export workflow (maximize vs minimize export, live textarea)
+- per-page CSV coverage loading (lazy fetch per page)
 
 ## Risks and mitigations
 
@@ -147,7 +161,7 @@ The sample implementation is in `sampleBooks/sample1/` and demonstrates:
 
 ## Definition of done
 
-- Coverage runtime reads `coverage-config.json` + per-section CSV files.
+- Coverage runtime reads `coverage-config.json` + per-page CSV files for the current section(s).
 - Student mode enforces picker gating and tab-scoped persistence.
 - Professor mode supports comparison, navigation persistence, sidebar controls, and chooser dismiss-on-`Esc`.
 - Professor can generate/export CSV coverage from UI.

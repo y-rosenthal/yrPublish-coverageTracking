@@ -1,0 +1,6 @@
+URL,html-id,covered
+/index.html,welcome,covered
+/index.html,sec-how-to-use,covered
+/index.html,sec-reading-plan,not-covered
+/index.html,sec-course-goals,covered
+/index.html,sec-prerequisites,not-covered

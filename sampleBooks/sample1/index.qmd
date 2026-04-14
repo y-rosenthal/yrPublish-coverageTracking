@@ -1,4 +1,4 @@
-# Welcome
+# Welcome {#welcome}
 
 This sample Quarto book demonstrates section-level course coverage tracking.
 
@@ -9,3 +9,11 @@ Use the dropdown to pick a section as a student. Add `?prof` (or `?prof=true`) t
 ## Reading plan {#sec-reading-plan}
 
 In this sample, some sections are marked as covered for one section and not the other so you can observe different highlighting states.
+
+## Course goals {#sec-course-goals}
+
+These learning goals apply to every section in the sample.
+
+## Prerequisites {#sec-prerequisites}
+
+Review algebra and trigonometry before the chapters on calculus topics.

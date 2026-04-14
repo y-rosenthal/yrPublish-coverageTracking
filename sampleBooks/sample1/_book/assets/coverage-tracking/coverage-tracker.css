@@ -169,3 +169,58 @@ body.ct-needs-selection #quarto-content {
   font-size: 0.86rem;
   color: #475467;
 }
+
+.ct-export-fieldset {
+  border: 1px solid #bcc5cf;
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.65rem 0.55rem;
+  margin: 0.5rem 0 0;
+}
+
+.ct-export-fieldset legend {
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+.ct-export-radio-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  cursor: pointer;
+}
+
+.ct-export-radio-row:last-child {
+  margin-bottom: 0;
+}
+
+.ct-export-radio-row input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.ct-inline-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  flex-wrap: wrap;
+}
+
+.ct-inline-cb-wrap {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ct-inline-cb-wrap input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+}

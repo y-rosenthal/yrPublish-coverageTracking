@@ -10,6 +10,7 @@ book:
   chapters:
     - index.qmd
     - chapter1.qmd
+    - chapter2.qmd
 
 format:
   html:

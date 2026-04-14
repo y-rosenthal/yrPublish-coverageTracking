@@ -3,14 +3,12 @@
     {
       "id": "MATH101-01",
       "label": "MATH101 Section 01",
-      "color": "#2e7d32",
-      "coverageCsv": "assets/coverage-tracking/coverage-data/MATH101-01.csv"
+      "color": "#2e7d32"
     },
     {
       "id": "MATH101-02",
       "label": "MATH101 Section 02",
-      "color": "#1565c0",
-      "coverageCsv": "assets/coverage-tracking/coverage-data/MATH101-02.csv"
+      "color": "#1565c0"
     }
   ]
 }

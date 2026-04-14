@@ -14,7 +14,7 @@
     "href": "index.html#current-chapters",
     "title": "Quarto Coverage Tracking",
     "section": "1.1 Current chapters",
-    "text": "1.1 Current chapters\n\nspec.qmd: functional and technical specification for the first implementation.\nGUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd: setup and operations guide for instructors and editors.",
+    "text": "1.1 Current chapters\n\nspec.qmd: functional and technical specification for the first implementation.\nSPEC-0.0.2-v001.qmd: versioned spec (0.0.2, pseudo-v001) for professor CSV editor, inline toggles, and export modes.\nGUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd: setup and operations guide for instructors and editors.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Documentation Home</span>"
     ]
@@ -34,7 +34,7 @@
     "href": "spec.html#scope",
     "title": "2  Coverage Tracking Spec",
     "section": "2.2 Scope",
-    "text": "2.2 Scope\n\n2.2.1 In scope\n\nSection-level coverage keyed by page URL + HTML section ID.\nStudent and professor modes in one JavaScript/CSS add-on.\nCSV-based coverage data (one file per class section).\nProfessor UI tools for selecting coverage and exporting CSV text.\nHelper scripts for adding missing heading IDs and updating coverage CSVs.\n\n\n\n2.2.2 Out of scope\n\nAuth and server-side write APIs.\nHosted database dependency.\nReal-time writes from browser directly into repository files.",
+    "text": "2.2 Scope\n\n2.2.1 In scope\n\nSection-level coverage keyed by page URL + HTML section ID.\nStudent and professor modes in one JavaScript/CSS add-on.\nCSV-based coverage data (one file per rendered HTML page per class section; see file layout below).\nProfessor UI tools for selecting coverage and exporting CSV text.\nHelper scripts for adding missing heading IDs and updating coverage CSVs.\n\n\n\n2.2.2 Out of scope\n\nAuth and server-side write APIs.\nHosted database dependency.\nReal-time writes from browser directly into repository files.",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
     ]
@@ -44,7 +44,7 @@
     "href": "spec.html#functional-requirements",
     "title": "2  Coverage Tracking Spec",
     "section": "2.3 Functional requirements",
-    "text": "2.3 Functional requirements\n\n2.3.1 FR-1: Coverage identity\n\nCoverage is keyed by:\n\nURL (for example /chapter1.html)\nHTML ID (for example sec-limits-review)\nClass section ID (for example MATH101-01)\n\n\n\n\n2.3.2 FR-2: Student section picker\n\nOn first visit, students must choose exactly one class section.\nContent is blurred until selection is made.\nStudent selection is stored per browser tab/session (sessionStorage).\nDeep links must still trigger picker gating when no section is selected.\n\n\n\n2.3.3 FR-3: Student highlighting\n\nCovered items are highlighted.\nMissing coverage entry defaults to not covered.\nSidebar control shows selected section name and lets student reset/re-pick.\n\n\n\n2.3.4 FR-4: Professor mode and navigation\n\nProfessor mode activates with ?prof or ?prof=true.\nProfessor chooser supports selecting zero or more sections using checkboxes.\nChooser is not auto-opened on navigation; opens when professor clicks sidebar controls.\nEsc dismisses chooser without applying changes.\nInternal links preserve prof query parameter.\n\n\n\n2.3.5 FR-5: Professor sidebar controls\n\nSidebar top shows selected professor sections as color-coded entries.\nClicking any selected section entry re-opens chooser.\nIf none selected, show Choose section(s) entry.\nInclude Edit page coverage CSV entry to open CSV editor.\n\n\n\n2.3.6 FR-6: Coverage data file format\n\ncoverage-config.json remains JSON and defines sections and colors.\nCoverage data is stored as one CSV file per class section.\nCSV row formats:\n\nURL,html-id,covered\nURL,html-id,not-covered\nURL,html-id (defaults to covered)\nURL,html-id, (defaults to covered)\n\nIf (URL,html-id) is missing from a section CSV, default is not covered.\n\n\n\n2.3.7 FR-7: Professor CSV editing UI\n\nProfessor can open page-level coverage editor in the UI.\nEditor supports:\n\nselect all page IDs as covered\nclear all page IDs as not covered\nindividually toggle each page ID\ngenerate CSV output\ncopy CSV text\ndownload CSV file\n\nWorkflow remains static-first: professor can copy/download and save offline.\n\n\n\n2.3.8 FR-8: Helper scripts\n\ntools/yrAddSectionsIds.sh\n\ninput: one .qmd file\noutput: new .qmd with missing heading IDs inserted\nskips fenced code blocks so # inside code is ignored\n\ntools/yrUpdateCoverage.sh\n\ninput: section coverage CSV + one or more .qmd files\noutput: new .csv with missing (URL,html-id) rows added\nadds missing rows as not-covered",
+    "text": "2.3 Functional requirements\n\n2.3.1 FR-1: Coverage identity\n\nCoverage is keyed by:\n\nURL (for example /chapter1.html)\nHTML ID (for example sec-limits-review)\nClass section ID (for example MATH101-01)\n\n\n\n\n2.3.2 FR-2: Student section picker\n\nOn first visit, students must choose exactly one class section.\nContent is blurred until selection is made.\nStudent selection is stored per browser tab/session (sessionStorage).\nDeep links must still trigger picker gating when no section is selected.\n\n\n\n2.3.3 FR-3: Student highlighting\n\nCovered items are highlighted.\nMissing coverage entry defaults to not covered.\nSidebar control shows selected section name and lets student reset/re-pick.\n\n\n\n2.3.4 FR-4: Professor mode and navigation\n\nProfessor mode activates with ?prof or ?prof=true.\nProfessor chooser supports selecting zero or more sections using checkboxes.\nChooser is not auto-opened on navigation; opens when professor clicks sidebar controls.\nEsc dismisses chooser without applying changes.\nInternal links preserve prof query parameter.\n\n\n\n2.3.5 FR-5: Professor sidebar controls\n\nSidebar top shows selected professor sections as color-coded entries.\nClicking any selected section entry re-opens chooser.\nIf none selected, show Choose section(s) entry.\nInclude Edit page coverage CSV entry to open CSV editor.\n\n\n\n2.3.6 FR-5b: Professor inline coverage toggles\n\nWhen professor mode is active and at least one class section is selected, the tracker shows per-section checkboxes next to each trackable heading (or chapter title span) in the page content, color-coded by section.\nToggling an inline checkbox updates in-memory coverage, refreshes highlights, and stays in sync with the CSV editor dialog when it is open.\n\n\n\n2.3.7 FR-6: Coverage data file format\n\ncoverage-config.json remains JSON and defines sections and colors (optional coverageDataDir per section).\nCoverage data is stored under coverage-data/&lt;SECTION-ID&gt;/ with one CSV per HTML page: yr-coverage--&lt;page-slug&gt;.csv (see proposed file structure). The runtime loads only the current page’s files.\nCSV row formats:\n\nURL,html-id,covered\nURL,html-id,not-covered\nURL,html-id (defaults to covered)\nURL,html-id, (defaults to covered)\n\nIf (URL,html-id) is missing from the relevant page’s CSV for that section, default is not covered.\n\n\n\n2.3.8 FR-7: Professor CSV editing UI\n\nProfessor can open page-level coverage editor in the UI.\nEditor supports:\n\nselect all page IDs as covered\nclear all page IDs as not covered\nindividually toggle each page ID (each toggle updates the textarea immediately; there is no separate “Build CSV” button)\nMaximize CSV vs Minimize CSV export mode (radio buttons; default Maximize for the current page)\ncopy CSV text\ndownload CSV file (filename aligned with yr-coverage--&lt;page-slug&gt;.csv naming)\n\nManual edits in the textarea are copied or downloaded as-is; switching export mode or toggling checkboxes regenerates the textarea from the checklist.\nWorkflow remains static-first: professor can copy/download and save offline into the corresponding repo file.\n\n\n\n2.3.9 FR-7b: Trackable HTML ids (idsOnPage)\n\nThe runtime collects the same set of ids for highlighting, inline toggles, and the editor. In Quarto HTML books this typically includes elements with ids on section wrappers and chapter title h1 span[id] nodes, not only h1[id] / h2[id] on the heading element itself.\n\n\n\n2.3.10 FR-8: Helper scripts\n\ntools/yrAddSectionsIds.sh\n\ninput: one .qmd file\noutput: new .qmd with missing heading IDs inserted\nskips fenced code blocks so # inside code is ignored\n\ntools/yrUpdateCoverage.sh\n\ninput: section id, book root, data dir, one or more .qmd files\noutput: per-page yr-coverage--&lt;page-slug&gt;.updated.csv next to each target yr-coverage--&lt;page-slug&gt;.csv\nadds missing (URL,html-id) rows as not-covered",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
     ]
@@ -54,7 +54,7 @@
     "href": "spec.html#proposed-file-structure",
     "title": "2  Coverage Tracking Spec",
     "section": "2.4 Proposed file structure",
-    "text": "2.4 Proposed file structure\nassets/coverage-tracking/\n  coverage-config.json\n  coverage-data/\n    &lt;SECTION-ID&gt;.csv\n  coverage-tracker.js\n  coverage-tracker.css\n  coverage-tracker.html\ntools/\n  yrAddSectionsIds.sh\n  yrUpdateCoverage.sh",
+    "text": "2.4 Proposed file structure\nassets/coverage-tracking/\n  coverage-config.json\n  coverage-data/\n    &lt;SECTION-ID&gt;/\n      yr-coverage--index.html.csv\n      yr-coverage--chapter1.html.csv\n      yr-coverage--part-a--chapter.html.csv\n  coverage-tracker.js\n  coverage-tracker.css\n  coverage-tracker.html\ntools/\n  yrAddSectionsIds.sh\n  yrUpdateCoverage.sh",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
     ]
@@ -74,7 +74,7 @@
     "href": "spec.html#sample-demo-book",
     "title": "2  Coverage Tracking Spec",
     "section": "2.6 Sample demo book",
-    "text": "2.6 Sample demo book\nThe sample implementation is in sampleBooks/sample1/ and demonstrates:\n\nstudent picker and highlighting\nprofessor compare mode\nprofessor sidebar controls\nprofessor CSV editor/export workflow\nCSV-per-section coverage loading",
+    "text": "2.6 Sample demo book\nThe sample implementation is in sampleBooks/sample1/ and demonstrates:\n\nstudent picker and highlighting\nprofessor compare mode\nprofessor sidebar controls\nprofessor CSV editor/export workflow\nper-page CSV coverage loading (lazy fetch per page)",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
     ]
@@ -94,109 +94,259 @@
     "href": "spec.html#definition-of-done",
     "title": "2  Coverage Tracking Spec",
     "section": "2.8 Definition of done",
-    "text": "2.8 Definition of done\n\nCoverage runtime reads coverage-config.json + per-section CSV files.\nStudent mode enforces picker gating and tab-scoped persistence.\nProfessor mode supports comparison, navigation persistence, sidebar controls, and chooser dismiss-on-Esc.\nProfessor can generate/export CSV coverage from UI.\nTools scripts exist and are documented.\nDocs include setup and operations guide for editors/professors.",
+    "text": "2.8 Definition of done\n\nCoverage runtime reads coverage-config.json + per-page CSV files for the current section(s).\nStudent mode enforces picker gating and tab-scoped persistence.\nProfessor mode supports comparison, navigation persistence, sidebar controls, and chooser dismiss-on-Esc.\nProfessor can generate/export CSV coverage from UI.\nTools scripts exist and are documented.\nDocs include setup and operations guide for editors/professors.",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Coverage Tracking Spec</span>"
     ]
   },
   {
+    "objectID": "SPEC-0.0.2-v001.html",
+    "href": "SPEC-0.0.2-v001.html",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "",
+    "text": "3.1 Document purpose\nThis document specifies version 0.0.2 of the coverage-tracking feature. The pseudo-version v001 allows multiple revisions of this spec to coexist in the Quarto docs book (e.g. SPEC-0.0.2-v002.qmd later) without replacing prior text.\nAudience: implementers and technical editors; professors who need to know how professor-mode editing and export behave.\nScope (v0.0.2): behavior of the “Edit page coverage CSV” dialog, live CSV updates, inline per-section checkboxes in professor mode, and minimize vs maximize CSV serialization.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#relationship-to-other-docs",
+    "href": "SPEC-0.0.2-v001.html#relationship-to-other-docs",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.2 Relationship to other docs",
+    "text": "3.2 Relationship to other docs\n\n\n\n\n\n\n\nFile\nRole\n\n\n\n\nspec.qmd\nLiving consolidated specification; may evolve.\n\n\nGUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd\nSetup, file paths, and day-to-day workflows.\n\n\nThis file\nFrozen snapshot for 0.0.2 + v001: professor editing UX and export semantics.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#persistent-data",
+    "href": "SPEC-0.0.2-v001.html#persistent-data",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.3 Persistent data",
+    "text": "3.3 Persistent data\n\nConfig: coverage-config.json (JSON) — class sections, labels, colors, optional coverageDataDir override per section.\nCoverage (option A — per HTML page, per class section): one CSV file per rendered page per section, using a fixed directory and filename pattern (large-book friendly; lazy-load one file per page in the browser).\n\n\n3.3.1 Directory and filename convention\nFor each class section id &lt;SECTION-ID&gt; and canonical page URL path &lt;PAGE&gt; (e.g. /chapter1.html or /part-a/chapter.html):\n\nDirectory: assets/coverage-tracking/coverage-data/&lt;SECTION-ID&gt;/\nFilename: yr-coverage--&lt;PAGE-SLUG&gt;.csv\n\n&lt;PAGE-SLUG&gt; is derived from &lt;PAGE&gt; by:\n\nStrip a leading /.\nReplace every / with -- (so nested paths stay in one filename segment).\n\nExamples:\n\n\n\n\n\n\n\n\nCanonical page URL\nPAGE-SLUG\nFilename\n\n\n\n\n/index.html\nindex.html\nyr-coverage--index.html.csv\n\n\n/chapter1.html\nchapter1.html\nyr-coverage--chapter1.html.csv\n\n\n/part-a/chapter.html\npart-a--chapter.html\nyr-coverage--part-a--chapter.html.csv\n\n\n\nOptional per-section override in JSON: \"coverageDataDir\": \"assets/coverage-tracking/coverage-data/MATH101-01/\" (must resolve to the section’s directory; trailing slash optional). If omitted, the implementation uses assets/coverage-tracking/coverage-data/&lt;SECTION-ID&gt;/.\n\n\n3.3.2 Runtime loading\n\nOn each page load, the tracker fetches only the CSV files for the current canonical page URL—one request per class section (parallel fetch). No single multi-megabyte whole-book CSV is required in memory.\nNavigating to another HTML page loads a new set of per-page files (full page navigation reloads the script; same-origin fetch applies).\n\n\n\n3.3.3 Row format (unchanged)\nPer-file content still uses the same row semantics as the global format; each file typically contains rows whose URL column matches that page (and may repeat the same URL on every row for clarity).\n\n\n3.3.4 CSV row semantics (normative)\n\n\n\nRow shape\nMeaning\n\n\n\n\nNo row for (URL, html-id)\nNot covered (default).\n\n\nURL,html-id\nCovered (short form; third column omitted).\n\n\nURL,html-id,\nCovered (empty third column).\n\n\nURL,html-id,covered\nCovered (explicit).\n\n\nURL,html-id,not-covered\nNot covered (explicit).\n\n\n\nOptional header row URL,html-id,covered may be present; parsers should skip it when detected.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#runtime-state-in-memory",
+    "href": "SPEC-0.0.2-v001.html#runtime-state-in-memory",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.4 Runtime state (in-memory)",
+    "text": "3.4 Runtime state (in-memory)\nAfter loading CSVs, the implementation holds a structure equivalent to:\nsectionId → { pageUrl → { htmlId → boolean } }\nwhere boolean is true iff that (URL, html-id) is covered under the rules above.\nStatic sites cannot write to Git; export is copy/download. Persisting changes is an offline editor workflow.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#url-and-page-identity",
+    "href": "SPEC-0.0.2-v001.html#url-and-page-identity",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.5 URL and page identity",
+    "text": "3.5 URL and page identity\n\npageUrl: canonical first column for the current HTML page (e.g. /chapter1.html). Use one shared implementation: canonical path + getPathCandidates() (or equivalent) so merging matches CSV keys.\nidsOnPage: ordered list of HTML id values that are editable in coverage UI on this page.\n\nNormative: idsOnPage must be the same set used for:\n\nstudent/professor highlighting,\nthe modal editor checklist,\ninline professor checkboxes.\n\nIf the DOM query for idsOnPage is narrower than the IDs used for highlights (e.g. headings in #quarto-content vs IDs only in margin TOC), the editor and CSV preview can omit rows that still drive colors — the section dropdown will then appear not to change the CSV. v0.0.2 requires a single definition of trackable IDs (see below).",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#canonical-idsonpage-v0.0.2",
+    "href": "SPEC-0.0.2-v001.html#canonical-idsonpage-v0.0.2",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.6 Canonical idsOnPage (v0.0.2)",
+    "text": "3.6 Canonical idsOnPage (v0.0.2)\nImplementations must define how IDs are collected, e.g.:\n\nIn Quarto book HTML, section wrappers often carry the anchor id (with h2 inside without a duplicate id), and chapter titles may use h1 span[id]. The runtime should treat those elements as the trackable anchors so idsOnPage matches getElementById / CSV keys.\nPolicy for elements outside #quarto-content (e.g. h2#toc-title in the margin TOC): include everywhere or exclude everywhere — choose one and document it in the editor guide.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#professor-mode-class-section-selection",
+    "href": "SPEC-0.0.2-v001.html#professor-mode-class-section-selection",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.7 Professor mode: class section selection",
+    "text": "3.7 Professor mode: class section selection\n\nActivated with ?prof or ?prof=true.\nProfessor selects zero or more class sections (checkbox chooser).\nSidebar shows color-coded entries; internal links preserve prof.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#goals-v0.0.2",
+    "href": "SPEC-0.0.2-v001.html#goals-v0.0.2",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.8 Goals (v0.0.2)",
+    "text": "3.8 Goals (v0.0.2)\n\n3.8.1 Modal: “Edit page coverage CSV”\n\nClass section dropdown — Changing selection reloads checkbox state from in-memory coverage for (selectedSectionId, pageUrl, htmlId) and immediately rebuilds the CSV textarea.\nEvery checkbox — Any toggle (including after re-render) immediately rebuilds the CSV textarea. Use event delegation on the checklist container (input/change → rebuild) so dynamically created inputs do not miss listeners.\nNo “Build CSV” button — The textarea is always live from checkboxes and export mode; there is no separate build action.\n\n\n\n3.8.2 Inline: per-heading, per-section controls\nWhen professor mode is active and N ≥ 1 class sections are selected:\n\nFor each htmlId in idsOnPage and each selected sectionId, show one checkbox (or a grouped row of N), color-coded to coverage-config.json color for that section.\nToggle updates in-memory state, refreshes highlights, and any open CSV preview/export for that section.\n\n\n\n3.8.3 Export: minimize vs maximize\nTwo named modes in the export UI (labels should match in the product):\n\n\n\n\n\n\n\n\nMode\nName\nBehavior\n\n\n\n\nMinimize CSV\nOmit non-covered rows where the format allows; for remaining rows use short URL,html-id or URL,html-id, when the state is covered (omit the literal word covered in the third column). Header row URL,html-id,covered may still be emitted.\n\n\n\nMaximize CSV\nOne row per (pageUrl, htmlId) in scope (default scope: current page), third column always covered or not-covered.\n\n\n\n\nDefault when opening export for the current page: maximize (full explicit grid) unless the user chooses minimize.\nScope note: maximize for the whole book is a separate product decision (optional); default is current page only.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#minimize-csv-normative-details",
+    "href": "SPEC-0.0.2-v001.html#minimize-csv-normative-details",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.9 Minimize CSV (normative details)",
+    "text": "3.9 Minimize CSV (normative details)\n\nRows: include only rows where coverage is covered, or omit rows that are not covered (so the file stays short). Rows that are explicitly not-covered may be omitted unless the editor needs to record them.\nShort form: for covered rows, prefer URL,html-id or URL,html-id, per the persistent CSV rules.\nAlign with the on-disk CSV format so pasted output is valid.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#maximize-csv-normative-details",
+    "href": "SPEC-0.0.2-v001.html#maximize-csv-normative-details",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.10 Maximize CSV (normative details)",
+    "text": "3.10 Maximize CSV (normative details)\n\nRows: every htmlId in idsOnPage for the current page (unless whole-book scope is explicitly selected).\nColumns: URL,html-id,covered\nThird column: always covered or not-covered.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#architecture-layers",
+    "href": "SPEC-0.0.2-v001.html#architecture-layers",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.11 Architecture (layers)",
+    "text": "3.11 Architecture (layers)\n\nLoad — for the current page only, fetch yr-coverage--&lt;PAGE-SLUG&gt;.csv under each section directory (parallel).\nParse — build sectionId → pageUrl → htmlId → boolean (same structure as before; only current page keys populated from network).\nRender highlights — existing overlap / badge behavior.\nEdit — modal and inline toggles write the same in-memory state.\nExport — serialize with minimize or maximize rules; copy/download.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#accessibility",
+    "href": "SPEC-0.0.2-v001.html#accessibility",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.12 Accessibility",
+    "text": "3.12 Accessibility\n\nCheckboxes: aria-label including section name and heading id where helpful.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#implementation-checklist",
+    "href": "SPEC-0.0.2-v001.html#implementation-checklist",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.13 Implementation checklist",
+    "text": "3.13 Implementation checklist\n\nidsOnPage query matches highlight coverage IDs (section ids + chapter title span ids; TOC excluded).\npageUrl + merge logic shared everywhere.\nEditor: change on section &lt;select&gt; → persist previous section → renderCheckboxes() + rebuild CSV.\nEditor: event delegation on checklist → rebuild CSV on any checkbox input/change.\nInline checkbox component bound to same state as modal.\nExport UI: Minimize CSV vs Maximize CSV (radio group); copy; download; default maximize for current page.\nSample: two sections, three pages, multiple ids per page — dropdown and textarea reflect each section.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#open-decisions-record-in-project-when-resolved",
+    "href": "SPEC-0.0.2-v001.html#open-decisions-record-in-project-when-resolved",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.14 Open decisions (record in project when resolved)",
+    "text": "3.14 Open decisions (record in project when resolved)\n\nMaximize scope: current page vs whole book.\nInclude or exclude toc-title (and similar) in idsOnPage consistently.\nIf modal and inline editor are both visible: sync rules or single source of truth.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
+    "objectID": "SPEC-0.0.2-v001.html#changelog-this-file",
+    "href": "SPEC-0.0.2-v001.html#changelog-this-file",
+    "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
+    "section": "3.15 Changelog (this file)",
+    "text": "3.15 Changelog (this file)\n\nv0.0.2 / v001: Professor CSV editor (live updates, unified idsOnPage), inline per-section checkboxes, minimize CSV vs maximize CSV export naming and semantics.\nv0.0.2 / v001 (revision): Per-page CSV layout option A: coverage-data/&lt;SECTION-ID&gt;/yr-coverage--&lt;page-slug&gt;.csv, lazy load per page, optional coverageDataDir.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
+    ]
+  },
+  {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html",
-    "title": "3  Guide for Content Editors and Teachers",
+    "title": "4  Guide for Content Editors and Teachers",
     "section": "",
-    "text": "3.1 Who this guide is for\nThis guide is for people who maintain Quarto books and track class coverage.\nStudents do not need special documentation to consume the book.",
+    "text": "4.1 Who this guide is for\nThis guide is for people who maintain Quarto books and track class coverage.\nStudents do not need special documentation to consume the book.",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#what-this-system-does",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#what-this-system-does",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.2 What this system does",
-    "text": "3.2 What this system does\n\nStudents pick a class section and see covered content highlighted.\nProfessors can compare multiple sections in ?prof mode.\nCoverage data is maintained in section-specific CSV files.\nProfessors can generate updated CSV content from the website UI.",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.2 What this system does",
+    "text": "4.2 What this system does\n\nStudents pick a class section and see covered content highlighted.\nProfessors can compare multiple sections in ?prof mode.\nCoverage data is maintained in per-class-section directories, with one CSV per rendered HTML page (see naming below).\nProfessors can generate updated CSV content from the website UI.",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#required-directory-structure",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#required-directory-structure",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.3 Required directory structure",
-    "text": "3.3 Required directory structure\nIn your Quarto book project, include:\nassets/coverage-tracking/\n  coverage-config.json\n  coverage-data/\n    &lt;SECTION-ID&gt;.csv\n  coverage-tracker.js\n  coverage-tracker.css\n  coverage-tracker.html\nOptional helper scripts:\ntools/\n  yrAddSectionsIds.sh\n  yrUpdateCoverage.sh",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.3 Required directory structure",
+    "text": "4.3 Required directory structure\nIn your Quarto book project, include:\nassets/coverage-tracking/\n  coverage-config.json\n  coverage-data/\n    &lt;SECTION-ID&gt;/\n      yr-coverage--index.html.csv\n      yr-coverage--chapter1.html.csv\n      yr-coverage--part-a--chapter.html.csv\n  coverage-tracker.js\n  coverage-tracker.css\n  coverage-tracker.html\nFilename rule: yr-coverage-- + slug + .csv, where slug is the page path without a leading slash, with / replaced by -- (e.g. /chapter1.html → chapter1.html; /part-a/chapter.html → part-a--chapter.html).\nOptional helper scripts:\ntools/\n  yrAddSectionsIds.sh\n  yrUpdateCoverage.sh",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#file-formats",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#file-formats",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.4 File formats",
-    "text": "3.4 File formats\n\n3.4.1 coverage-config.json (JSON, required)\nDefines available sections and styling.\n{\n  \"sections\": [\n    {\n      \"id\": \"MATH101-01\",\n      \"label\": \"MATH101 Section 01\",\n      \"color\": \"#2e7d32\",\n      \"coverageCsv\": \"assets/coverage-tracking/coverage-data/MATH101-01.csv\"\n    }\n  ]\n}\n\n\n3.4.2 coverage-data/&lt;SECTION-ID&gt;.csv (CSV, required per section)\nEach class section has its own coverage file.\nAccepted row formats:\n\nURL,html-id,covered\nURL,html-id,not-covered\nURL,html-id\nURL,html-id,\n\nDefault semantics:\n\nMissing row =&gt; not covered\nBlank/missing third column =&gt; covered\n\nExample:\nURL,html-id,covered\n/chapter1.html,sec-limits-review,covered\n/chapter1.html,sec-continuity-basics,not-covered\n/chapter1.html,sec-derivatives-preview,",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.4 File formats",
+    "text": "4.4 File formats\n\n4.4.1 coverage-config.json (JSON, required)\nDefines available sections and styling.\n{\n  \"sections\": [\n    {\n      \"id\": \"MATH101-01\",\n      \"label\": \"MATH101 Section 01\",\n      \"color\": \"#2e7d32\"\n    }\n  ]\n}\nOptional: \"coverageDataDir\": \"assets/coverage-tracking/coverage-data/MATH101-01/\" if the section directory is not the default coverage-data/&lt;SECTION-ID&gt;/.\n\n\n4.4.2 coverage-data/&lt;SECTION-ID&gt;/yr-coverage--&lt;page-slug&gt;.csv (CSV, required per page you track)\nEach class section has its own directory. Each rendered page you care about has its own CSV file in that directory. Large books stay maintainable: you edit only the files for the pages you change.\nAccepted row formats:\n\nURL,html-id,covered\nURL,html-id,not-covered\nURL,html-id\nURL,html-id,\n\nDefault semantics:\n\nMissing row =&gt; not covered\nBlank/missing third column =&gt; covered\n\nExample:\nURL,html-id,covered\n/chapter1.html,sec-limits-review,covered\n/chapter1.html,sec-continuity-basics,not-covered\n/chapter1.html,sec-derivatives-preview,",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#quarto-integration-steps",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#quarto-integration-steps",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.5 Quarto integration steps",
-    "text": "3.5 Quarto integration steps\nIn your book _quarto.yml:\n\nInclude coverage config and CSV directory as project resources.\nInclude coverage CSS.\nInclude the tracker script HTML include.\n\nExample:\nproject:\n  type: book\n  resources:\n    - assets/coverage-tracking/coverage-config.json\n    - assets/coverage-tracking/coverage-data/\n\nformat:\n  html:\n    css:\n      - assets/coverage-tracking/coverage-tracker.css\n    include-after-body:\n      - assets/coverage-tracking/coverage-tracker.html",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.5 Quarto integration steps",
+    "text": "4.5 Quarto integration steps\nIn your book _quarto.yml:\n\nInclude coverage config and CSV directory as project resources.\nInclude coverage CSS.\nInclude the tracker script HTML include.\n\nExample:\nproject:\n  type: book\n  resources:\n    - assets/coverage-tracking/coverage-config.json\n    - assets/coverage-tracking/coverage-data/\n\nformat:\n  html:\n    css:\n      - assets/coverage-tracking/coverage-tracker.css\n    include-after-body:\n      - assets/coverage-tracking/coverage-tracker.html",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#authoring-content-safely",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#authoring-content-safely",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.6 Authoring content safely",
-    "text": "3.6 Authoring content safely\nCoverage is based on HTML IDs, so section headings should have explicit IDs:\n## Limits Review {#sec-limits-review}\nThis makes coverage stable and portable across edits.",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.6 Authoring content safely",
+    "text": "4.6 Authoring content safely\nCoverage is based on HTML IDs, so section headings should have explicit IDs:\n## Limits Review {#sec-limits-review}\nThis makes coverage stable and portable across edits.",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#helper-tools",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#helper-tools",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.7 Helper tools",
-    "text": "3.7 Helper tools\n\n3.7.1 yrAddSectionsIds.sh\nPurpose:\n\nadd missing heading IDs in a .qmd file\nskip fenced code blocks\n\nUsage:\n./tools/yrAddSectionsIds.sh input.qmd [output.qmd]\n\n\n3.7.2 yrUpdateCoverage.sh\nPurpose:\n\nread one section CSV plus one or more .qmd files\nadd missing (URL,html-id) rows to a new output CSV\nmissing rows are added as not-covered\n\nUsage:\n./tools/yrUpdateCoverage.sh --coverage assets/coverage-tracking/coverage-data/MATH101-01.csv chapter1.qmd chapter2.qmd",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.7 Helper tools",
+    "text": "4.7 Helper tools\n\n4.7.1 yrAddSectionsIds.sh\nPurpose:\n\nadd missing heading IDs in a .qmd file\nskip fenced code blocks\n\nUsage:\n./tools/yrAddSectionsIds.sh input.qmd [output.qmd]\n\n\n4.7.2 yrUpdateCoverage.sh\nPurpose:\n\nFor a given class section, update one per-page CSV per .qmd file.\nAdds missing (URL,html-id) rows as not-covered.\nWrites yr-coverage--&lt;page-slug&gt;.updated.csv next to each target yr-coverage--&lt;page-slug&gt;.csv.\n\nUsage (from your Quarto book root, so URLs resolve to /index.html, /chapter1.html, etc.):\n./tools/yrUpdateCoverage.sh --section MATH101-01 --data-dir assets/coverage-tracking/coverage-data index.qmd chapter1.qmd\nFrom another working directory, pass --book-root pointing at the book project:\n./tools/yrUpdateCoverage.sh --section MATH101-01 --book-root path/to/book --data-dir path/to/book/assets/coverage-tracking/coverage-data path/to/book/index.qmd",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#professor-workflow-in-ui",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#professor-workflow-in-ui",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.8 Professor workflow in UI",
-    "text": "3.8 Professor workflow in UI\n\n3.8.1 Compare mode\n\nOpen book with ?prof or ?prof=true.\nUse sidebar entry to open section chooser.\nSelect zero or more sections with checkboxes.\nApply and review highlighted overlap.\n\n\n\n3.8.2 Edit page coverage CSV\n\nIn professor mode, click Edit page coverage CSV in sidebar.\nChoose the class section to edit.\nUse:\n\nSelect all on page\nClear all on page\nindividual checkbox toggles per section ID\n\nClick Build CSV.\nCopy or download output and save/update the section CSV offline.",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.8 Professor workflow in UI",
+    "text": "4.8 Professor workflow in UI\n\n4.8.1 Compare mode\n\nOpen book with ?prof or ?prof=true.\nUse sidebar entry to open section chooser.\nSelect zero or more sections with checkboxes.\nApply and review highlighted overlap.\n\n\n\n4.8.2 Inline toggles (in page content)\n\nAfter at least one class section is selected, each trackable heading on the page shows small checkboxes (one per selected section), color-coded by section.\nToggling an inline checkbox updates highlights immediately and stays consistent with the CSV editor dialog if it is open.\n\n\n\n4.8.3 Edit page coverage CSV\n\nIn professor mode, click Edit page coverage CSV in sidebar.\nChoose the class section to edit.\nChoose Maximize CSV (full grid with explicit covered / not-covered) or Minimize CSV (omit not-covered rows; short URL,html-id for covered). Default is Maximize.\nUse:\n\nSelect all on page\nClear all on page\nindividual checkbox toggles per section ID (the textarea updates immediately; there is no separate “Build CSV” step)\n\nYou may paste or type into the textarea manually; Copy / Download use the textarea as shown. Changing checkboxes or export mode regenerates the textarea from the checklist.\nCopy or download output and save/update the matching yr-coverage--&lt;page-slug&gt;.csv file in the repo under coverage-data/&lt;SECTION-ID&gt;/.\n\n\n\n4.8.4 Heading IDs in Quarto HTML\nQuarto often places the stable anchor on a &lt;section id=\"...\"&gt; wrapper (with the visible heading inside), or on a &lt;span id=\"...\"&gt; inside the chapter title h1. Use explicit {#id} on headings in source when possible, and ensure CSV html-id values match the rendered DOM ids (see the sample book).",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#notes-on-defaults-and-new-content",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#notes-on-defaults-and-new-content",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.9 Notes on defaults and new content",
-    "text": "3.9 Notes on defaults and new content\n\nIf a new heading is added but not listed in CSV, it is interpreted as not covered.\nThis default is useful during course progression because coverage accumulates over time.",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.9 Notes on defaults and new content",
+    "text": "4.9 Notes on defaults and new content\n\nIf a new heading is added but not listed in CSV, it is interpreted as not covered.\nThis default is useful during course progression because coverage accumulates over time.",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   },
   {
     "objectID": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#moving-this-feature-into-another-repository",
     "href": "GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.html#moving-this-feature-into-another-repository",
-    "title": "3  Guide for Content Editors and Teachers",
-    "section": "3.10 Moving this feature into another repository",
-    "text": "3.10 Moving this feature into another repository\nTo copy this feature into a larger Quarto feature collection:\n\nCopy assets/coverage-tracking/.\nCopy tools/ scripts if desired.\nUpdate target book _quarto.yml.\nRender and test student + professor modes.",
+    "title": "4  Guide for Content Editors and Teachers",
+    "section": "4.10 Moving this feature into another repository",
+    "text": "4.10 Moving this feature into another repository\nTo copy this feature into a larger Quarto feature collection:\n\nCopy assets/coverage-tracking/.\nCopy tools/ scripts if desired.\nUpdate target book _quarto.yml.\nRender and test student + professor modes.",
     "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Guide for Content Editors and Teachers</span>"
     ]
   }
 ]
