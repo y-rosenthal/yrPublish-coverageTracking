@@ -161,7 +161,7 @@ When professor mode is active and **N ≥ 1** class sections are selected:
 
 1. **Load** — for the current page only, fetch `yr-coverage--<PAGE-SLUG>.csv` under each section directory (parallel).
 2. **Parse** — build `sectionId → pageUrl → htmlId → boolean` (same structure as before; only current page keys populated from network).
-3. **Render highlights** — existing overlap / badge behavior.
+3. **Render highlights** — existing overlap behavior with inline checkbox controls.
 4. **Edit** — modal and inline toggles write the same in-memory state.
 5. **Export** — serialize explicit rows; copy/download.
 

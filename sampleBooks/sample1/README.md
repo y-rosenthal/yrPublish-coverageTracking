@@ -56,7 +56,6 @@ Output is written to `sampleBooks/sample1/_book/`.
   - Close the dialog with the top-right `×` button
   - With the dialog open, toggle an **inline** checkbox and confirm the dialog row state stays in sync
   - Confirm sections covered by all selected sections differ from partially covered sections
-  - Confirm small colored badges indicate which section(s) covered each item
 
 ## Update coverage
 

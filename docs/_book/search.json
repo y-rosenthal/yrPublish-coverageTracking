@@ -194,7 +194,7 @@
     "href": "SPEC-0.0.2-v001.html#architecture-layers",
     "title": "3  Coverage tracking — Specification v0.0.2 (pseudo-v001)",
     "section": "3.10 Architecture (layers)",
-    "text": "3.10 Architecture (layers)\n\nLoad — for the current page only, fetch yr-coverage--&lt;PAGE-SLUG&gt;.csv under each section directory (parallel).\nParse — build sectionId → pageUrl → htmlId → boolean (same structure as before; only current page keys populated from network).\nRender highlights — existing overlap / badge behavior.\nEdit — modal and inline toggles write the same in-memory state.\nExport — serialize explicit rows; copy/download.",
+    "text": "3.10 Architecture (layers)\n\nLoad — for the current page only, fetch yr-coverage--&lt;PAGE-SLUG&gt;.csv under each section directory (parallel).\nParse — build sectionId → pageUrl → htmlId → boolean (same structure as before; only current page keys populated from network).\nRender highlights — existing overlap behavior with inline checkbox controls.\nEdit — modal and inline toggles write the same in-memory state.\nExport — serialize explicit rows; copy/download.",
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Coverage tracking — Specification v0.0.2 (pseudo-v001)</span>"
     ]

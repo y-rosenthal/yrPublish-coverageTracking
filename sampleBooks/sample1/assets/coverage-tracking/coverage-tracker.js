@@ -392,15 +392,6 @@
       } else {
         node.classList.add("ct-covered-some");
       }
-
-      var badgeRow = createElement("span", { class: "ct-badge-row", "aria-hidden": "true" });
-      coveredBy.forEach(function (sectionId) {
-        var badge = createElement("span", { class: "ct-badge" });
-        badge.style.backgroundColor = colors[sectionId] || "#666";
-        badge.title = sectionId;
-        badgeRow.appendChild(badge);
-      });
-      node.appendChild(badgeRow);
     });
   }
 

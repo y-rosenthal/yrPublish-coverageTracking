@@ -106,20 +106,6 @@ body.ct-needs-selection #quarto-content {
   border-radius: 0.22rem;
 }
 
-.ct-badge-row {
-  margin-left: 0.35rem;
-  display: inline-flex;
-  vertical-align: middle;
-}
-
-.ct-badge {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  margin-right: 0.2rem;
-  border: 1px solid rgba(0, 0, 0, 0.18);
-}
-
 .ct-sidebar-item .ct-change-section-link {
   font-weight: 700;
   color: #1f6feb;
