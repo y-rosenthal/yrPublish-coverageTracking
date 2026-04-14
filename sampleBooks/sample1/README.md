@@ -47,6 +47,7 @@ Output is written to `sampleBooks/sample1/_book/`.
   - Outside the editor dialog, test professor inline undo/redo hotkeys (`Ctrl+Z` / `Ctrl+Y`)
   - Click `Edit page coverage CSV`, then test:
     - Confirm rows are shown in a single editor-like multiline control with gutter checkboxes
+    - Confirm nested ids are visually indented by 2 spaces per level in editor display
     - Set all covered
     - Set all explicit not-covered
     - Set all implicit not-covered
@@ -58,7 +59,7 @@ Output is written to `sampleBooks/sample1/_book/`.
     - Copy and download
   - Drag the dialog and confirm the underlying page remains scrollable while it is open
   - Close the dialog with the top-right `×` button
-  - With the dialog open, toggle an **inline** checkbox and confirm the dialog row state stays in sync
+  - With the dialog open, toggle an **inline** checkbox and confirm the dialog row state stays in sync (and vice versa)
   - Confirm sections covered by all selected sections differ from partially covered sections
 
 ## Update coverage

@@ -375,7 +375,10 @@ ul.task-list li input[type="checkbox"] {
 <h3 data-number="3.8.1" class="anchored" data-anchor-id="modal-edit-page-coverage-csv"><span class="header-section-number">3.8.1</span> Modal: “Edit page coverage CSV”</h3>
 <ol type="1">
 <li><strong>Class section dropdown</strong> — Changing selection reloads row state from in-memory coverage for <code>(selectedSectionId, pageUrl, htmlId)</code> and <strong>immediately</strong> refreshes highlights and export output.</li>
-<li><strong>Single editor surface, one row per html-id</strong> — The dialog uses one multi-line text-editor-like control; each <code>idsOnPage</code> entry is one CSV row with a checkbox aligned in a gutter beside that row.</li>
+<li><strong>Single editor surface, one row per html-id</strong> — The dialog uses one multi-line text-editor-like control; each <code>idsOnPage</code> entry is one CSV row with a checkbox aligned in a gutter beside that row.
+<ul>
+<li>Show nested structure with 2-space indentation per nesting level in the editor view only (do not persist indentation to CSV output).</li>
+</ul></li>
 <li><strong>Tri-state checkbox per row</strong> — Covered -&gt; explicit not-covered -&gt; implicit not-covered (grey/italic row and greyed checkbox). Implicit rows are omitted from exported CSV text.</li>
 <li><strong>Bulk row actions</strong> — The editor provides set-all covered / explicit not-covered / implicit not-covered plus conversions between explicit/implicit not-covered states.</li>
 <li><strong>Undo/redo</strong> — The editor keeps per-section history and supports undo/redo via UI buttons and keyboard shortcuts (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, with macOS <code>Cmd+Z</code> / <code>Cmd+Shift+Z</code>).</li>
@@ -396,6 +399,7 @@ ul.task-list li input[type="checkbox"] {
 <li><code>Esc</code> in that choice dialog cancels and applies no checkbox changes</li>
 </ul></li>
 <li>Inline actions support undo/redo hotkeys while professor mode is active (<code>Ctrl+Z</code> / <code>Ctrl+Y</code>, and macOS equivalents).</li>
+<li>Modal editor checkbox behavior follows the same nested prompt/cascade rules as inline checkboxes.</li>
 </ul>
 </section>
 <section id="export-semantics-with-tri-state-rows" class="level3" data-number="3.8.3">

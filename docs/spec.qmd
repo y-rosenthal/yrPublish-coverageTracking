@@ -87,6 +87,7 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
 - Editor supports:
   - a **single multi-line text-editor-style** control for all rows on the page
   - one visible CSV row per trackable `html-id`, with the checkbox aligned in a gutter directly next to that row text
+  - visual indentation by nesting depth (2 spaces per level) in the editor display only
   - tri-state row status cycle: covered -> explicit not-covered -> implicit not-covered (omitted from CSV output)
   - set all page IDs to covered
   - set all page IDs to explicit not-covered
@@ -98,6 +99,8 @@ The implementation is static-site friendly (GitHub Pages compatible) and easy to
   - download CSV file (filename aligned with `yr-coverage--<page-slug>.csv` naming)
 - Implicit rows are visually grey/italic with a greyed checkbox, but still visible so users can promote them to explicit rows.
 - Manual edits to a row make it explicit; deleting/emptying a row line reverts that row to implicit not-covered (grey/italic) rather than removing it from the editor surface.
+- Dialog checkbox cascades/prompts for nested ids mirror the inline checkbox behavior in the page body.
+- Dialog and inline professor checkboxes stay synchronized through shared coverage state updates/events.
 - The dialog is draggable and non-modal; underlying page content remains scrollable while editing, and it is closed via an upper-right `×` button.
 - Workflow remains static-first: professor can copy/download and save offline into the corresponding repo file.
 

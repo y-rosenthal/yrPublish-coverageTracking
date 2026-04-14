@@ -381,6 +381,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>In professor mode, click <code>Edit page coverage CSV</code> in sidebar.</li>
 <li>Choose the class section to edit.</li>
 <li>The dialog uses a <strong>single multi-line text-editor-style</strong> control. Each HTML id maps to one row, with a checkbox aligned in a left gutter next to that row text.</li>
+<li>Rows are indented by <strong>2 spaces per nesting level</strong> so parent/child structure is visible in the editor view (indentation is visual only and is not written to exported CSV files).</li>
 <li>Checkbox state is <strong>tri-state</strong> per row:
 <ul>
 <li>checked = explicit <code>covered</code></li>
@@ -397,6 +398,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>Make all not-covereds implicit</code></li>
 <li>individual row toggles (cycle through covered → explicit not-covered → implicit not-covered)</li>
 </ul></li>
+<li>Dialog checkbox toggles stay in sync with inline professor checkboxes shown in the page text, and nested-toggle prompts/cascade rules are consistent in both places.</li>
 <li>If a line is edited to empty/deleted, that row does <strong>not disappear</strong>; it reverts to implicit not-covered (grey/italic).</li>
 <li>You can manually edit any row text. If you start editing an implicit (grey) row, it becomes explicit (not grey) so that row is included in output.</li>
 <li>The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing. Use the <strong><code>×</code></strong> button in the top-right of the dialog to close it.</li>

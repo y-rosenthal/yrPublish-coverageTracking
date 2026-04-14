@@ -738,6 +738,23 @@
     });
 
     var allRows = getPageSectionRows();
+    var idsSet = {};
+    allRows.forEach(function (row) {
+      idsSet[row.id] = true;
+    });
+    var depthById = {};
+    allRows.forEach(function (row) {
+      var el = document.getElementById(row.id);
+      var depth = 0;
+      var parent = el ? el.parentElement : null;
+      while (parent && parent !== document.body) {
+        if (parent.id && idsSet[parent.id]) {
+          depth += 1;
+        }
+        parent = parent.parentElement;
+      }
+      depthById[row.id] = depth;
+    });
     var sectionColors = sectionColorMap(config);
     var editor = createElement("div", { class: "ct-editor-codewrap" });
     var gutter = createElement("div", { class: "ct-editor-gutter", "aria-hidden": "true" });
@@ -759,6 +776,7 @@
     var rows = [];
     var previousEditorLines = [];
     var rowsById = {};
+    var editorNestedDialogOpen = false;
     var historyBySection = {};
     var restoringHistory = false;
 
@@ -807,8 +825,22 @@
       return csvEscape(url) + "," + csvEscape(htmlId) + ",not-covered";
     }
 
+    function rowIndentPrefix(htmlId) {
+      var depth = depthById[htmlId] || 0;
+      return "  ".repeat(depth);
+    }
+
+    function stripEditorIndent(line) {
+      return (line || "").replace(/^\s+/, "");
+    }
+
+    function formattedEditorLine(state, htmlId, lineOverride) {
+      var raw = stripEditorIndent(lineOverride || defaultLineForState(state, htmlId));
+      return rowIndentPrefix(htmlId) + raw;
+    }
+
     function parseCsvLineState(rawLine) {
-      var parts = (rawLine || "").split(",");
+      var parts = ((rawLine || "").replace(/^\s+/, "")).split(",");
       if (parts.length < 2) {
         return { covered: false };
       }
@@ -924,7 +956,7 @@
         row.label + " status: " + (state === "covered" ? "covered" : state === "explicit-not-covered" ? "explicit not covered" : "implicit not covered")
       );
       if (updateText) {
-        row.text = defaultLineForState(state, row.id);
+        row.text = formattedEditorLine(state, row.id);
       }
     }
 
@@ -1045,7 +1077,7 @@
 
       rows.forEach(function (row, index) {
         var next = lines[index];
-        var defaultImplicit = defaultLineForState("implicit", row.id);
+        var defaultImplicit = formattedEditorLine("implicit", row.id);
         if ((next || "").trim() === "") {
           applyRowVisualState(row, "implicit", false);
           row.text = defaultImplicit;
@@ -1054,9 +1086,9 @@
         if (row.state === "implicit" && (index === editedIdx || next !== defaultImplicit)) {
           applyRowVisualState(row, "explicit-not-covered", false);
         }
-        row.text = next;
+        row.text = formattedEditorLine(row.state, row.id, next);
         if (row.state !== "implicit") {
-          var parsed = parseCsvLineState(row.text);
+          var parsed = parseCsvLineState(stripEditorIndent(row.text));
           applyRowVisualState(row, parsed.covered ? "covered" : "explicit-not-covered", false);
         }
       });
@@ -1072,7 +1104,7 @@
           setPageCoverageForSection(coverageState, sectionId, url, id, false, false);
           return;
         }
-        var raw = (row.text || "").trim();
+        var raw = stripEditorIndent((row.text || "").trim());
         var parsed = parseCsvLineState(raw);
         setPageCoverageForSection(coverageState, sectionId, url, id, parsed.covered, true, raw || defaultLineForState(row.state, id));
       });
@@ -1084,7 +1116,7 @@
         if (row.state === "implicit") {
           return;
         }
-        lines.push((row.text || "").trim() || defaultLineForState(row.state, row.id));
+        lines.push(stripEditorIndent((row.text || "").trim()) || defaultLineForState(row.state, row.id));
       });
       return lines.join("\n");
     }
@@ -1092,8 +1124,12 @@
     function refreshFromRows() {
       var selectedSectionId = sectionSelect.value;
       persistRowsToCoverage(selectedSectionId);
-      callbacks.applyHighlights();
-      syncInlineCheckboxesFromState(coverageState, callbacks.getSelectedProfSections());
+      if (callbacks.syncProfessorUi) {
+        callbacks.syncProfessorUi();
+      } else {
+        callbacks.applyHighlights();
+        syncInlineCheckboxesFromState(coverageState, callbacks.getSelectedProfSections());
+      }
       localStorage.setItem(STORAGE_KEY_PROF_EDITOR_SECTION, selectedSectionId);
     }
 
@@ -1119,19 +1155,86 @@
           id: row.id,
           label: row.label,
           checkbox: checkbox,
-          text: exists ? pageRaw[row.id] || defaultLineForState(state, row.id) : defaultLineForState(state, row.id),
+          text: formattedEditorLine(state, row.id, exists ? pageRaw[row.id] || defaultLineForState(state, row.id) : defaultLineForState(state, row.id)),
+          descendants: descendantTrackableIds(row.id, idsSet),
           state: "implicit"
         };
         rowsById[row.id] = rowModel;
         rows.push(rowModel);
         applyRowVisualState(rowModel, state, false);
 
-        checkbox.addEventListener("click", function (evt) {
+        checkbox.addEventListener("click", async function (evt) {
           evt.stopPropagation();
-          cycleRowState(rowModel);
-          syncTextareaFromRows();
-          refreshFromRows();
-          pushHistorySnapshot();
+          if (editorNestedDialogOpen) {
+            syncTextareaFromRows();
+            return;
+          }
+          editorNestedDialogOpen = true;
+          try {
+            var previousState = rowModel.state;
+            var nextState = previousState === "implicit" ? "covered" : previousState === "covered" ? "explicit-not-covered" : "implicit";
+            var descendants = rowModel.descendants || [];
+            var coveredCount = descendants.filter(function (id) {
+              return rowsById[id] && rowsById[id].state === "covered";
+            }).length;
+            var uncheckedCount = descendants.length - coveredCount;
+            var decision = "only";
+
+            if (descendants.length && coveredCount > 0 && uncheckedCount > 0) {
+              if (nextState === "covered") {
+                decision = await showNestedCascadeDialog({
+                  title: "Nested sections",
+                  message: "This section has mixed covered and uncovered nested ids.",
+                  allLabel: "Check this section and all nested sections",
+                  onlyLabel: "Only check this section"
+                });
+              } else {
+                decision = await showNestedCascadeDialog({
+                  title: "Nested sections",
+                  message: "This section has mixed covered and uncovered nested ids.",
+                  allLabel: "Uncheck this section and all nested sections",
+                  onlyLabel: "Only uncheck this section"
+                });
+              }
+              if (decision === "cancel") {
+                syncTextareaFromRows();
+                return;
+              }
+            }
+
+            applyRowVisualState(rowModel, nextState, true);
+            if (descendants.length) {
+              if (nextState === "covered") {
+                if (uncheckedCount === descendants.length) {
+                  descendants.forEach(function (id) {
+                    if (rowsById[id]) {
+                      applyRowVisualState(rowsById[id], "covered", true);
+                    }
+                  });
+                } else if (coveredCount > 0 && uncheckedCount > 0 && decision === "all") {
+                  descendants.forEach(function (id) {
+                    if (rowsById[id] && rowsById[id].state !== "covered") {
+                      applyRowVisualState(rowsById[id], "covered", true);
+                    }
+                  });
+                }
+              } else {
+                var shouldUncheckAll = coveredCount > 0 && uncheckedCount > 0 ? decision === "all" : true;
+                if (shouldUncheckAll) {
+                  descendants.forEach(function (id) {
+                    if (rowsById[id]) {
+                      applyRowVisualState(rowsById[id], "explicit-not-covered", true);
+                    }
+                  });
+                }
+              }
+            }
+            syncTextareaFromRows();
+            refreshFromRows();
+            pushHistorySnapshot();
+          } finally {
+            editorNestedDialogOpen = false;
+          }
         });
       });
       syncTextareaFromRows();
@@ -1480,6 +1583,12 @@
         document.body.appendChild(panel);
       }
 
+      function syncProfessorUi() {
+        mountInlineProfessorControls(config, selected, coverageState);
+        applyProfessorCoverage(selected, config, coverageState);
+        syncInlineCheckboxesFromState(coverageState, selected);
+      }
+
       function openEditor() {
         var existing = document.getElementById("ct-editor-overlay");
         if (existing) {
@@ -1490,11 +1599,14 @@
           showTrackerLoadError("Professor editor unavailable: no sections are defined in coverage-config.json.");
           return;
         }
-        var initial = localStorage.getItem(STORAGE_KEY_PROF_EDITOR_SECTION) || selected[0] || sections[0].id;
+        // Default to the first currently selected professor section so dialog and inline rows align by default.
+        var initial = selected[0] || sections[0].id;
+        localStorage.setItem(STORAGE_KEY_PROF_EDITOR_SECTION, initial);
         var panel = createProfessorEditorPanel(config, coverageState, initial, {
           applyHighlights: function () {
             applyProfessorCoverage(selected, config, coverageState);
           },
+          syncProfessorUi: syncProfessorUi,
           getSelectedProfSections: function () {
             return selected;
           }
@@ -1645,6 +1757,7 @@
           }
           applyProfessorCoverage(selected, config, coverageState);
           syncInlineCheckboxesFromState(coverageState, selected);
+          localStorage.setItem(STORAGE_KEY_PROF_EDITOR_SECTION, sectionId);
           document.dispatchEvent(new CustomEvent("ct-coverage-changed"));
           pushInlineHistorySnapshot();
         } finally {
@@ -1680,8 +1793,7 @@
       professorHotkeysListener = onProfessorHotkeys;
       document.addEventListener("keydown", professorHotkeysListener);
 
-      mountInlineProfessorControls(config, selected, coverageState);
-      applyProfessorCoverage(selected, config, coverageState);
+      syncProfessorUi();
       mountProfessorControls(config, selected, openChooser, openEditor);
       pushInlineHistorySnapshot();
       return;

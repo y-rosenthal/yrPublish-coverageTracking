@@ -180,11 +180,12 @@ From another working directory, pass `--book-root` pointing at the book project:
 1. In professor mode, click `Edit page coverage CSV` in sidebar.
 2. Choose the class section to edit.
 3. The dialog uses a **single multi-line text-editor-style** control. Each HTML id maps to one row, with a checkbox aligned in a left gutter next to that row text.
-4. Checkbox state is **tri-state** per row:
+4. Rows are indented by **2 spaces per nesting level** so parent/child structure is visible in the editor view (indentation is visual only and is not written to exported CSV files).
+5. Checkbox state is **tri-state** per row:
    - checked = explicit `covered`
    - unchecked = explicit `not-covered`
    - grey/italic (indeterminate) = **implicit not-covered** (line is omitted from CSV output)
-5. Use:
+6. Use:
    - `Undo` / `Redo` (or keyboard `Ctrl+Z` / `Ctrl+Y`; `Cmd+Z` / `Cmd+Shift+Z` on macOS)
    - `Set all covered`
    - `Set all explicit not-covered`
@@ -192,11 +193,12 @@ From another working directory, pass `--book-root` pointing at the book project:
    - `Make all not-covereds explicit`
    - `Make all not-covereds implicit`
    - individual row toggles (cycle through covered → explicit not-covered → implicit not-covered)
-6. If a line is edited to empty/deleted, that row does **not disappear**; it reverts to implicit not-covered (grey/italic).
-7. You can manually edit any row text. If you start editing an implicit (grey) row, it becomes explicit (not grey) so that row is included in output.
-8. The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing. Use the **`×`** button in the top-right of the dialog to close it.
-9. Undo/redo hotkeys are recognized while the dialog is open (not only when the text area is focused).
-10. **Copy** / **Download** exports only explicit rows (plus header). Save/update the matching **`yr-coverage--<page-slug>.csv`** file in the repo under **`coverage-data/<SECTION-ID>/`**.
+7. Dialog checkbox toggles stay in sync with inline professor checkboxes shown in the page text, and nested-toggle prompts/cascade rules are consistent in both places.
+8. If a line is edited to empty/deleted, that row does **not disappear**; it reverts to implicit not-covered (grey/italic).
+9. You can manually edit any row text. If you start editing an implicit (grey) row, it becomes explicit (not grey) so that row is included in output.
+10. The dialog is draggable and non-modal, so you can move it and scroll/read the underlying page while editing. Use the **`×`** button in the top-right of the dialog to close it.
+11. Undo/redo hotkeys are recognized while the dialog is open (not only when the text area is focused).
+12. **Copy** / **Download** exports only explicit rows (plus header). Save/update the matching **`yr-coverage--<page-slug>.csv`** file in the repo under **`coverage-data/<SECTION-ID>/`**.
 
 ### Heading IDs in Quarto HTML
 

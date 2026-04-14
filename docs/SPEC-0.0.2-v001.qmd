@@ -123,6 +123,7 @@ Implementations must define how IDs are collected, e.g.:
 
 1. **Class section dropdown** — Changing selection reloads row state from in-memory coverage for `(selectedSectionId, pageUrl, htmlId)` and **immediately** refreshes highlights and export output.
 2. **Single editor surface, one row per html-id** — The dialog uses one multi-line text-editor-like control; each `idsOnPage` entry is one CSV row with a checkbox aligned in a gutter beside that row.
+   - Show nested structure with 2-space indentation per nesting level in the editor view only (do not persist indentation to CSV output).
 3. **Tri-state checkbox per row** — Covered -> explicit not-covered -> implicit not-covered (grey/italic row and greyed checkbox). Implicit rows are omitted from exported CSV text.
 4. **Bulk row actions** — The editor provides set-all covered / explicit not-covered / implicit not-covered plus conversions between explicit/implicit not-covered states.
 5. **Undo/redo** — The editor keeps per-section history and supports undo/redo via UI buttons and keyboard shortcuts (`Ctrl+Z` / `Ctrl+Y`, with macOS `Cmd+Z` / `Cmd+Shift+Z`).
@@ -140,6 +141,7 @@ When professor mode is active and **N ≥ 1** class sections are selected:
   - mixed descendant states use a custom draggable choice dialog with explicit action labels (not browser-native confirm dialogs)
   - `Esc` in that choice dialog cancels and applies no checkbox changes
 - Inline actions support undo/redo hotkeys while professor mode is active (`Ctrl+Z` / `Ctrl+Y`, and macOS equivalents).
+- Modal editor checkbox behavior follows the same nested prompt/cascade rules as inline checkboxes.
 
 ### Export semantics with tri-state rows
 
