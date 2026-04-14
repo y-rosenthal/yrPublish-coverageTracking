@@ -2,7 +2,7 @@ project:
   type: book
   resources:
     - assets/coverage-tracking/coverage-config.json
-    - assets/coverage-tracking/coverage-data.json
+    - assets/coverage-tracking/coverage-data/
 
 book:
   title: "Coverage Tracker Demo Book"

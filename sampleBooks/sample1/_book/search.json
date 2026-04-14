@@ -14,7 +14,7 @@
     "href": "index.html#sec-how-to-use",
     "title": "Coverage Tracker Demo Book",
     "section": "1.1 How to use this sample",
-    "text": "1.1 How to use this sample\nUse the dropdown to pick a section as a student. Add ?prof=true to the URL to enable professor mode and select multiple sections.",
+    "text": "1.1 How to use this sample\nUse the dropdown to pick a section as a student. Add ?prof (or ?prof=true) to the URL to enable professor mode and select sections with checkboxes.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
     ]

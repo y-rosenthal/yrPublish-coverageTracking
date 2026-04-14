@@ -1,0 +1,178 @@
+# Guide for Content Editors and Teachers
+
+## Who this guide is for
+
+This guide is for people who maintain Quarto books and track class coverage.
+
+Students do not need special documentation to consume the book.
+
+## What this system does
+
+- Students pick a class section and see covered content highlighted.
+- Professors can compare multiple sections in `?prof` mode.
+- Coverage data is maintained in section-specific CSV files.
+- Professors can generate updated CSV content from the website UI.
+
+## Required directory structure
+
+In your Quarto book project, include:
+
+```text
+assets/coverage-tracking/
+  coverage-config.json
+  coverage-data/
+    <SECTION-ID>.csv
+  coverage-tracker.js
+  coverage-tracker.css
+  coverage-tracker.html
+```
+
+Optional helper scripts:
+
+```text
+tools/
+  yrAddSectionsIds.sh
+  yrUpdateCoverage.sh
+```
+
+## File formats
+
+### `coverage-config.json` (JSON, required)
+
+Defines available sections and styling.
+
+```json
+{
+  "sections": [
+    {
+      "id": "MATH101-01",
+      "label": "MATH101 Section 01",
+      "color": "#2e7d32",
+      "coverageCsv": "assets/coverage-tracking/coverage-data/MATH101-01.csv"
+    }
+  ]
+}
+```
+
+### `coverage-data/<SECTION-ID>.csv` (CSV, required per section)
+
+Each class section has its own coverage file.
+
+Accepted row formats:
+
+- `URL,html-id,covered`
+- `URL,html-id,not-covered`
+- `URL,html-id`
+- `URL,html-id,`
+
+Default semantics:
+
+- Missing row => not covered
+- Blank/missing third column => covered
+
+Example:
+
+```csv
+URL,html-id,covered
+/chapter1.html,sec-limits-review,covered
+/chapter1.html,sec-continuity-basics,not-covered
+/chapter1.html,sec-derivatives-preview,
+```
+
+## Quarto integration steps
+
+In your book `_quarto.yml`:
+
+1. Include coverage config and CSV directory as project resources.
+2. Include coverage CSS.
+3. Include the tracker script HTML include.
+
+Example:
+
+```yaml
+project:
+  type: book
+  resources:
+    - assets/coverage-tracking/coverage-config.json
+    - assets/coverage-tracking/coverage-data/
+
+format:
+  html:
+    css:
+      - assets/coverage-tracking/coverage-tracker.css
+    include-after-body:
+      - assets/coverage-tracking/coverage-tracker.html
+```
+
+## Authoring content safely
+
+Coverage is based on HTML IDs, so section headings should have explicit IDs:
+
+```qmd
+## Limits Review {#sec-limits-review}
+```
+
+This makes coverage stable and portable across edits.
+
+## Helper tools
+
+### `yrAddSectionsIds.sh`
+
+Purpose:
+
+- add missing heading IDs in a `.qmd` file
+- skip fenced code blocks
+
+Usage:
+
+```bash
+./tools/yrAddSectionsIds.sh input.qmd [output.qmd]
+```
+
+### `yrUpdateCoverage.sh`
+
+Purpose:
+
+- read one section CSV plus one or more `.qmd` files
+- add missing `(URL,html-id)` rows to a new output CSV
+- missing rows are added as `not-covered`
+
+Usage:
+
+```bash
+./tools/yrUpdateCoverage.sh --coverage assets/coverage-tracking/coverage-data/MATH101-01.csv chapter1.qmd chapter2.qmd
+```
+
+## Professor workflow in UI
+
+### Compare mode
+
+1. Open book with `?prof` or `?prof=true`.
+2. Use sidebar entry to open section chooser.
+3. Select zero or more sections with checkboxes.
+4. Apply and review highlighted overlap.
+
+### Edit page coverage CSV
+
+1. In professor mode, click `Edit page coverage CSV` in sidebar.
+2. Choose the class section to edit.
+3. Use:
+   - `Select all on page`
+   - `Clear all on page`
+   - individual checkbox toggles per section ID
+4. Click `Build CSV`.
+5. Copy or download output and save/update the section CSV offline.
+
+## Notes on defaults and new content
+
+- If a new heading is added but not listed in CSV, it is interpreted as not covered.
+- This default is useful during course progression because coverage accumulates over time.
+
+## Moving this feature into another repository
+
+To copy this feature into a larger Quarto feature collection:
+
+1. Copy `assets/coverage-tracking/`.
+2. Copy `tools/` scripts if desired.
+3. Update target book `_quarto.yml`.
+4. Render and test student + professor modes.

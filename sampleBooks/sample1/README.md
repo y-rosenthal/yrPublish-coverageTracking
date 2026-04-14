@@ -2,6 +2,8 @@
 
 This sample book demonstrates section-level coverage tracking in a portable Quarto setup.
 
+Coverage data is stored as one CSV file per class section under `assets/coverage-tracking/coverage-data/`.
+
 ## Render
 
 From repo root:
@@ -33,9 +35,30 @@ Output is written to `sampleBooks/sample1/_book/`.
   - If no sections are selected, confirm one left-sidebar entry is shown as `Choose section(s)`
   - Click any professor sidebar entry and confirm the chooser popup opens again
   - Press `Esc` in the chooser and confirm it closes without applying changes
+  - Click `Edit page coverage CSV`, then test:
+    - Select all on page
+    - Clear all on page
+    - Individual toggles
+    - Build CSV, copy, and download
   - Confirm sections covered by all selected sections differ from partially covered sections
   - Confirm small colored badges indicate which section(s) covered each item
 
 ## Update coverage
 
-Edit `assets/coverage-tracking/coverage-data.json` and render again to publish updated highlights.
+Edit the relevant file in `assets/coverage-tracking/coverage-data/<SECTION-ID>.csv` and render again.
+
+CSV supports rows like:
+
+- `URL,html-id,covered`
+- `URL,html-id,not-covered`
+- `URL,html-id` (defaults to covered)
+- `URL,html-id,` (defaults to covered)
+
+Missing rows default to not covered.
+
+## Helper tools
+
+- Add missing heading IDs in one file:
+  - `./tools/yrAddSectionsIds.sh sampleBooks/sample1/chapter1.qmd`
+- Update one section CSV from one or more `.qmd` files:
+  - `./tools/yrUpdateCoverage.sh --coverage sampleBooks/sample1/assets/coverage-tracking/coverage-data/MATH101-01.csv sampleBooks/sample1/index.qmd sampleBooks/sample1/chapter1.qmd`

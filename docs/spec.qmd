@@ -2,222 +2,154 @@
 
 ## Goal
 
-Add a portable coverage-tracking feature to Quarto books so students can quickly see what has already been covered in class, while allowing the professor to compare coverage across multiple sections of the same course.
+Provide a portable coverage-tracking add-on for Quarto books so students can see what has been covered and professors can compare sections, edit coverage, and maintain data in human-friendly files.
 
-The solution should remain easy to copy into other Quarto books and should work with GitHub Pages hosting (static-first approach).
+The implementation is static-site friendly (GitHub Pages compatible) and easy to move into a larger `yrPublish` feature collection.
 
 ## Scope
 
-### In scope (initial release)
+### In scope
 
-- Track coverage at the section-header level using explicit section IDs (for example, `## Topic {#sec-topic}`).
-- Persist per-section coverage data in version-controlled files (no hosted database required).
-- Render student-facing highlighting for "covered" material based on selected class section.
-- Require section selection before content is fully readable.
-- Support professor mode for viewing one or multiple sections at once.
-- Provide a minimal workflow for offline coverage updates and republishing.
+- Section-level coverage keyed by page URL + HTML section ID.
+- Student and professor modes in one JavaScript/CSS add-on.
+- CSV-based coverage data (one file per class section).
+- Professor UI tools for selecting coverage and exporting CSV text.
+- Helper scripts for adding missing heading IDs and updating coverage CSVs.
 
-### Out of scope (initial release)
+### Out of scope
 
-- Real-time writes from the hosted website back to server-side storage.
-- Authentication/authorization infrastructure.
-- Hosted databases and backend APIs.
-- Fine-grained analytics beyond covered/not covered at section level.
-
-## Assumptions and constraints
-
-- Books are published as static HTML (for example, GitHub Pages).
-- Client-side JavaScript can read static JSON files but cannot safely write back to hosted files.
-- Coverage updates can be performed offline by the professor and then committed/published.
-- Reliable section tracking requires stable section IDs in source `.qmd` files.
+- Auth and server-side write APIs.
+- Hosted database dependency.
+- Real-time writes from browser directly into repository files.
 
 ## Functional requirements
 
 ### FR-1: Coverage identity
 
 - Coverage is keyed by:
-  - Book page path (or canonical URL path),
-  - Section ID,
-  - Course section code (for example, `MATH101-01`).
+  - URL (for example `/chapter1.html`)
+  - HTML ID (for example `sec-limits-review`)
+  - Class section ID (for example `MATH101-01`)
 
-### FR-2: Student section selection
+### FR-2: Student section picker
 
-- On first visit, the reader must choose exactly one class section from a configured list.
-- Until selected, page content is visually blurred with a clear selector UI.
-- Selected student section is stored for the current browser tab/session (for example, `sessionStorage`).
-- This requirement applies to all entry points, including deep links to chapter pages or anchors in the middle of the book.
-- Opening the same URL in a new tab should require section selection again unless a section was selected in that same tab session.
+- On first visit, students must choose exactly one class section.
+- Content is blurred until selection is made.
+- Student selection is stored per browser tab/session (`sessionStorage`).
+- Deep links must still trigger picker gating when no section is selected.
 
 ### FR-3: Student highlighting
 
-- After selection, sections covered for that class section are visually highlighted (default: light green background).
-- Sections without coverage remain unstyled.
+- Covered items are highlighted.
+- Missing coverage entry defaults to not covered.
+- Sidebar control shows selected section name and lets student reset/re-pick.
 
-### FR-4: Professor mode
+### FR-4: Professor mode and navigation
 
-- Professor mode is enabled by URL parameter `?prof` or `?prof=true`.
-- In professor mode, user can select zero or more class sections.
-- Professor selection UI uses explicit checkboxes (not keyboard-dependent multi-select controls).
-- Chosen professor sections are shown at the top of the left sidebar as clickable, color-coded entries.
-- Clicking any professor sidebar entry re-opens the section chooser.
-- If no sections are selected, show one sidebar entry labeled `Choose section(s)`.
-- While in professor mode, internal navigation links preserve the professor query parameter across pages.
-- The professor chooser should not auto-open on page navigation; it opens only when the professor clicks a sidebar control entry.
-- Pressing `Esc` in the professor chooser dismisses the chooser without applying changes.
-- Visuals differentiate:
-  - Covered by all selected sections,
-  - Covered by some selected sections,
-  - Covered by individual section(s) only.
+- Professor mode activates with `?prof` or `?prof=true`.
+- Professor chooser supports selecting zero or more sections using checkboxes.
+- Chooser is not auto-opened on navigation; opens when professor clicks sidebar controls.
+- `Esc` dismisses chooser without applying changes.
+- Internal links preserve `prof` query parameter.
 
-### FR-5: Offline update workflow
+### FR-5: Professor sidebar controls
 
-- Coverage data can be edited offline in a source file and republished with the book.
-- Data format should remain human-readable and merge-friendly.
+- Sidebar top shows selected professor sections as color-coded entries.
+- Clicking any selected section entry re-opens chooser.
+- If none selected, show `Choose section(s)` entry.
+- Include `Edit page coverage CSV` entry to open CSV editor.
 
-### FR-6: Reset and re-pick section
+### FR-6: Coverage data file format
 
-- The user must have a clear way to re-display the section picker after a section has already been saved.
-- At minimum, support a URL-triggered reset flow (for example, `?resetSection=true`) that clears saved student selection and re-opens the picker.
-- Prefer also providing an in-page control (for example, "Change section") to clear and re-pick without editing local storage manually.
-- Once a student section is selected, the in-page control label should display the selected section name while retaining its reset/re-pick behavior.
+- `coverage-config.json` remains JSON and defines sections and colors.
+- Coverage data is stored as one CSV file per class section.
+- CSV row formats:
+  - `URL,html-id,covered`
+  - `URL,html-id,not-covered`
+  - `URL,html-id` (defaults to covered)
+  - `URL,html-id,` (defaults to covered)
+- If `(URL,html-id)` is missing from a section CSV, default is not covered.
 
-## Proposed architecture
+### FR-7: Professor CSV editing UI
 
-### 1) Authoring conventions in Quarto content
+- Professor can open page-level coverage editor in the UI.
+- Editor supports:
+  - select all page IDs as covered
+  - clear all page IDs as not covered
+  - individually toggle each page ID
+  - generate CSV output
+  - copy CSV text
+  - download CSV file
+- Workflow remains static-first: professor can copy/download and save offline.
 
-- Enforce section IDs for trackable headers:
-  - Example: `## Limits Review {#sec-limits-review}`
-- Provide a lightweight rule/checklist for new content to include stable IDs.
+### FR-8: Helper scripts
 
-### 2) Static configuration and data files
+- `tools/yrAddSectionsIds.sh`
+  - input: one `.qmd` file
+  - output: new `.qmd` with missing heading IDs inserted
+  - skips fenced code blocks so `#` inside code is ignored
+- `tools/yrUpdateCoverage.sh`
+  - input: section coverage CSV + one or more `.qmd` files
+  - output: new `.csv` with missing `(URL,html-id)` rows added
+  - adds missing rows as `not-covered`
 
-- `coverage-config.json`:
-  - Available class sections,
-  - Color mapping,
-  - Optional labels and defaults.
-- `coverage-data.json`:
-  - Coverage records by class section and page/section ID.
-- Both files are shipped with the static site and loaded client-side.
+## Proposed file structure
 
-### 3) Frontend addon (portable JS/CSS)
-
-- `coverage-tracker.js`:
-  - Detect page path,
-  - Read URL parameters,
-  - Load config/data JSON,
-  - Render selection UI,
-  - Apply section highlighting,
-  - Persist chosen section(s).
-- `coverage-tracker.css`:
-  - Blur overlay before selection,
-  - Student highlight styles,
-  - Professor multi-state styles.
-
-### 4) Quarto integration
-
-- Include addon assets in each book through Quarto configuration and/or partial includes.
-- Keep install instructions short so files can be copied into other books.
-
-## Sample demo Quarto book
-
-Create a working sample book that demonstrates the coverage-tracking behavior end-to-end.
-
-### Required location
-
-- The sample book will be created at `sampleBooks/sample1/`.
-
-### Purpose
-
-- Provide a safe sandbox for testing before copying into course production books.
-- Serve as a reference implementation for folder structure, config, and setup.
-- Make regressions easy to catch while iterating on JavaScript/CSS behavior.
-
-### Planned contents of `sampleBooks/sample1/`
-
-- Quarto book scaffold (`_quarto.yml`, `index.qmd`, and at least one chapter page).
-- Headers with explicit section IDs to test coverage mapping.
-- Feature assets grouped in `assets/coverage-tracking/` for portability into a larger `yrPublish` repository.
-- Coverage addon assets (`coverage-tracker.js`, `coverage-tracker.css`) in that subfolder.
-- Static data files (`coverage-config.json`, `coverage-data.json`) in that subfolder with at least two course sections.
-- A short README with render/test instructions for student mode and professor mode.
-
-### Demo acceptance criteria
-
-- Rendering the sample produces HTML with the addon enabled.
-- Student mode enforces single-section selection and highlights covered sections.
-- Professor mode (`?prof` or `?prof=true`) supports checkbox-based multi-select, overlap visualization, and non-auto-opening chooser behavior.
-- Coverage JSON can be edited locally, re-rendered, and reflected in the output.
-- Deep links (including chapter URLs and anchors) still enforce picker gating when student selection is not set.
-- Sample includes a reset flow that re-displays the section picker after a previous selection.
-
-## Data model (initial)
-
-```json
-{
-  "version": 1,
-  "sections": ["MATH101-01", "MATH101-02"],
-  "coverage": {
-    "MATH101-01": {
-      "/chapter-1.html": ["sec-limits-review", "sec-continuity-basics"]
-    },
-    "MATH101-02": {
-      "/chapter-1.html": ["sec-limits-review"]
-    }
-  }
-}
+```text
+assets/coverage-tracking/
+  coverage-config.json
+  coverage-data/
+    <SECTION-ID>.csv
+  coverage-tracker.js
+  coverage-tracker.css
+  coverage-tracker.html
+tools/
+  yrAddSectionsIds.sh
+  yrUpdateCoverage.sh
 ```
 
-## UX behavior
+## CSV semantics
 
-### Student mode (default)
+Example section file:
 
-1. Page loads.
-2. If no section in storage, blur content and show section dropdown.
-3. On selection, unblur content and highlight covered sections.
-4. Persist selection for the current tab session.
-5. If user opens a deep link without a saved selection, apply the same blur + picker gating before content is readable.
-6. If user requests reset (for example, via control or reset query parameter), clear stored selection and show picker again.
+```csv
+URL,html-id,covered
+/index.html,sec-how-to-use,covered
+/index.html,sec-reading-plan,not-covered
+/chapter1.html,sec-limits-review,
+```
 
-### Professor mode (`?prof` or `?prof=true`)
+Interpretation:
 
-1. Page loads in professor controls mode.
-2. Show checkbox list for sections (allow zero or more selected).
-3. Apply visual encoding for overlap/all/some coverage.
-4. Allow quick toggle/reset of selected sections.
+- Third column `covered` => covered
+- Third column `not-covered` => not covered
+- Missing/blank third column => covered
+- Missing row entirely => not covered
 
-## Phased implementation plan
+## Sample demo book
 
-### Phase 1: MVP data + student highlighting
+The sample implementation is in `sampleBooks/sample1/` and demonstrates:
 
-- Define JSON schema and sample data.
-- Implement page + section matching logic.
-- Implement single-section selector and local persistence.
-- Implement default student highlight style.
-
-### Phase 2: Professor comparison mode
-
-- Add URL parameter handling.
-- Add multi-select UI.
-- Add overlap color logic and legend.
-
-### Phase 3: Portability and docs
-
-- Package assets for easy copy/paste into other books.
-- Add setup instructions and conventions for section IDs.
-- Add maintenance guidance for updating coverage data.
+- student picker and highlighting
+- professor compare mode
+- professor sidebar controls
+- professor CSV editor/export workflow
+- CSV-per-section coverage loading
 
 ## Risks and mitigations
 
-- Missing/unstable section IDs:
-  - Mitigation: require explicit IDs and document conventions.
-- URL/path mismatches after book structure changes:
-  - Mitigation: normalize paths and document republish checks.
-- Style conflicts with existing book themes:
-  - Mitigation: namespace CSS classes and keep selectors specific.
+- Missing stable section IDs:
+  - mitigate with `yrAddSectionsIds.sh` and explicit `{#id}` authoring practice.
+- Inconsistent URLs between source and rendered pages:
+  - mitigate with conventions in tooling and editor guide.
+- Theme collisions:
+  - mitigate with namespaced `.ct-*` CSS selectors.
 
-## Definition of done (initial implementation)
+## Definition of done
 
-- A Quarto book can load static coverage JSON and highlight covered sections for a selected class section.
-- Section selection is required on first visit and persisted for the current browser tab/session.
-- Professor mode can compare multiple sections with distinct visual states.
-- Feature files are documented and easy to copy into another Quarto book.
+- Coverage runtime reads `coverage-config.json` + per-section CSV files.
+- Student mode enforces picker gating and tab-scoped persistence.
+- Professor mode supports comparison, navigation persistence, sidebar controls, and chooser dismiss-on-`Esc`.
+- Professor can generate/export CSV coverage from UI.
+- Tools scripts exist and are documented.
+- Docs include setup and operations guide for editors/professors.

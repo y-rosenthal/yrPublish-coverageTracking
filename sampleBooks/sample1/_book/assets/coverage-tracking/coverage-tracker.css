@@ -80,6 +80,12 @@ body.ct-needs-selection #quarto-content {
   cursor: pointer;
 }
 
+.ct-btn-secondary {
+  background: #eef2f7;
+  color: #1d2939;
+  border: 1px solid #c5d0dd;
+}
+
 .ct-panel button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -130,4 +136,36 @@ body.ct-needs-selection #quarto-content {
   border-radius: 0.28rem;
   padding: 0.06rem 0.3rem;
   font-weight: 700;
+}
+
+.ct-editor-panel {
+  max-width: 48rem;
+}
+
+.ct-editor-checklist {
+  max-height: 18rem;
+  margin-top: 0.5rem;
+}
+
+.ct-editor-toolbar {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.55rem 0;
+}
+
+.ct-editor-toolbar button {
+  margin-top: 0;
+}
+
+.ct-editor-output {
+  width: 100%;
+  border: 1px solid #bcc5cf;
+  border-radius: 0.4rem;
+  padding: 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.ct-small-note {
+  font-size: 0.86rem;
+  color: #475467;
 }

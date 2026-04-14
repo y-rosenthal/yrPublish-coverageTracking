@@ -1,4 +1,5 @@
-I would like the coverage-data to be more readable and maintainable by humans. Therefore, don't use JSON. Also use a different file for each section. These should be CSV files that contain lines such as:
+I would like the coverage-data to be more readable and maintainable by humans. Therefore, don't use JSON for the coverage-data file.
+Also use a different file coverage-data file for each class section. These should be CSV files that contain lines such as:
 
 URL,html-id,covered
 
@@ -6,7 +7,8 @@ or
 
 URL,html-id,not-covered
 
-If there is no entry for a particular URL,html-id, the default logic is that it was not covered. However, if a line in the csv appears as:
+If there is no entry for a particular URL,html-id in one of these csv files then the default logic is that it was not covered.
+However, if a line in the csv appears as:
 
 URL,html-id
 
@@ -14,17 +16,36 @@ or
 
 URL,html-id,
 
-then the default should be tha it WAS covered. This allows for these files to be either easier to read by listing all sections or smaller by not-listing some sections taht were not covered. If a new section is added to the text without updating the coverage the coverage will symantically indicate that it wasn't covered yet.
+then the default should be tha it WAS covered.
+This allows for these coverage-data csv files to be easier to read and edit by a professor by listing all content sections in the book.
+Alternatively, for bigger books it might be nicer to have a smaller file by not-listing some content sections that were not covered yet.
 
-Continue to use the JSON for the coverage-config.json file.
+If a new section is added to the text without updating the coverage the coverage will symantically indicate that it wasn't covered yet.
 
-Also please create a USER-GUIDE.qmd file (in Quarto markdown) and add it to the docs book that explains to a professor how to use this system. I don't think a student needs any documentation to read the website - it's easy to understand how to pick their section.
+Please, continue to use the JSON for the coverage-config.json file.
+
+## tools
 
 Also I would like some tools for professors and content editors.
 
 1. A bash script named yrAddSectionsIds.sh, that takes a .qmd file as input and outputs a new version of the .qmd that adds html-ids to any section that didn't already have one. Make sure to skip quarto code blocks so that # signs in the code block aren't mistaken for Quarto headings.
 
-2. A bash script named yrUpdateCoverage.sh that takes one or more .qmd files as input as well as a coverage.csv file (as described) for a section. The script should be assumed to be run from inside a Quarto project that uses this system. The script should output a new .csv file that adds any missing html-ids for the .qmd files.
+2. A bash script named yrUpdateCoverage.sh that takes one or more .qmd files as input as well as a coverage-data csv file (as described) for a section. The script should be assumed to be run from inside a Quarto project that uses this system for the resolution of URLs. The script should output a new .csv file that adds any missing html-ids for the .qmd files.
 
-3. Design a way for a professor to use the website's UI to create and edit these .csv files.
+3. Design a way for a professor to use the website's UI to create and edit these .csv files. There should be a way to
+a) select all html-ids on the page as having been covered
+b) de-select all html-ids on the page
+c) individually select or de-select specific html-ids on the page
+d) write the selection data out to a csv file. If that is not possible then give the professor a way to display the contents of the coverage-data csv to a popup or similar so that the professor can copy/paste the info
+into a csv and save/update it while offline.
+
+## GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd
+
+Please create a GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd file (in Quarto markdown) and add it to the docs book that explains to book editors and professors how to use this system. I don't think a student needs any documentation to read the website - it's easy to understand how to pick their section.
+
+Make sure to include sections that describe all file formats, directory structures, how to add this system to an existing Quarto book.
+
+## Update docs
+
+Please make sure to update all docs.
 
