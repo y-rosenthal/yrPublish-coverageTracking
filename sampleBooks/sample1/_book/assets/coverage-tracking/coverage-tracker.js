@@ -589,6 +589,7 @@
     });
 
     var allRows = getPageSectionRows();
+    var sectionColors = sectionColorMap(config);
     var editor = createElement("div", { class: "ct-editor-codewrap" });
     var gutter = createElement("div", { class: "ct-editor-gutter", "aria-hidden": "true" });
     var gutterInner = createElement("div", { class: "ct-editor-gutter-inner" });
@@ -951,6 +952,7 @@
       rows = [];
       rowsById = {};
       var selectedSectionId = sectionSelect.value;
+      var selectedSectionColor = sectionColors[selectedSectionId] || "#2f6feb";
       var pageCoverage = coverageStateForCurrentPage(selectedSectionId, coverageState);
       var pageRaw = coverageRawStateForCurrentPage(selectedSectionId, coverageState);
 
@@ -962,6 +964,7 @@
           class: "ct-editor-gutter-checkbox",
           "data-html-id": row.id
         });
+        checkbox.style.accentColor = selectedSectionColor;
 
         var rowModel = {
           id: row.id,
