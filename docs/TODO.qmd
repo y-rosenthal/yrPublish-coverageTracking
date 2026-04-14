@@ -1,0 +1,34 @@
+# TODO
+
+## Left menu icon semantics in student/professor views
+
+- Problem: the red `x` icon can be misleading for students because it may look like a section will never be covered, while the intended meaning is "not covered yet."
+- Candidate update:
+  - replace red `x` with a neutral "not yet covered" state (for example a greyed-out check outline or grey dash-in-circle)
+  - keep a clear "covered" icon (green check)
+  - revisit the partial/yellow icon to ensure its meaning is obvious in both student and professor modes
+- Action: ask the LLM for advice on icon shape/color combinations that communicate:
+  - covered
+  - partially covered
+  - not yet covered
+  while minimizing student confusion and maintaining accessibility/contrast.
+
+## Show left-menu coverage icons in student mode
+
+- Problem: left-menu coverage icons are currently shown only in professor mode.
+- Required fix:
+  - display left-menu coverage icons in student mode as well
+  - ensure icon logic reflects the currently selected student section (single section) and remains consistent with professor-mode multi-section semantics.
+
+## One-click whole-page toggle for chapter pages
+
+- Observation:
+  - `welcome` page supports a top-level checkbox flow that effectively lets us toggle the whole page
+  - `chapter1` and `chapter2` do not behave the same way
+  - suspected cause: difference in top-level/nested `html-id` structure (for example, where the chapter title id sits relative to section ids)
+- Investigation tasks:
+  - compare rendered DOM id structure between `index`, `chapter1`, and `chapter2`
+  - confirm how the tracker currently computes descendants and cascade decisions for top-level ids
+  - identify why chapter pages do not expose a reliable single "whole-page" parent toggle
+- Goal:
+  - design and implement a consistent "whole page" checkbox behavior for chapter pages, matching `welcome`, so one click can select/unselect all tracked ids on the page.

@@ -6,6 +6,7 @@ book:
   subtitle: "Project Documentation"
   chapters:
     - index.qmd
+    - TODO.qmd
     - spec.qmd
     - SPEC-0.0.2-v001.qmd
     - GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd

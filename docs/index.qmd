@@ -9,3 +9,4 @@ Use the chapters in this book to track implementation decisions, scope, and prog
 - `spec.qmd`: functional and technical specification for the first implementation.
 - `SPEC-0.0.2-v001.qmd`: versioned spec (0.0.2, pseudo-v001) for professor CSV editor, inline toggles, and export modes.
 - `GUIDE-FOR-CONTENT-EDITORS-AND-TEACHERS.qmd`: setup and operations guide for instructors and editors.
+- `TODO.qmd`: prioritized open issues and follow-up implementation tasks.
